@@ -109,4 +109,23 @@ class Validators {
     }
     return null;
   }
+
+  /// Validates a phone number (Kenya format).
+  static String? validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Phone number is required';
+    }
+
+    // Remove spaces and dashes
+    final cleaned = value.replaceAll(RegExp(r'[\s\-]'), '');
+
+    // Kenya phone format: +254XXXXXXXXX or 07XXXXXXXX or 01XXXXXXXX
+    final phoneRegex = RegExp(r'^(\+254|0)[17]\d{8}$');
+
+    if (!phoneRegex.hasMatch(cleaned)) {
+      return 'Please enter a valid phone number';
+    }
+
+    return null;
+  }
 }

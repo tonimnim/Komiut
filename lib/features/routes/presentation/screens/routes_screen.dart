@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../passenger/discovery/presentation/providers/sacco_providers.dart';
 import '../../domain/entities/route_entity.dart';
 import '../providers/route_providers.dart';
+import '../widgets/nearby_routes_section.dart';
+import '../widgets/popular_routes_section.dart';
+import '../widgets/route_filter_bar.dart';
 import 'booking_screen.dart';
 
 class RoutesScreen extends ConsumerWidget {
@@ -12,73 +16,61 @@ class RoutesScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final routesAsync = ref.watch(filteredRoutesProvider);
-    final searchQuery = ref.watch(routeSearchQueryProvider);
+    // Use advancedFilteredRoutesProvider for enhanced filtering
+    final routesAsync = ref.watch(advancedFilteredRoutesProvider);
+    final filterState = ref.watch(routeFilterStateProvider);
+    final saccosAsync = ref.watch(saccosProvider);
+
+    // Determine if we should show popular routes section
+    // Only show when no filters are active
+    final showPopularSection = !filterState.hasActiveFilters;
+
+    // Build sacco options for filter bar
+    final saccoOptions = saccosAsync.whenOrNull(
+      data: (saccos) => saccos
+          .map((s) => {'id': s.id, 'name': s.name})
+          .toList(),
+    );
 
     return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
 
-          // Search bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: TextField(
-              onChanged: (value) {
-                ref.read(routeSearchQueryProvider.notifier).state = value;
-              },
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 15,
-              ),
-              decoration: InputDecoration(
-                hintText: 'Search routes...',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey[500] : AppColors.textHint,
-                  fontSize: 15,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: isDark ? Colors.grey[500] : AppColors.textHint,
-                  size: 22,
-                ),
-                filled: true,
-                fillColor: isDark ? Colors.grey[900] : Colors.grey[50],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: isDark ? Colors.grey[700]! : Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(
-                    color: AppColors.primaryBlue,
-                    width: 1.5,
-                  ),
-                ),
-              ),
-            ),
+          // Filter bar with search and sacco filter
+          RouteFilterBar(
+            showSaccoFilter: saccoOptions != null && saccoOptions.isNotEmpty,
+            saccoOptions: saccoOptions,
+            placeholder: 'Search routes, destinations...',
           ),
           const SizedBox(height: 20),
+
+          // Popular Routes section (only when no filters active)
+          if (showPopularSection) ...[
+            PopularRoutesSection(
+              onRouteTap: (route) => _openBooking(context, ref, route),
+              onSeeAllTap: () {
+                // Could navigate to a dedicated popular routes page
+                // For now, just clear filters to show all routes
+              },
+            ),
+            const SizedBox(height: 20),
+
+            // Nearby Routes section
+            NearbyRoutesSection(
+              onRouteTap: (route) => _openBooking(context, ref, route),
+              onSeeAllTap: () {
+                // Navigate to nearby routes
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
 
           // Section title
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              searchQuery.isEmpty ? 'Popular Routes' : 'Search Results',
+              _getSectionTitle(filterState),
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -93,7 +85,7 @@ class RoutesScreen extends ConsumerWidget {
             child: routesAsync.when(
               data: (routes) {
                 if (routes.isEmpty) {
-                  return _buildEmptyState(context, searchQuery);
+                  return _buildEmptyState(context, filterState);
                 }
                 return ListView.builder(
                   physics: const BouncingScrollPhysics(
@@ -143,7 +135,23 @@ class RoutesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, String query) {
+  /// Returns the appropriate section title based on filter state.
+  String _getSectionTitle(RouteFilterState filterState) {
+    if (filterState.saccoId != null) {
+      return 'Routes by Sacco';
+    }
+    if (filterState.destinationFilter != null &&
+        filterState.destinationFilter!.isNotEmpty) {
+      return 'Routes to ${filterState.destinationFilter}';
+    }
+    if (filterState.searchQuery != null &&
+        filterState.searchQuery!.isNotEmpty) {
+      return 'Search Results';
+    }
+    return 'All Routes';
+  }
+
+  Widget _buildEmptyState(BuildContext context, RouteFilterState filterState) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -165,10 +173,10 @@ class RoutesScreen extends ConsumerWidget {
               color: isDark ? Colors.grey[400] : AppColors.textSecondary,
             ),
           ),
-          if (query.isNotEmpty) ...[
+          if (filterState.hasActiveFilters) ...[
             const SizedBox(height: 8),
             Text(
-              'Try a different search',
+              'Try adjusting your filters',
               style: TextStyle(
                 fontSize: 14,
                 color: isDark ? Colors.grey[600] : AppColors.textHint,
@@ -217,7 +225,7 @@ class _RouteTile extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: 14),
             child: Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.directions_bus,
                   color: AppColors.primaryBlue,
                   size: 26,
@@ -239,7 +247,7 @@ class _RouteTile extends ConsumerWidget {
                           ),
                           if (route.isFavorite) ...[
                             const SizedBox(width: 6),
-                            Icon(
+                            const Icon(
                               Icons.favorite,
                               size: 14,
                               color: AppColors.error,

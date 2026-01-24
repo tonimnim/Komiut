@@ -2,15 +2,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/domain/entities/user.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/custom_text_field.dart';
-import '../../../auth/domain/entities/user_entity.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_controller.dart';
 import '../providers/profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
-  final UserEntity user;
+  final User user;
 
   const EditProfileScreen({
     super.key,
@@ -32,7 +32,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(text: widget.user.fullName);
+    _fullNameController = TextEditingController(text: widget.user.fullName ?? '');
     _phoneController = TextEditingController(text: widget.user.phone ?? '');
     _currentImagePath = widget.user.profileImage;
   }
@@ -143,7 +143,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isLoading = false);
 
     if (success) {
-      await ref.read(authStateProvider.notifier).refreshUser();
+      // Refresh user data from auth controller
+      await ref.read(authControllerProvider.notifier).fetchCurrentUser();
       if (!mounted) return;
       Navigator.pop(context, true);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +180,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           decoration: BoxDecoration(
             color: isDark
                 ? Colors.grey[800]
-                : AppColors.primaryBlue.withOpacity(0.1),
+                : AppColors.primaryBlue.withValues(alpha: 0.1),
             shape: BoxShape.circle,
             image: imageProvider != null
                 ? DecorationImage(
@@ -189,7 +190,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 : null,
           ),
           child: imageProvider == null
-              ? Icon(
+              ? const Icon(
                   Icons.person,
                   size: 50,
                   color: AppColors.primaryBlue,

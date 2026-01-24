@@ -10,7 +10,13 @@ abstract class Failure extends Equatable {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure(super.message);
+  const ServerFailure(super.message, {this.statusCode});
+
+  /// HTTP status code if available.
+  final int? statusCode;
+
+  @override
+  List<Object> get props => [message, if (statusCode != null) statusCode!];
 }
 
 class DatabaseFailure extends Failure {
@@ -31,6 +37,24 @@ class ValidationFailure extends Failure {
 
 class NetworkFailure extends Failure {
   const NetworkFailure(super.message);
+}
+
+class ConnectionFailure extends Failure {
+  const ConnectionFailure(super.message);
+}
+
+class RealtimeFailure extends Failure {
+  const RealtimeFailure(super.message);
+}
+
+class PaymentFailure extends Failure {
+  const PaymentFailure(super.message, {this.transactionId});
+
+  /// Transaction/checkout ID if available.
+  final String? transactionId;
+
+  @override
+  List<Object> get props => [message, if (transactionId != null) transactionId!];
 }
 
 class UnknownFailure extends Failure {

@@ -21,7 +21,7 @@ class CustomErrorWidget extends StatelessWidget {
             Icon(
               Icons.error_outline,
               size: 80,
-              color: Theme.of(context).colorScheme.error.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.error.withValues(alpha: 0.7),
             ),
             const SizedBox(height: 24),
             Text(
@@ -36,7 +36,7 @@ class CustomErrorWidget extends StatelessWidget {
                     color: Theme.of(context)
                         .colorScheme
                         .onSurface
-                        .withOpacity(0.6),
+                        .withValues(alpha: 0.6),
                   ),
               textAlign: TextAlign.center,
             ),

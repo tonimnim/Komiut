@@ -13,6 +13,12 @@ class RouteEntity {
   final List<String> stops;
   final bool isFavorite;
 
+  /// The ID of the organization (sacco) that operates this route.
+  final String? organizationId;
+
+  /// Whether this route is marked as popular/featured.
+  final bool isPopular;
+
   const RouteEntity({
     required this.id,
     required this.name,
@@ -25,11 +31,16 @@ class RouteEntity {
     required this.currency,
     required this.stops,
     this.isFavorite = false,
+    this.organizationId,
+    this.isPopular = false,
   });
 
   String get formattedDuration => '~$durationMinutes min';
 
   String get formattedBaseFare => '$currency ${baseFare.toStringAsFixed(0)}';
+
+  /// Alias for formattedBaseFare for backwards compatibility.
+  String get formattedFare => formattedBaseFare;
 
   String get routeSummary => '$startPoint → $endPoint';
 
@@ -55,6 +66,8 @@ class RouteEntity {
     String? currency,
     List<String>? stops,
     bool? isFavorite,
+    String? organizationId,
+    bool? isPopular,
   }) {
     return RouteEntity(
       id: id ?? this.id,
@@ -68,11 +81,18 @@ class RouteEntity {
       currency: currency ?? this.currency,
       stops: stops ?? this.stops,
       isFavorite: isFavorite ?? this.isFavorite,
+      organizationId: organizationId ?? this.organizationId,
+      isPopular: isPopular ?? this.isPopular,
     );
   }
 
   /// Create from database model
-  factory RouteEntity.fromDatabase(dynamic dbRoute, {bool isFavorite = false}) {
+  factory RouteEntity.fromDatabase(
+    dynamic dbRoute, {
+    bool isFavorite = false,
+    String? organizationId,
+    bool isPopular = false,
+  }) {
     List<String> stopsList;
     try {
       stopsList = List<String>.from(jsonDecode(dbRoute.stops as String));
@@ -92,6 +112,8 @@ class RouteEntity {
       currency: dbRoute.currency as String,
       stops: stopsList,
       isFavorite: isFavorite,
+      organizationId: organizationId,
+      isPopular: isPopular,
     );
   }
 }

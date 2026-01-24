@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+
 import 'core/navigation/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
 import 'core/constants/app_constants.dart';
+import 'features/queue/presentation/providers/notification_providers.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   // Keep splash screen visible while app initializes
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -32,6 +34,12 @@ class KomiutApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
     final isDark = themeMode == ThemeMode.dark;
+    final router = ref.watch(appRouterProvider);
+
+    // Initialize notification service with router for navigation
+    setNotificationRouter(router);
+    // Initialize the notification service
+    ref.read(notificationServiceProvider).initialize();
 
     // Set status bar style based on theme
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -46,7 +54,7 @@ class KomiutApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      routerConfig: appRouter,
+      routerConfig: router,
     );
   }
 }

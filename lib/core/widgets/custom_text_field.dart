@@ -16,6 +16,8 @@ class CustomTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final void Function(String)? onChanged;
   final void Function()? onTap;
+  final TextInputAction? textInputAction;
+  final void Function(String)? onFieldSubmitted;
 
   const CustomTextField({
     super.key,
@@ -33,6 +35,8 @@ class CustomTextField extends StatefulWidget {
     this.inputFormatters,
     this.onChanged,
     this.onTap,
+    this.textInputAction,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -75,6 +79,8 @@ class _CustomTextFieldState extends State<CustomTextField> {
           inputFormatters: widget.inputFormatters,
           onChanged: widget.onChanged,
           onTap: widget.onTap,
+          textInputAction: widget.textInputAction,
+          onFieldSubmitted: widget.onFieldSubmitted,
           decoration: InputDecoration(
             hintText: widget.hint,
             prefixIcon: widget.prefixIcon != null

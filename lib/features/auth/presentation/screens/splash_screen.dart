@@ -1,12 +1,18 @@
+/// Splash Screen.
+///
+/// Displays app branding while checking authentication state.
+/// Routes to appropriate screen based on auth and role.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../providers/auth_providers.dart';
-import '../providers/auth_state_notifier.dart';
+import '../providers/auth_controller.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -21,6 +27,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late Animation<double> _fadeAnimation;
   late Animation<double> _scaleAnimation;
   bool _hasNavigated = false;
+  bool _minTimeElapsed = false;
 
   @override
   void initState() {
@@ -50,31 +57,42 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     // Remove native splash once Flutter UI is ready
     FlutterNativeSplash.remove();
 
-    _startNavigation();
+    // Start minimum display timer
+    _startMinTimer();
   }
 
-  Future<void> _startNavigation() async {
-    // Minimum splash display time
+  Future<void> _startMinTimer() async {
     await Future.delayed(Duration(seconds: AppConstants.splashDuration));
-    _navigateIfReady();
+    if (!mounted) return;
+    _minTimeElapsed = true;
+    _tryNavigate();
   }
 
-  void _navigateIfReady() {
-    if (_hasNavigated || !mounted) return;
+  void _tryNavigate() {
+    if (_hasNavigated || !mounted || !_minTimeElapsed) return;
 
-    final authState = ref.read(authStateProvider);
+    final authState = ref.read(authControllerProvider);
 
-    if (!authState.isInitialized) {
-      // Auth not ready yet, wait a bit and try again
-      Future.delayed(const Duration(milliseconds: 50), _navigateIfReady);
+    // Still loading - wait
+    if (authState.isLoading) {
+      Future.delayed(const Duration(milliseconds: 100), _tryNavigate);
+      return;
+    }
+
+    final state = authState.valueOrNull;
+    if (state == null) {
+      // Still initializing
+      Future.delayed(const Duration(milliseconds: 100), _tryNavigate);
       return;
     }
 
     _hasNavigated = true;
 
-    if (authState.user != null) {
-      context.go(RouteConstants.home);
+    if (state is AuthAuthenticated) {
+      // Navigate to role-based home
+      context.go(state.role.homeRoute);
     } else {
+      // Not authenticated - go to login
       context.go(RouteConstants.login);
     }
   }
@@ -87,6 +105,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Listen for auth state changes to navigate when ready
+    ref.listen<AsyncValue<AuthState>>(authControllerProvider, (previous, next) {
+      _tryNavigate();
+    });
+
     return Scaffold(
       backgroundColor: AppColors.primaryBlue,
       body: Container(
@@ -94,10 +117,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primaryBlue,
-              AppColors.primaryGreen,
-            ],
+            colors: [AppColors.primaryBlue, AppColors.primaryGreen],
           ),
         ),
         child: Center(
@@ -113,6 +133,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     'assets/images/labellogo.jpeg',
                     width: 250,
                     fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.directions_bus,
+                      size: 100,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 50),
 
@@ -122,9 +147,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                     height: 32,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.white,
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   ),
                 ],

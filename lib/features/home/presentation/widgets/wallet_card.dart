@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 
 class WalletCard extends StatefulWidget {
@@ -7,6 +9,7 @@ class WalletCard extends StatefulWidget {
   final String currency;
   final bool isLoading;
   final bool hasError;
+  final VoidCallback? onPointsTapped;
 
   const WalletCard({
     super.key,
@@ -15,6 +18,7 @@ class WalletCard extends StatefulWidget {
     required this.currency,
     this.isLoading = false,
     this.hasError = false,
+    this.onPointsTapped,
   });
 
   @override
@@ -128,25 +132,44 @@ class _WalletCardState extends State<WalletCard> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.stars_rounded,
-                      size: 18,
-                      color: Colors.amber.shade300,
+                GestureDetector(
+                  onTap: widget.onPointsTapped ?? () {
+                    context.push(RouteConstants.passengerLoyalty);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      _balanceHidden
-                          ? 'Available Points: ****'
-                          : 'Available Points: ${widget.points}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white.withOpacity(0.9),
-                        fontWeight: FontWeight.w500,
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.stars_rounded,
+                          size: 18,
+                          color: Colors.amber.shade300,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _balanceHidden
+                              ? '**** pts'
+                              : '${widget.points} pts',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

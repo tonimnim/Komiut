@@ -10,6 +10,7 @@ import '../providers/home_providers.dart';
 import '../widgets/wallet_card.dart';
 import '../widgets/quick_actions.dart';
 import '../widgets/recent_trips_section.dart';
+import '../widgets/suggested_saccos_section.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -71,7 +72,7 @@ class HomeContent extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                               image: authState.user?.profileImage != null &&
                                       File(authState.user!.profileImage!).existsSync()
@@ -154,6 +155,8 @@ class HomeContent extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
                 const QuickActions(),
+                const SizedBox(height: 24),
+                const SuggestedSaccosSection(),
                 const SizedBox(height: 24),
               tripsAsync.when(
                 data: (trips) => RecentTripsSection(trips: trips),

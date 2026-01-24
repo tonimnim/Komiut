@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/loading/shimmer_loading.dart';
 import '../../../../core/widgets/main_navigation.dart';
 import '../../../activity/presentation/screens/activity_screen.dart';
 import '../../domain/entities/trip_entity.dart';
@@ -67,17 +68,18 @@ class RecentTripsSection extends ConsumerWidget {
   }
 
   Widget _buildLoadingState(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: const Center(
-        child: CircularProgressIndicator(
-          color: AppColors.primaryBlue,
+    // Use shimmer loading for better UX
+    return Column(
+      children: List.generate(
+        2,
+        (index) => const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: ShimmerListTile(
+            hasLeading: true,
+            hasSubtitle: true,
+            hasTrailing: true,
+            padding: EdgeInsets.all(16),
+          ),
         ),
       ),
     );
@@ -99,7 +101,7 @@ class RecentTripsSection extends ConsumerWidget {
             Icon(
               Icons.error_outline,
               size: 48,
-              color: AppColors.error.withOpacity(0.5),
+              color: AppColors.error.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -130,7 +132,7 @@ class RecentTripsSection extends ConsumerWidget {
             Icon(
               Icons.directions_bus_outlined,
               size: 48,
-              color: isDark ? Colors.grey[600] : AppColors.textSecondary.withOpacity(0.5),
+              color: isDark ? Colors.grey[600] : AppColors.textSecondary.withValues(alpha: 0.5),
             ),
             const SizedBox(height: 12),
             Text(
@@ -155,12 +157,30 @@ class RecentTripsSection extends ConsumerWidget {
   }
 
   Widget _buildTripsList(BuildContext context) {
+    // Use indexed iteration for better performance with keyed widgets
     return Column(
-      children: trips.take(4).map((trip) => _buildTripCard(context, trip)).toList(),
+      children: [
+        for (var i = 0; i < trips.length && i < 4; i++)
+          _RecentTripCard(
+            key: ValueKey(trips[i].id),
+            trip: trips[i],
+          ),
+      ],
     );
   }
+}
 
-  Widget _buildTripCard(BuildContext context, TripEntity trip) {
+/// Extracted trip card widget for better rebuild isolation.
+class _RecentTripCard extends StatelessWidget {
+  const _RecentTripCard({
+    super.key,
+    required this.trip,
+  });
+
+  final TripEntity trip;
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final dateFormat = DateFormat('MMM d, yyyy');
@@ -174,7 +194,7 @@ class RecentTripsSection extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: isDark ? null : [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -182,7 +202,7 @@ class RecentTripsSection extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.directions_bus,
             color: AppColors.primaryBlue,
             size: 26,

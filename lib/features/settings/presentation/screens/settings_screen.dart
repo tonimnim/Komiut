@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/theme_provider.dart';
-import '../../../auth/presentation/providers/auth_providers.dart';
+import '../../../auth/presentation/providers/auth_controller.dart';
+import '../../../queue/presentation/providers/notification_providers.dart';
 import 'edit_profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -24,14 +26,13 @@ class SettingsContent extends ConsumerStatefulWidget {
 }
 
 class _SettingsContentState extends ConsumerState<SettingsContent> {
-  bool _notificationsEnabled = true;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final authState = ref.watch(authStateProvider);
-    final user = authState.user;
+    // Use select to only rebuild when user changes, not on every auth state change
+    final user = ref.watch(currentUserProvider);
+    final notificationSettings = ref.watch(notificationSettingsProvider);
 
     return SafeArea(
       bottom: false,
@@ -72,7 +73,7 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: AppColors.primaryBlue.withOpacity(0.1),
+                          color: AppColors.primaryBlue.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                           image: user?.profileImage != null &&
                                   File(user!.profileImage!).existsSync()
@@ -142,13 +143,27 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                   children: [
                     _buildSwitchTile(
                       context: context,
-                      icon: Icons.notifications_outlined,
-                      title: 'Notifications',
-                      value: _notificationsEnabled,
+                      icon: Icons.queue_outlined,
+                      title: 'Queue Notifications',
+                      subtitle: 'Vehicle position & departure alerts',
+                      value: notificationSettings.queueNotificationsEnabled,
                       onChanged: (value) {
-                        setState(() {
-                          _notificationsEnabled = value;
-                        });
+                        ref
+                            .read(notificationSettingsProvider.notifier)
+                            .setQueueNotificationsEnabled(value);
+                      },
+                    ),
+                    Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
+                    _buildSwitchTile(
+                      context: context,
+                      icon: Icons.directions_bus_outlined,
+                      title: 'Trip Notifications',
+                      subtitle: 'Trip start & destination alerts',
+                      value: notificationSettings.tripNotificationsEnabled,
+                      onChanged: (value) {
+                        ref
+                            .read(notificationSettingsProvider.notifier)
+                            .setTripNotificationsEnabled(value);
                       },
                     ),
                     Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
@@ -160,6 +175,13 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                       onChanged: (value) {
                         ref.read(themeProvider.notifier).toggleTheme();
                       },
+                    ),
+                    Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
+                    _buildTile(
+                      context: context,
+                      icon: Icons.tune,
+                      title: 'More Preferences',
+                      onTap: () => context.push(RouteConstants.settingsPreferences),
                     ),
                   ],
                 ),
@@ -185,14 +207,28 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                       context: context,
                       icon: Icons.help_outline,
                       title: 'Help & Support',
-                      onTap: () {},
+                      onTap: () => context.push(RouteConstants.settingsHelp),
                     ),
                     Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
                     _buildTile(
                       context: context,
                       icon: Icons.info_outline,
                       title: 'About',
-                      onTap: () {},
+                      onTap: () => context.push(RouteConstants.settingsAbout),
+                    ),
+                    Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
+                    _buildTile(
+                      context: context,
+                      icon: Icons.privacy_tip_outlined,
+                      title: 'Privacy Policy',
+                      onTap: () => context.push(RouteConstants.settingsPrivacy),
+                    ),
+                    Divider(height: 1, color: isDark ? Colors.grey[800] : AppColors.divider),
+                    _buildTile(
+                      context: context,
+                      icon: Icons.description_outlined,
+                      title: 'Terms of Service',
+                      onTap: () => context.push(RouteConstants.settingsTerms),
                     ),
                   ],
                 ),
@@ -201,9 +237,11 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
-                  onPressed: () {
-                    ref.read(authStateProvider.notifier).logout();
-                    context.go('/login');
+                  onPressed: () async {
+                    await ref.read(authControllerProvider.notifier).logout();
+                    if (context.mounted) {
+                      context.go(RouteConstants.login);
+                    }
                   },
                   icon: const Icon(Icons.logout, color: AppColors.error),
                   label: const Text(
@@ -239,10 +277,12 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
     required BuildContext context,
     required IconData icon,
     required String title,
+    String? subtitle,
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -251,12 +291,27 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
           Icon(icon, color: AppColors.primaryBlue, size: 22),
           const SizedBox(width: 14),
           Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 15,
-                color: theme.colorScheme.onSurface,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.grey[500] : AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
           Transform.scale(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/main_navigation.dart';
 
@@ -22,11 +24,20 @@ class QuickActions extends ConsumerWidget {
         ),
         _buildActionButton(
           context: context,
+          icon: Icons.directions_bus,
+          label: 'Explore',
+          color: AppColors.secondaryPurple,
+          onTap: () {
+            context.push(RouteConstants.passengerSaccos);
+          },
+        ),
+        _buildActionButton(
+          context: context,
           icon: Icons.card_giftcard,
-          label: 'Redeem',
+          label: 'Points',
           color: AppColors.primaryGreen,
           onTap: () {
-            // TODO: Handle redeem points
+            context.push(RouteConstants.passengerLoyalty);
           },
         ),
         _buildActionButton(
@@ -63,7 +74,7 @@ class QuickActions extends ConsumerWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, 4),
                 ),

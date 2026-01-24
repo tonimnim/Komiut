@@ -1,13 +1,19 @@
+/// Login Screen.
+///
+/// Handles user authentication for both passengers and drivers.
+/// Drivers are added manually from backend - they only login here.
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/route_constants.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/utils/extensions.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
-import '../providers/auth_providers.dart';
+import '../providers/auth_controller.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -20,6 +26,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -30,26 +37,44 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_isSubmitting) return;
 
-    final authNotifier = ref.read(authStateProvider.notifier);
-    final success = await authNotifier.login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    setState(() => _isSubmitting = true);
+
+    await ref.read(authControllerProvider.notifier).login(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
 
     if (!mounted) return;
-
-    if (success) {
-      context.go(RouteConstants.home);
-    } else {
-      final error = ref.read(authStateProvider).error;
-      context.showErrorSnackBar(error ?? 'Login failed');
-    }
+    setState(() => _isSubmitting = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
+    // Listen for auth state changes and navigate accordingly
+    ref.listen<AsyncValue<AuthState>>(authControllerProvider, (previous, next) {
+      next.whenData((authState) {
+        if (!mounted) return;
+
+        if (authState is AuthAuthenticated) {
+          // Navigate to role-based home
+          context.go(authState.role.homeRoute);
+        } else if (authState is AuthError) {
+          // Show error
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(authState.message),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      });
+    });
+
+    // Only watch loading state to minimize rebuilds
+    final isLoading = ref.watch(isAuthLoadingProvider);
 
     return Scaffold(
       body: Container(
@@ -57,10 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primaryBlue,
-              AppColors.primaryGreen,
-            ],
+            colors: [AppColors.primaryBlue, AppColors.primaryGreen],
           ),
         ),
         child: SafeArea(
@@ -78,6 +100,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         'assets/images/labellogo.jpeg',
                         width: 200,
                         fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.directions_bus,
+                          size: 80,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 32),
@@ -97,10 +124,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Subtitle
                     const Text(
                       'Sign in to continue your journey',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(fontSize: 16, color: Colors.white70),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 48),
@@ -113,6 +137,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       keyboardType: TextInputType.emailAddress,
                       prefixIcon: Icons.email_outlined,
                       validator: Validators.validateEmail,
+                      textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: 16),
 
@@ -125,6 +150,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       prefixIcon: Icons.lock_outline,
                       validator: (value) =>
                           Validators.validateRequired(value, 'Password'),
+                      textInputAction: TextInputAction.done,
+                      onFieldSubmitted: (_) => _handleLogin(),
                     ),
                     const SizedBox(height: 8),
 
@@ -132,11 +159,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () =>
-                            context.push(RouteConstants.forgotPassword),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                        ),
+                        onPressed: () => context.push(RouteConstants.forgotPassword),
+                        style: TextButton.styleFrom(foregroundColor: Colors.white),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(fontWeight: FontWeight.w500),
@@ -148,14 +172,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Login button
                     CustomButton(
                       text: 'Sign In',
-                      onPressed: authState.isLoading ? null : _handleLogin,
-                      isLoading: authState.isLoading,
+                      onPressed: (isLoading || _isSubmitting) ? null : _handleLogin,
+                      isLoading: isLoading || _isSubmitting,
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primaryBlue,
                     ),
                     const SizedBox(height: 32),
 
-                    // Sign up prompt
+                    // Sign up prompt (for passengers only)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -165,15 +189,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () => context.push(RouteConstants.signUp),
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                          ),
+                          style: TextButton.styleFrom(foregroundColor: Colors.white),
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
+                    ),
+
+                    // Driver note
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Drivers: Contact your Sacco admin to get registered',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white54,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ],
                 ),

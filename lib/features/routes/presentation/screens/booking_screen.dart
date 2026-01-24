@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../home/presentation/providers/home_providers.dart';
+import '../../../loyalty/presentation/providers/loyalty_providers.dart';
+import '../../../loyalty/domain/loyalty_rules.dart';
 import '../providers/route_providers.dart';
 import 'ticket_screen.dart';
 import '../services/booking_service.dart';
@@ -477,7 +479,7 @@ class _SelectButton extends StatelessWidget {
   }
 }
 
-class _BookingBottomBar extends StatelessWidget {
+class _BookingBottomBar extends ConsumerWidget {
   final dynamic route;
   final BookingState bookingState;
   final VoidCallback onBook;
@@ -489,10 +491,19 @@ class _BookingBottomBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final isValid = bookingState.isValid;
+    final loyaltyAsync = ref.watch(loyaltyPointsProvider);
+
+    // Calculate points to be earned
+    final pointsEarned = isValid
+        ? LoyaltyRules.calculatePointsEarned(
+            bookingState.fare,
+            tier: loyaltyAsync.valueOrNull?.tier,
+          )
+        : 0;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -506,54 +517,112 @@ class _BookingBottomBar extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // Fare display
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Total Fare',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+            // Points earned indicator
+            if (isValid && pointsEarned > 0)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGreen.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.primaryGreen.withOpacity(0.3),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  isValid ? route.formatFare(bookingState.fare) : '---',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.stars_rounded,
+                      size: 18,
+                      color: Colors.amber.shade700,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Earn $pointsEarned points with this trip',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryGreen,
+                      ),
+                    ),
+                    if (loyaltyAsync.valueOrNull?.tier != null &&
+                        loyaltyAsync.valueOrNull!.tier.bonusPercentage > 0) ...[
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryGreen,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          '+${loyaltyAsync.valueOrNull!.tier.bonusPercentage}%',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+            // Fare and book button row
+            Row(
+              children: [
+                // Fare display
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Total Fare',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isValid ? route.formatFare(bookingState.fare) : '---',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 20),
+
+                // Book button
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: isValid ? onBook : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryBlue,
+                      disabledBackgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Book Trip',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isValid ? Colors.white : (isDark ? Colors.grey[600] : Colors.grey[500]),
+                      ),
+                    ),
                   ),
                 ),
               ],
-            ),
-            const SizedBox(width: 20),
-
-            // Book button
-            Expanded(
-              child: ElevatedButton(
-                onPressed: isValid ? onBook : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryBlue,
-                  disabledBackgroundColor: isDark ? Colors.grey[800] : Colors.grey[300],
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  'Book Trip',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: isValid ? Colors.white : (isDark ? Colors.grey[600] : Colors.grey[500]),
-                  ),
-                ),
-              ),
             ),
           ],
         ),
