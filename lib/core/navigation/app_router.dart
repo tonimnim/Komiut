@@ -44,6 +44,7 @@ import '../../features/queue/presentation/screens/queue_screen.dart';
 import '../../features/trips/presentation/screens/active_trip_screen.dart';
 import '../../features/loyalty/presentation/screens/loyalty_screen.dart';
 import '../../features/tickets/tickets.dart';
+import '../config/app_config.dart';
 import '../constants/route_constants.dart';
 
 /// Provider for the app router.
@@ -54,9 +55,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 /// Creates and configures the application router.
 GoRouter createAppRouter(Ref ref) {
   return GoRouter(
-    initialLocation: RouteConstants.splash,
+    // Skip auth: go directly to home, otherwise start at splash
+    initialLocation: AppConfig.skipAuth ? RouteConstants.home : RouteConstants.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
+      // DEV MODE: Skip all auth checks - no redirects at all
+      if (AppConfig.skipAuth) {
+        return null;
+      }
+
       final authState = ref.read(authControllerProvider).valueOrNull;
       final isAuthenticated = authState is AuthAuthenticated;
       final currentPath = state.matchedLocation;
@@ -134,6 +141,9 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteConstants.home,
         name: 'home',
         redirect: (context, state) {
+          // DEV MODE: Skip auth check
+          if (AppConfig.skipAuth) return null;
+
           final authState = ref.read(authControllerProvider).valueOrNull;
           if (authState is AuthAuthenticated) {
             return authState.role.homeRoute;

@@ -94,6 +94,7 @@ dev_dependencies:
 
   # Testing
   mocktail: ^1.0.4
+  test: any
 
   # App Icon & Splash
   flutter_launcher_icons: ^0.14.3

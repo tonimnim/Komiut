@@ -36,7 +36,7 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
 
     return SafeArea(
       bottom: false,
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

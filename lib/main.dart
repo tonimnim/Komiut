@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
+import 'core/config/app_config.dart';
 import 'core/navigation/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -12,8 +13,13 @@ import 'features/queue/presentation/providers/notification_providers.dart';
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // Keep splash screen visible while app initializes
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Keep splash screen visible while app initializes (unless skipping auth)
+  if (!AppConfig.skipAuth) {
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  } else {
+    // Remove splash immediately when skipping auth
+    FlutterNativeSplash.remove();
+  }
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

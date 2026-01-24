@@ -98,6 +98,11 @@ class AppConfig {
   // Feature Flags
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// DEV MODE: Skip authentication and go directly to home screen.
+  /// Set to true to preview UI without logging in.
+  /// ⚠️ Set to false before release!
+  static const bool skipAuth = true;
+
   /// Whether to enable loyalty points feature.
   static const bool enableLoyalty = true;
 
