@@ -18,7 +18,7 @@ class QueueMockData {
       vehicle: 'Volkswagen Transporter',
       plateNumber: 'KYZ 789',
       position: 'POS #3',
-      status: '', // Current user highlight handles status differently usually
+      status: '',
       isMe: true,
       avatarUrl: 'https://i.pravatar.cc/150?img=11',
     ),

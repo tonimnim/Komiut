@@ -3,7 +3,7 @@ import 'package:komiut_app/core/config/api_endpoints.dart';
 import 'package:komiut_app/shared/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<String> login(String phone, [String? password]);
+  Future<Map<String, dynamic>> login(String phone, [String? password]);
   Future<Map<String, dynamic>> verifyOtp(String verificationId, String otp);
   Future<void> logout();
   Future<Map<String, dynamic>> refreshToken();
@@ -15,20 +15,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this._apiClient);
 
   @override
-  Future<String> login(String phone, [String? password]) async {
+  Future<Map<String, dynamic>> login(String phoneOrEmail, [String? password]) async {
     final response = await _apiClient.post(
       ApiEndpoints.login,
       data: {
-        'phone': phone,
-        if (password != null) 'password': password,
+        'email': phoneOrEmail, // v2 Swagger uses 'email' in MobileLoginCommand
+        'password': password ?? '',
       },
     );
 
     final data = response.data;
-    if (data['success'] == true) {
-      return data['data']['verification_id'] as String;
+    // v2 returns directly or wrapped
+    final result = data is Map && data.containsKey('data') ? data['data'] : data;
+    
+    if (result is List) {
+      return result.first as Map<String, dynamic>;
     }
-    throw Exception(data['error']?['message'] ?? 'Login failed');
+    return result as Map<String, dynamic>;
   }
 
   @override

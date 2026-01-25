@@ -6,13 +6,13 @@ import 'package:komiut_app/driver/earnings/domain/entities/earnings.dart';
 class TripHistoryDetails extends Equatable {
   final String tripId;
   final String status;
-  final CircleRoute route; // Reusing from dashbaord
+  final CircleRoute route;
   final DateTime startedAt;
   final DateTime endedAt;
   final int durationMins;
   final double distanceKm;
   final int passengerCount;
-  final Earnings earnings; // Reusing from Earnings feature
+  final Earnings earnings;
 
   const TripHistoryDetails({
     required this.tripId,

@@ -87,4 +87,25 @@ class ApiClient {
       options: options,
     );
   }
+
+  Future<Response<T>> uploadFile<T>(
+    String path, {
+    required String filePath,
+    required String fieldName,
+    Map<String, dynamic>? additionalFields,
+    Options? options,
+    ProgressCallback? onSendProgress,
+  }) async {
+    final formData = FormData.fromMap({
+      fieldName: await MultipartFile.fromFile(filePath),
+      ...?additionalFields,
+    });
+
+    return _dio.post<T>(
+      path,
+      data: formData,
+      options: options,
+      onSendProgress: onSendProgress,
+    );
+  }
 }

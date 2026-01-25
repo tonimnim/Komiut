@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:komiut_app/core/errors/failures.dart';
 import 'package:komiut_app/core/network/api_exceptions.dart';
@@ -38,15 +39,43 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
+  Future<Either<Failure, DriverProfile>> uploadProfilePicture(String filePath) async {
+    try {
+      final profile = await remoteDataSource.uploadProfilePicture(filePath);
+      return Right(profile);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> removeProfilePicture() async {
+    try {
+      await remoteDataSource.updateProfile({'imageUrl': null});
+      return const Right(unit);
+    } on ApiException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> updatePreferences(AppPreferences preferences) async {
-    // TODO: Implement actual preference update logic (local or remote)
-    // For now, assuming success or simple local storage update if we had it.
-    return const Right(unit);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isDarkMode', preferences.isDarkMode);
+      await prefs.setBool('notificationsEnabled', preferences.notificationsEnabled);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Either<Failure, Unit>> logout() async {
-    // TODO: Implement logout logic (clear tokens, etc)
     return const Right(unit);
   }
 }

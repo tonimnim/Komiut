@@ -9,9 +9,6 @@ class EarningsMockDataSource implements EarningsRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    
-    // Default mock data for charts and summary
     return EarningsSummaryModel(
       period: period,
       totalTrips: 142,

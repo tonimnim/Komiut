@@ -21,26 +21,46 @@ class AuthRepositoryImpl implements AuthRepository {
     if (!await networkInfo.isConnected) {
       throw Exception('No internet connection');
     }
-    return await remoteDataSource.login(phone, password);
+    final data = await remoteDataSource.login(phone, password);
+    
+    // Check if we got tokens immediately (v2 flow)
+    if (data.containsKey('accessToken') || data.containsKey('access_token')) {
+      await _saveLoginData(data);
+      return 'SUCCESS'; // Special signal for UI that we logged in directly
+    }
+    
+    // Otherwise assume it's a verification ID
+    return data['verification_id'] ?? data['id'] ?? '';
+  }
+
+  Future<void> _saveLoginData(Map<String, dynamic> data) async {
+    final accessToken = (data['accessToken'] ?? data['access_token']) as String;
+    final refreshToken = (data['refreshToken'] ?? data['refresh_token']) as String;
+    
+    await localDataSource.saveTokens(accessToken, refreshToken);
+
+    final userJson = data['user'] ?? data;
+    final userModel = UserModel.fromJson(userJson as Map<String, dynamic>);
+    await localDataSource.saveUser(userModel);
   }
 
   @override
   Future<User> verifyOtp(String verificationId, String otp) async {
+    if (verificationId == 'SUCCESS') {
+      // Already logged in via direct password
+      final user = await localDataSource.getUser();
+      if (user != null) return user;
+      throw Exception('User data not found');
+    }
+
     if (!await networkInfo.isConnected) {
       throw Exception('No internet connection');
     }
 
     final data = await remoteDataSource.verifyOtp(verificationId, otp);
-    
-    await localDataSource.saveTokens(
-      data['access_token'] as String,
-      data['refresh_token'] as String,
-    );
+    await _saveLoginData(data);
 
-    final userModel = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-    await localDataSource.saveUser(userModel);
-
-    return userModel;
+    return await localDataSource.getUser() as User;
   }
 
   @override

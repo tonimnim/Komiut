@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:komiut_app/core/config/api_endpoints.dart';
 
 import 'package:komiut_app/core/network/api_client.dart';
 import 'package:komiut_app/core/network/api_exceptions.dart';
@@ -6,8 +7,9 @@ import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
 import 'package:komiut_app/driver/settings/data/models/driver_settings_model.dart';
 
 abstract class SettingsRemoteDataSource {
-  Future<DriverSettingsModel> getSettings(); // Likely a composite of profile + vehicle + local prefs
+  Future<DriverSettingsModel> getSettings();
   Future<DriverProfileModel> updateProfile(Map<String, dynamic> data);
+  Future<DriverProfileModel> uploadProfilePicture(String filePath);
 }
 
 class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
@@ -18,16 +20,21 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   @override
   Future<DriverSettingsModel> getSettings() async {
     try {
-      // In a real scenario, this might be multiple calls (profile, vehicle).
-      // For simplicity, assuming a wrapper endpoint or sequential calls.
-      final profileResponse = await apiClient.get('/api/driver/profile');
-      final vehicleResponse = await apiClient.get('/api/driver/vehicle');
+      final profileResponse = await apiClient.get(ApiEndpoints.driverProfile);
+      final vehicleResponse = await apiClient.get(ApiEndpoints.driverVehicle);
       
-      // Construct composite JSON for the model
+      final profileData = profileResponse.data is Map && profileResponse.data.containsKey('data') 
+          ? profileResponse.data['data'] 
+          : (profileResponse.data is List ? profileResponse.data.first : profileResponse.data);
+          
+      final vehicleData = vehicleResponse.data is Map && vehicleResponse.data.containsKey('data') 
+          ? vehicleResponse.data['data'] 
+          : (vehicleResponse.data is List ? vehicleResponse.data.first : vehicleResponse.data);
+
       final Map<String, dynamic> compositeJson = {
-        'profile': profileResponse.data['data'],
-        'vehicle': vehicleResponse.data['data'],
-        'preferences': {}, // Preferences usually local, but maybe synced
+        'profile': profileData,
+        'vehicle': vehicleData,
+        'preferences': {},
       };
       
       return DriverSettingsModel.fromJson(compositeJson);
@@ -40,10 +47,30 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   Future<DriverProfileModel> updateProfile(Map<String, dynamic> data) async {
     try {
       final response = await apiClient.put(
-        '/api/driver/profile',
+        ApiEndpoints.driverProfile,
         data: data,
       );
-      return DriverProfileModel.fromJson(response.data['data']);
+      final responseData = response.data is Map && response.data.containsKey('data') 
+          ? response.data['data'] 
+          : response.data;
+      return DriverProfileModel.fromJson(responseData);
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
+
+  @override
+  Future<DriverProfileModel> uploadProfilePicture(String filePath) async {
+    try {
+      final response = await apiClient.uploadFile(
+        ApiEndpoints.driverProfilePhoto,
+        filePath: filePath,
+        fieldName: 'photo',
+      );
+      final responseData = response.data is Map && response.data.containsKey('data') 
+          ? response.data['data'] 
+          : response.data;
+      return DriverProfileModel.fromJson(responseData);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }

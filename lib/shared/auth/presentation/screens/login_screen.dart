@@ -18,10 +18,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _showPassword = false;
 
   @override
   void dispose() {
     _phoneController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -32,7 +35,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final phone = rawNumber.startsWith('0') ? rawNumber.substring(1) : rawNumber;
       
       context.read<AuthBloc>().add(
-        AuthLoginRequested(phone: '+254$phone'),
+        AuthLoginRequested(
+          phone: '+254$phone',
+          password: _passwordController.text.trim(),
+        ),
       );
     }
   }
@@ -45,6 +51,8 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           if (state is AuthOtpSent) {
             context.push(RouteNames.otp, extra: state.verificationId);
+          } else if (state is AuthAuthenticated) {
+            context.go(RouteNames.driverDashboard);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
@@ -112,9 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC), // Slate 50
+                        color: const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)), // Slate 200
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
                       ),
                       child: Row(
                         children: [
@@ -160,6 +168,46 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'Password',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1E293B),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_showPassword,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1E293B),
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '••••••••',
+                          hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _showPassword ? Icons.visibility_off : Icons.visibility,
+                              color: const Color(0xFF64748B),
+                            ),
+                            onPressed: () => setState(() => _showPassword = !_showPassword),
+                          ),
+                        ),
                       ),
                     ),
 

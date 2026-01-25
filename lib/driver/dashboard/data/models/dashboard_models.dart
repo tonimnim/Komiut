@@ -3,25 +3,41 @@ import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.d
 class DriverProfileModel extends DriverProfile {
   const DriverProfileModel({
     required super.id,
+    required super.organizationId,
     required super.name,
+    required super.email,
     required super.phone,
-    super.email,
-    super.profileImage,
-    required super.rating,
-    required super.totalTrips,
+    super.role,
     required super.status,
+    required super.createdAt,
+    super.imageUrl,
+    super.rating,
+    super.totalTrips,
   });
 
   factory DriverProfileModel.fromJson(Map<String, dynamic> json) {
     return DriverProfileModel(
       id: json['id'] as String,
-      name: json['name'] as String,
-      phone: json['phone'] as String,
-      email: json['email'] as String?,
-      profileImage: json['profile_image'] as String?,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      totalTrips: json['total_trips'] as int? ?? 0,
-      status: json['status'] as String? ?? 'offline',
+      organizationId: json['organizationId'] as String,
+      name: json['name'] as String? ?? '',
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      role: json['role'],
+      status: json['status'] is int ? json['status'] as int : (json['status'] == 'Active' ? 1 : 0),
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      imageUrl: json['imageUrl'] as String?,
+      rating: (json['rating'] as num?)?.toDouble(),
+      totalTrips: json['totalTrips'] as int? ?? json['total_trips'] as int?,
+    );
+  }
+}
+
+class RegistrationNumberModel extends RegistrationNumber {
+  const RegistrationNumberModel({required super.value});
+
+  factory RegistrationNumberModel.fromJson(Map<String, dynamic> json) {
+    return RegistrationNumberModel(
+      value: json['value'] as String,
     );
   }
 }
@@ -29,28 +45,43 @@ class DriverProfileModel extends DriverProfile {
 class VehicleModel extends Vehicle {
   const VehicleModel({
     required super.id,
-    required super.plateNumber,
-    required super.type,
+    required super.registrationNumber,
     required super.capacity,
-    required super.model,
-    required super.year,
-    required super.color,
     required super.status,
+    super.currentRouteId,
+    required super.organizationId,
+    required super.domainId,
+    required super.createdAt,
+    super.updatedAt,
+    super.model,
+    super.year,
+    super.color,
+    super.type,
+    super.insuranceExpiry,
+    super.inspectionExpiry,
   });
 
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
     return VehicleModel(
       id: json['id'] as String,
-      plateNumber: json['plate_number'] as String,
-      type: json['type'] as String,
+      registrationNumber: RegistrationNumberModel.fromJson(json['registrationNumber'] as Map<String, dynamic>),
       capacity: json['capacity'] as int,
-      model: json['model'] as String,
-      year: json['year'] as int,
-      color: json['color'] as String,
-      status: json['status'] as String? ?? 'active',
+      status: json['status']?.toString() ?? 'active',
+      currentRouteId: json['currentRouteId'] as String?,
+      organizationId: json['organizationId'] as String,
+      domainId: json['domainId'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      model: json['model'] as String?,
+      year: json['year'] as int?,
+      color: json['color'] as String?,
+      type: json['type'] as String?,
+      insuranceExpiry: json['insuranceExpiry'] != null ? DateTime.parse(json['insuranceExpiry'] as String) : (json['insurance_expiry'] != null ? DateTime.parse(json['insurance_expiry'] as String) : null),
+      inspectionExpiry: json['inspectionExpiry'] != null ? DateTime.parse(json['inspectionExpiry'] as String) : (json['inspection_expiry'] != null ? DateTime.parse(json['inspection_expiry'] as String) : null),
     );
   }
 }
+
 
 class CircleModel extends Circle {
   const CircleModel({
@@ -78,36 +109,29 @@ class CircleModel extends Circle {
 class CircleRouteModel extends CircleRoute {
   const CircleRouteModel({
     required super.id,
-    required super.number,
     required super.name,
-    super.description,
-    required super.circleId,
-    required super.startPoint,
-    required super.endPoint,
-    required super.stops,
-    required super.fare,
-    required super.estimatedDurationMins,
+    required super.code,
+    required super.status,
+    required super.organizationId,
+    required super.createdAt,
+    super.circleName,
+    super.pickupPoint,
   });
 
   factory CircleRouteModel.fromJson(Map<String, dynamic> json) {
-    final startJson = json['start_point'] as Map<String, dynamic>;
-    final endJson = json['end_point'] as Map<String, dynamic>;
-    final stopsJson = json['stops'] as List<dynamic>? ?? [];
-
     return CircleRouteModel(
       id: json['id'] as String,
-      number: json['number'] as String? ?? '',
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      circleId: json['circle_id'] as String,
-      startPoint: RoutePointModel.fromJson(startJson),
-      endPoint: RoutePointModel.fromJson(endJson),
-      stops: stopsJson.map((s) => RoutePointModel.fromJson(s)).toList(),
-      fare: (json['fare'] as num).toDouble(),
-      estimatedDurationMins: json['estimated_duration_mins'] as int,
+      name: json['name'] as String? ?? '',
+      code: json['code'] as String? ?? '',
+      status: json['status']?.toString() ?? 'active',
+      organizationId: json['organizationId'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      circleName: json['circle_name'] as String? ?? json['domainName'] as String?,
+      pickupPoint: json['pickup_point'] as String?,
     );
   }
 }
+
 
 class RoutePointModel extends RoutePoint {
   const RoutePointModel({

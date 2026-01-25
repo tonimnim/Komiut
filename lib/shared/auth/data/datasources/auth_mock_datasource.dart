@@ -2,9 +2,23 @@ import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.d
 
 class AuthMockDataSource implements AuthRemoteDataSource {
   @override
-  Future<String> login(String phone, [String? password]) async {
+  Future<Map<String, dynamic>> login(String phone, [String? password]) async {
     await Future.delayed(const Duration(seconds: 1));
-    return "mock-verification-id";
+    if (password != null && password.isNotEmpty) {
+      return {
+        'access_token': 'mock-access-token',
+        'refresh_token': 'mock-refresh-token',
+        'user': {
+          'id': 'mock-user-id',
+          'name': 'Mock Driver',
+          'phone': phone,
+          'email': 'driver@komiut.com',
+          'role': 'driver',
+          'profile_image': 'https://i.pravatar.cc/150?u=mockdriver',
+        }
+      };
+    }
+    return {"verification_id": "mock-verification-id"};
   }
 
   @override

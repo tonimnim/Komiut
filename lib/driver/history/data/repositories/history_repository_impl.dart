@@ -43,27 +43,16 @@ class HistoryRepositoryImpl implements HistoryRepository {
     try {
       final json = await remoteDataSource.getTripHistoryDetails(tripId);
       
-      // Manual mapping since we didn't make a standalone model for the details response structure yet
-      // This maps the complex nested response from API_REFERENCE.md
-      
       final routeJson = json['route'];
-      final earningsJson = json['earnings']; // Needs to match EarningsModel expectation
+      final earningsJson = json['earnings'];
 
-      // Construct RoutePoint dummies if not in response, or parse if they are
-      // API ref says "route": { "name":..., "start":..., "end":... } which is partial CircleRoute
-      // We might need to adapt CircleRoute to be nullable or create a simpler DTO.
-      // For now, mapping best effort.
-      
       final route = CircleRoute(
-        id: 'unknown', // API ref doesn't return ID in details?
-        number: '??', 
+        id: 'unknown',
         name: routeJson['name'],
-        circleId: 'unknown',
-        startPoint: RoutePoint(name: routeJson['start'], lat: 0, lng: 0),
-        endPoint: RoutePoint(name: routeJson['end'], lat: 0, lng: 0),
-        stops: const [],
-        fare: 0, // Not in this specific response snippet
-        estimatedDurationMins: 0,
+        code: '??',
+        status: 'completed',
+        organizationId: 'unknown',
+        createdAt: DateTime.now(),
        );
 
       final details = TripHistoryDetails(
@@ -78,11 +67,11 @@ class HistoryRepositoryImpl implements HistoryRepository {
         earnings: EarningsModel(
            tripId: json['trip_id'],
            routeName: routeJson['name'],
-           date: DateTime.parse(json['started_at']), // approximate
+           date: DateTime.parse(json['started_at']),
            passengerCount: json['passenger_count'],
-           farePerPassenger: 0, // Missing in this response
+           farePerPassenger: 0,
            grossFare: (earningsJson['gross_fare'] as num).toDouble(),
-           platformFeePercent: 0, // Missing
+           platformFeePercent: 0,
            platformFee: (earningsJson['platform_fee'] as num).toDouble(),
            netEarnings: (earningsJson['net_earnings'] as num).toDouble(),
         ),

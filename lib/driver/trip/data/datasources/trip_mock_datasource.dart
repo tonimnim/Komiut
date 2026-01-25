@@ -8,14 +8,11 @@ class TripMockDataSource implements TripRemoteDataSource {
 
   final _mockRoute = CircleRouteModel(
     id: 'mock-route-123',
-    number: '102',
     name: 'CBD - Kikuyu',
-    circleId: 'mock-circle-123',
-    startPoint: const RoutePointModel(name: 'Kikuyu', lat: -1.24, lng: 36.67),
-    endPoint: const RoutePointModel(name: 'CBD', lat: -1.28, lng: 36.82),
-    stops: const [],
-    fare: 100.0,
-    estimatedDurationMins: 45,
+    code: '102',
+    status: 'active',
+    organizationId: 'mock-org-123',
+    createdAt: DateTime.now().subtract(const Duration(days: 100)),
   );
 
   @override

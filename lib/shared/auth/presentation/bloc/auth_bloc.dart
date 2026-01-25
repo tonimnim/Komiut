@@ -110,6 +110,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final verificationId = await authRepository.login(event.phone, event.password);
+      if (verificationId == 'SUCCESS') {
+        final user = await authRepository.getCurrentUser();
+        if (user != null) {
+          emit(AuthAuthenticated(user: user));
+          return;
+        }
+      }
       emit(AuthOtpSent(verificationId: verificationId));
     } catch (e) {
       emit(AuthError(message: e.toString()));

@@ -36,8 +36,7 @@ class TripModel extends Trip {
   Map<String, dynamic> toJson() {
     return {
       'trip_id': id,
-      // 'route': (route as CircleRouteModel).toJson(), // Assuming cast is safe or map it
-      'status': status.toString().split('.').last, // simplified
+      'status': status.toString().split('.').last,
       'passenger_count': currentPassengerCount,
       'current_earnings': currentEarnings,
     };

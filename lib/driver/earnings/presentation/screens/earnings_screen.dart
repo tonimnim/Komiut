@@ -1,276 +1,281 @@
 import 'package:flutter/material.dart';
-import '../../data/datasources/earnings_mock_data.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../widgets/earnings_widgets.dart';
+import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
+import '../../../../core/routes/route_names.dart';
 
-class EarningsScreen extends StatelessWidget {
-  const EarningsScreen({super.key});
+class EarningsScreen extends StatefulWidget {
+  final bool isTab;
+  final DriverProfile? profile;
+  const EarningsScreen({super.key, this.isTab = false, this.profile});
+
+  @override
+  State<EarningsScreen> createState() => _EarningsScreenState();
+}
+
+class _EarningsScreenState extends State<EarningsScreen> {
+  bool _isWeekly = true;
 
   @override
   Widget build(BuildContext context) {
+    final String balance = _isWeekly ? '14,250.00' : '4,500.00';
+    final String trend = _isWeekly ? '12%' : '8%';
+    final List<double> chartValues = _isWeekly 
+        ? [0.2, 0.4, 0.3, 0.6, 0.8, 0.5, 0.1]
+        : [0.3, 0.7, 0.4];
+    final List<String> chartLabels = _isWeekly
+        ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+        : ['08:00', '12:00', '16:00'];
+    final String periodText = _isWeekly ? 'Oct 16 - Oct 22' : 'Today, Oct 22';
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
-        elevation: 0,
-        title: const Text(
-          'Earnings',
-          style: TextStyle(
-            color: Color(0xFF1E293B), // Slate 900
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (!widget.isTab) _buildHeader(context),
+             Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    EarningsToggle(
+                      isWeekly: _isWeekly,
+                      onToggle: (val) => setState(() => _isWeekly = val),
+                    ),
+                    const SizedBox(height: 24),
+                    BalanceCard(amount: balance, trend: trend),
+                    const SizedBox(height: 32),
+                    EarningsChart(
+                      values: chartValues,
+                      labels: chartLabels,
+                      period: periodText,
+                    ),
+                    const SizedBox(height: 32),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Recent Trips',
+                          style: AppTextStyles.heading3.copyWith(fontSize: 18),
+                        ),
+                        TextButton(
+                          onPressed: () => context.push(RouteNames.tripHistory, extra: widget.profile),
+                          child: Text(
+                            'See All',
+                            style: AppTextStyles.body2.copyWith(
+                              color: AppColors.primaryBlue,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (!_isWeekly) ...[
+                      TransactionItem(
+                        title: 'Downtown Loop',
+                        date: 'Today, 2:45 PM',
+                        status: 'Completed',
+                        amount: '2,480.00',
+                        icon: Icons.directions_bus_rounded,
+                        iconColor: AppColors.primaryBlue,
+                        onTap: () => _showTripDetail(context, 'Downtown Loop', 'KES 2,480.00'),
+                      ),
+                      TransactionItem(
+                        title: 'Airport Terminal 2',
+                        date: 'Today, 11:20 AM',
+                        status: 'Completed',
+                        amount: '2,020.00',
+                        icon: Icons.flight_takeoff_rounded,
+                        iconColor: AppColors.primaryBlue,
+                        onTap: () => _showTripDetail(context, 'Airport Terminal 2', 'KES 2,020.00'),
+                      ),
+                    ] else ...[
+                      TransactionItem(
+                        title: 'Downtown Loop',
+                        date: 'Today, 2:45 PM',
+                        status: 'Completed',
+                        amount: '2,480.00',
+                        icon: Icons.directions_bus_rounded,
+                        iconColor: AppColors.primaryBlue,
+                        onTap: () => _showTripDetail(context, 'Downtown Loop', 'KES 2,480.00'),
+                      ),
+                      TransactionItem(
+                        title: 'Airport Terminal 2',
+                        date: 'Today, 11:20 AM',
+                        status: 'Completed',
+                        amount: '5,800.00',
+                        icon: Icons.flight_takeoff_rounded,
+                        iconColor: AppColors.primaryBlue,
+                        onTap: () => _showTripDetail(context, 'Airport Terminal 2', 'KES 5,800.00'),
+                      ),
+                      TransactionItem(
+                        title: 'North Station',
+                        date: 'Yesterday, 6:30 PM',
+                        status: 'Archived',
+                        amount: '1,220.00',
+                        icon: Icons.history_rounded,
+                        iconColor: AppColors.textMuted,
+                        onTap: () => _showTripDetail(context, 'North Station', 'KES 1,220.00'),
+                      ),
+                    ],
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1E293B), size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-         actions: [
+      ),
+      bottomNavigationBar: widget.isTab ? null : _buildBottomAction(),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 8, 20, 8),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: AppColors.grey100)),
+      ),
+      child: Row(
+        children: [
           IconButton(
-            icon: const Icon(Icons.calendar_today, color: Color(0xFF1E293B), size: 20),
-            onPressed: () {},
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+            onPressed: () => context.pop(),
+          ),
+          Expanded(
+            child: Text(
+              'Earnings',
+              textAlign: TextAlign.center,
+              style: AppTextStyles.heading4.copyWith(fontSize: 18),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: const BoxDecoration(
+              color: AppColors.grey900,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.info_rounded, color: Colors.white, size: 18),
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+    );
+  }
+
+  Widget _buildBottomAction() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: ElevatedButton.icon(
+        onPressed: () {},
+        icon: const Icon(Icons.payments_rounded, color: Colors.white),
+        label: const Text('Request Payout'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primaryBlue,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          textStyle: AppTextStyles.button.copyWith(fontSize: 18),
+        ),
+      ),
+    );
+  }
+
+  void _showTripDetail(BuildContext context, String title, String total) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        padding: const EdgeInsets.all(32),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildBalanceCard(),
-            const SizedBox(height: 24),
-            _buildChartSection(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Trip Details', style: AppTextStyles.heading3),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            _buildDetailRow('Route', title),
+            const SizedBox(height: 20),
+            _buildDetailRow('Date', 'October 22, 2026'),
+            const SizedBox(height: 20),
+            _buildDetailRow('Passengers', '14'),
+            const SizedBox(height: 20),
+            _buildDetailRow('Distance', '12.5 km'),
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 32),
+            _buildDetailRow('Gross Fare', total),
+            const SizedBox(height: 12),
+            _buildDetailRow('Platform Fee (10%)', '- KES 250.00', isRed: true),
             const SizedBox(height: 24),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Recent Trips',
-                  style: TextStyle(
-                    color: Color(0xFF1E293B),
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('See All'),
-                ),
+                Text('Net Earnings', style: AppTextStyles.heading4),
+                Text(total, style: AppTextStyles.heading4.copyWith(color: AppColors.primaryGreen)),
               ],
             ),
-             const SizedBox(height: 12),
-            _buildTransactionsList(),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: const Text('CLOSE', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBalanceCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E293B), // Dark card for earnings
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Text(
-            EarningsMockData.earningsLabel,
-            style: TextStyle(
-              color: Color(0xFF94A3B8), // Slate 400
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            EarningsMockData.totalEarnings,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1,
-            ),
-          ),
-          const SizedBox(height: 8),
-           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-               mainAxisSize: MainAxisSize.min,
-              children: const [
-                 Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
-                 SizedBox(width: 4),
-                 Text(
-                  '+12% vs last week',
-                  style: TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChartSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Weekly Summary',
-                style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Icon(Icons.more_horiz, color: Color(0xFF94A3B8)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: EarningsMockData.weeklyChart.map((data) => _buildBar(data)).toList(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBar(Map<String, dynamic> data) {
-    final height = 120.0 * (data['pct'] as double);
-    final isMax = (data['pct'] as double) == 1.0;
-
-    return Column(
+  Widget _buildDetailRow(String label, String value, {bool isRed = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          width: 12,
-          height: height,
-          decoration: BoxDecoration(
-            color: isMax ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        const SizedBox(height: 12),
+        Text(label, style: AppTextStyles.body1.copyWith(color: AppColors.textSecondary)),
         Text(
-          data['day'],
-          style: TextStyle(
-            color: isMax ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-            fontSize: 12,
+          value,
+          style: AppTextStyles.body1.copyWith(
             fontWeight: FontWeight.bold,
+            color: isRed ? Colors.redAccent : AppColors.textPrimary,
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTransactionsList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: EarningsMockData.transactions.length,
-      itemBuilder: (context, index) {
-        final tx = EarningsMockData.transactions[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.directions_car, color: Color(0xFF64748B), size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tx['id']!,
-                      style: const TextStyle(
-                        color: Color(0xFF1E293B),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      tx['date']!,
-                      style: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    tx['amount']!,
-                    style: const TextStyle(
-                      color: Color(0xFF10B981),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    tx['status']!,
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
