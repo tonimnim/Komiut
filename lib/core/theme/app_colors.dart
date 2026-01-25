@@ -42,6 +42,8 @@ class AppColors {
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color textMuted = Color(0xFF9CA3AF);
+  static const Color textHint = Color(0xFFB2BEC3);
+  static const Color textLight = Color(0xFFFFFFFF);
 
   static const Color dutyOnline = primaryBlue;
   static const Color dutyOffline = textSecondary;
@@ -49,11 +51,18 @@ class AppColors {
   static const Color statusOnline = primaryGreen;
   static const Color statusOffline = dutyOffline;
   static const Color statusOnTrip = info;
+
+  // Status colors (from remote)
+  static const Color completed = Color(0xFF059669);
+  static const Color failed = Color(0xFFEF4444);
+  static const Color pending = Color(0xFFF59E0B);
   
   static const Color border = Color(0xFFE5E7EB);
   static const Color divider = Color(0xFFF3F4F6);
+  static const Color dividerDark = Color(0xFF1F2937);
   static const Color cardBg = Color(0xFFFFFFFF);
   static const Color cardShadow = Color(0x0D000000); // Subtle shadow
+  static const Color shadow = Color(0x1A000000);
   
   static const Color pillBlueBg = Color(0xFFEFF6FF); // Light blue for pills
   static const Color pillGreenBg = Color(0xFFECFDF5); // Light green for status
@@ -90,5 +99,3 @@ class AppColors {
     ],
   );
 }
-
-

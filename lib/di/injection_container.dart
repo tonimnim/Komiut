@@ -6,6 +6,7 @@ import 'package:komiut_app/core/network/api_client.dart';
 import 'package:komiut_app/core/network/network_info.dart';
 import 'package:komiut_app/core/config/app_config.dart';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:komiut_app/shared/auth/data/datasources/auth_mock_datasource.dart';
 import 'package:komiut_app/shared/auth/data/datasources/auth_local_datasource.dart';
@@ -51,8 +52,13 @@ Future<void> initializeDependencies() async {
   getIt.registerSingleton<SharedPreferences>(sharedPreferences);
   getIt.registerSingleton<FlutterSecureStorage>(const FlutterSecureStorage());
 
-  getIt.registerSingleton<ApiClient>(ApiClient(storage: getIt()));
-  getIt.registerSingleton<NetworkInfo>(NetworkInfo());
+  getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(Connectivity()));
+  getIt.registerLazySingleton<ApiClient>(
+    () => ApiClient(
+      storage: getIt<FlutterSecureStorage>(),
+      networkInfo: getIt<NetworkInfo>(),
+    ),
+  );
 
   // Auth
   if (AppConfig.enableMockData) {
