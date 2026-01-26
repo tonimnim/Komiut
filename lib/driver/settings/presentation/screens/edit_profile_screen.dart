@@ -4,9 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
-import 'package:komiut_app/di/injection_container.dart';
-import 'package:komiut_app/driver/settings/domain/repositories/settings_repository.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/di/injection_container.dart';
+import 'package:komiut/driver/settings/domain/repositories/settings_repository.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final DriverProfile? profile;

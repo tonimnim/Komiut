@@ -1,7 +1,7 @@
-import 'package:komiut_app/driver/trip/data/datasources/trip_remote_datasource.dart';
-import 'package:komiut_app/driver/trip/data/models/trip_model.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-import 'package:komiut_app/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/trip/data/datasources/trip_remote_datasource.dart';
+import 'package:komiut/driver/trip/data/models/trip_model.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/trip/domain/entities/trip.dart';
 
 class TripMockDataSource implements TripRemoteDataSource {
   TripModel? _currentTrip;

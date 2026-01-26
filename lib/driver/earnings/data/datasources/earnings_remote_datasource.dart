@@ -36,7 +36,7 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
     }
 
     try {
-      final response = await apiClient.get(
+      final response = await apiClient.getDriver(
         ApiEndpoints.earningsSummary, 
         queryParameters: queryParams,
       );
@@ -52,7 +52,7 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
   @override
   Future<EarningsModel> getTripEarnings(String tripId) async {
     try {
-      final response = await apiClient.get(
+      final response = await apiClient.getDriver(
         ApiEndpoints.earningsTrip(tripId),
       );
 

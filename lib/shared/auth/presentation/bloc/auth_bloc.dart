@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
-import 'package:komiut_app/shared/auth/domain/repositories/auth_repository.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
 
 abstract class AuthEvent extends Equatable {
   @override

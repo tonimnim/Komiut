@@ -1,6 +1,8 @@
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
 
 abstract class DashboardRemoteDataSource {
   Future<DriverProfileModel> getDriverProfile();
@@ -18,71 +20,76 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
   DashboardRemoteDataSourceImpl(this._apiClient);
 
+  Future<T> _unwrap<T>(Future<dynamic> request) async {
+    final result = await request;
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => data as T,
+    );
+  }
+
   @override
   Future<DriverProfileModel> getDriverProfile() async {
-    final response = await _apiClient.get(ApiEndpoints.driverProfile);
-    // v2 might return the object directly or wrapped in 'data'
-    final data = response.data is Map && response.data.containsKey('data') 
-        ? response.data['data'] 
-        : (response.data is List ? response.data.first : response.data);
-    return DriverProfileModel.fromJson(data as Map<String, dynamic>);
+    final data = await _unwrap<dynamic>(_apiClient.getDriver(ApiEndpoints.driverProfile));
+    final processedData = data is Map && data.containsKey('data') 
+        ? data['data'] 
+        : (data is List ? data.first : data);
+    return DriverProfileModel.fromJson(processedData as Map<String, dynamic>);
   }
 
   @override
   Future<VehicleModel> getVehicle() async {
-    final response = await _apiClient.get(ApiEndpoints.driverVehicle);
-    final data = response.data is Map && response.data.containsKey('data') 
-        ? response.data['data'] 
-        : (response.data is List ? response.data.first : response.data);
-    return VehicleModel.fromJson(data as Map<String, dynamic>);
+    final data = await _unwrap<dynamic>(_apiClient.getDriver(ApiEndpoints.driverVehicle));
+    final processedData = data is Map && data.containsKey('data') 
+        ? data['data'] 
+        : (data is List ? data.first : data);
+    return VehicleModel.fromJson(processedData as Map<String, dynamic>);
   }
 
   @override
   Future<CircleModel> getCircle() async {
-    final response = await _apiClient.get(ApiEndpoints.driverCircle);
-    final data = response.data is Map && response.data.containsKey('data') 
-        ? response.data['data'] 
-        : (response.data is List ? response.data.first : response.data);
-    return CircleModel.fromJson(data as Map<String, dynamic>);
+    final data = await _unwrap<dynamic>(_apiClient.getDriver(ApiEndpoints.driverCircle));
+    final processedData = data is Map && data.containsKey('data') 
+        ? data['data'] 
+        : (data is List ? data.first : data);
+    return CircleModel.fromJson(processedData as Map<String, dynamic>);
   }
 
   @override
   Future<CircleRouteModel> getRoute() async {
-    final response = await _apiClient.get(ApiEndpoints.driverRoute);
-    final data = response.data is Map && response.data.containsKey('data') 
-        ? response.data['data'] 
-        : (response.data is List ? response.data.first : response.data);
-    return CircleRouteModel.fromJson(data as Map<String, dynamic>);
+    final data = await _unwrap<dynamic>(_apiClient.getDriver(ApiEndpoints.driverRoute));
+    final processedData = data is Map && data.containsKey('data') 
+        ? data['data'] 
+        : (data is List ? data.first : data);
+    return CircleRouteModel.fromJson(processedData as Map<String, dynamic>);
   }
 
   @override
   Future<String> toggleStatus(String newStatus) async {
-    // v2 uses PUT /api/Personnel for updates
     final profile = await getDriverProfile();
-    final response = await _apiClient.put(
+    final data = await _unwrap<dynamic>(_apiClient.putDriver(
       ApiEndpoints.driverProfile,
       data: {
         'id': profile.id,
         'status': newStatus == 'online' ? 1 : 0,
       },
-    );
-    // Handle potential wrapper or direct return
-    final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
-    return (data['status'] == 1 ? 'online' : 'offline');
+    ));
+    final processedData = data is Map && data.containsKey('data') ? data['data'] : data;
+    return (processedData['status'] == 1 ? 'online' : 'offline');
   }
 
   @override
   Future<EarningsSummaryModel> getTodayEarnings() async {
-    final response = await _apiClient.get(
+    final data = await _unwrap<dynamic>(_apiClient.getDriver(
       ApiEndpoints.earningsSummary,
       queryParameters: {
-        'FromDate': DateTime.now().toIso8601String().split('T')[0], // Simplified for today
+        'FromDate': DateTime.now().toIso8601String().split('T')[0],
       },
-    );
-    final data = response.data is Map && response.data.containsKey('data') 
-        ? response.data['data'] 
-        : (response.data is List ? response.data.first : response.data);
-    return EarningsSummaryModel.fromJson(data as Map<String, dynamic>);
+    ));
+    final processedData = data is Map && data.containsKey('data') 
+        ? data['data'] 
+        : (data is List ? data.first : data);
+    return EarningsSummaryModel.fromJson(processedData as Map<String, dynamic>);
   }
 
   @override

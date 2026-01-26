@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komiut_app/core/routes/route_names.dart';
-import 'package:komiut_app/core/theme/app_colors.dart';
+import 'package:komiut/core/routes/route_names.dart';
+import 'package:komiut/core/theme/app_colors.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});

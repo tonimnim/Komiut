@@ -1,4 +1,3 @@
-```dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -6,14 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'package:komiut_app/core/config/app_config.dart';
-import 'package:komiut_app/core/routes/app_router.dart';
-import 'package:komiut_app/core/theme/app_theme.dart';
-import 'package:komiut_app/di/injection_container.dart';
-import 'package:komiut_app/core/theme/theme_bloc.dart';
-import 'package:komiut_app/core/theme/theme_provider.dart';
-import 'package:komiut_app/core/constants/app_constants.dart';
-import 'features/queue/presentation/providers/notification_providers.dart';
+import 'package:komiut/core/config/app_config.dart';
+import 'package:komiut/core/routes/app_router.dart';
+import 'package:komiut/core/theme/app_theme.dart';
+import 'package:komiut/di/injection_container.dart';
+import 'package:komiut/core/theme/theme_bloc.dart';
+import 'package:komiut/core/theme/theme_provider.dart';
+import 'package:komiut/core/constants/app_constants.dart';
+import 'package:komiut/features/queue/presentation/providers/notification_providers.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +47,7 @@ class KomiutApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeProvider); // This line is kept as per instruction, but themeMode for MaterialApp.router comes from BlocBuilder
+    final themeMode = ref.watch(themeProvider);
     final isDark = themeMode == ThemeMode.dark;
     final router = ref.watch(appRouterProvider);
 
@@ -71,11 +70,10 @@ class KomiutApp extends ConsumerWidget {
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: state.themeMode, // Theme mode from Bloc
-          routerConfig: router, // Router from Riverpod
+          themeMode: state.themeMode, 
+          routerConfig: router,
         );
       },
     );
   }
 }
-```

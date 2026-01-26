@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/queue/domain/entities/queue_entities.dart';
-import 'package:komiut_app/driver/queue/domain/repositories/queue_repository.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/queue/domain/entities/queue_entities.dart';
+import 'package:komiut/driver/queue/domain/repositories/queue_repository.dart';
 import '../datasources/queue_remote_datasource.dart';
 
 class QueueRepositoryImpl implements QueueRepository {

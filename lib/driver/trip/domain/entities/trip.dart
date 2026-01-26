@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
 
 enum TripStatus { scheduled, started, inProgress, completed, cancelled }
 

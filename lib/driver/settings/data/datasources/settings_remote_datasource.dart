@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
 
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-import 'package:komiut_app/driver/settings/data/models/driver_settings_model.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/settings/data/models/driver_settings_model.dart';
 
 abstract class SettingsRemoteDataSource {
   Future<DriverSettingsModel> getSettings();
@@ -17,23 +18,31 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
 
   SettingsRemoteDataSourceImpl(this.apiClient);
 
+  Future<T> _unwrap<T>(Future<dynamic> request) async {
+    final result = await request;
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => data as T,
+    );
+  }
+
   @override
   Future<DriverSettingsModel> getSettings() async {
     try {
-      final profileResponse = await apiClient.get(ApiEndpoints.driverProfile);
-      final vehicleResponse = await apiClient.get(ApiEndpoints.driverVehicle);
+      final profileData = await _unwrap<dynamic>(apiClient.getDriver(ApiEndpoints.driverProfile));
+      final vehicleData = await _unwrap<dynamic>(apiClient.getDriver(ApiEndpoints.driverVehicle));
       
-      final profileData = profileResponse.data is Map && profileResponse.data.containsKey('data') 
-          ? profileResponse.data['data'] 
-          : (profileResponse.data is List ? profileResponse.data.first : profileResponse.data);
+      final processedProfile = profileData is Map && profileData.containsKey('data') 
+          ? profileData['data'] 
+          : (profileData is List ? profileData.first : profileData);
           
-      final vehicleData = vehicleResponse.data is Map && vehicleResponse.data.containsKey('data') 
-          ? vehicleResponse.data['data'] 
-          : (vehicleResponse.data is List ? vehicleResponse.data.first : vehicleResponse.data);
+      final processedVehicle = vehicleData is Map && vehicleData.containsKey('data') 
+          ? vehicleData['data'] 
+          : (vehicleData is List ? vehicleData.first : vehicleData);
 
       final Map<String, dynamic> compositeJson = {
-        'profile': profileData,
-        'vehicle': vehicleData,
+        'profile': processedProfile,
+        'vehicle': processedVehicle,
         'preferences': {},
       };
       
@@ -46,14 +55,15 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   @override
   Future<DriverProfileModel> updateProfile(Map<String, dynamic> data) async {
     try {
-      final response = await apiClient.put(
+      final responseData = await _unwrap<dynamic>(apiClient.putDriver(
         ApiEndpoints.driverProfile,
         data: data,
-      );
-      final responseData = response.data is Map && response.data.containsKey('data') 
-          ? response.data['data'] 
-          : response.data;
-      return DriverProfileModel.fromJson(responseData);
+      ));
+      
+      final processedData = responseData is Map && responseData.containsKey('data') 
+          ? responseData['data'] 
+          : responseData;
+      return DriverProfileModel.fromJson(processedData);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -62,15 +72,16 @@ class SettingsRemoteDataSourceImpl implements SettingsRemoteDataSource {
   @override
   Future<DriverProfileModel> uploadProfilePicture(String filePath) async {
     try {
-      final response = await apiClient.uploadFile(
+      final responseData = await _unwrap<dynamic>(apiClient.uploadFile(
         ApiEndpoints.driverProfilePhoto,
         filePath: filePath,
         fieldName: 'photo',
-      );
-      final responseData = response.data is Map && response.data.containsKey('data') 
-          ? response.data['data'] 
-          : response.data;
-      return DriverProfileModel.fromJson(responseData);
+      ));
+      
+      final processedData = responseData is Map && responseData.containsKey('data') 
+          ? responseData['data'] 
+          : responseData;
+      return DriverProfileModel.fromJson(processedData);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }

@@ -1,6 +1,6 @@
-import 'package:komiut_app/driver/earnings/data/datasources/earnings_remote_datasource.dart';
-import 'package:komiut_app/driver/earnings/data/models/earnings_model.dart';
-import 'package:komiut_app/driver/earnings/data/models/earnings_summary_model.dart';
+import 'package:komiut/driver/earnings/data/datasources/earnings_remote_datasource.dart';
+import 'package:komiut/driver/earnings/data/models/earnings_model.dart';
+import 'package:komiut/driver/earnings/data/models/earnings_summary_model.dart';
 
 class EarningsMockDataSource implements EarningsRemoteDataSource {
   @override

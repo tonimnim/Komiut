@@ -21,7 +21,7 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   Future<QueueStatusModel> getQueueStatus(String routeId) async {
     try {
       // v2 uses GET /api/Bookings/status with routeId query param
-      final response = await _apiClient.get(
+      final response = await _apiClient.getDriver(
         ApiEndpoints.queueStatus,
         queryParameters: {'RouteId': routeId},
       );
@@ -36,7 +36,7 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   Future<QueuePositionModel> joinQueue(String routeId, double lat, double lng) async {
     try {
       // v2 uses POST /api/Bookings for join/booking creation
-      final response = await _apiClient.post(
+      final response = await _apiClient.postDriver(
         ApiEndpoints.queueJoin,
         data: {
           'routeId': routeId,
@@ -54,7 +54,7 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<QueuePositionModel> getQueuePosition() async {
     try {
-      final response = await _apiClient.get(ApiEndpoints.queuePosition);
+      final response = await _apiClient.getDriver(ApiEndpoints.queuePosition);
       final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
       return QueuePositionModel.fromJson(data);
     } on DioException catch (e) {
@@ -65,7 +65,7 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<void> leaveQueue() async {
     try {
-      await _apiClient.post(ApiEndpoints.queueLeave);
+      await _apiClient.postDriver(ApiEndpoints.queueLeave);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -74,7 +74,7 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<List<QueuePositionModel>> getQueueList(String routeId) async {
     try {
-      final response = await _apiClient.get(
+      final response = await _apiClient.getDriver(
         ApiEndpoints.queueList,
         queryParameters: {'RouteId': routeId},
       );

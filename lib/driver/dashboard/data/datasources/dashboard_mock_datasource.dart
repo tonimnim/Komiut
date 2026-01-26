@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
 
 class DashboardMockDataSource implements DashboardRemoteDataSource {
   @override

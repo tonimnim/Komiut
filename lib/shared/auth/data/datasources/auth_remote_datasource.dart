@@ -1,6 +1,6 @@
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
-import 'package:komiut_app/shared/auth/data/models/user_model.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
+import 'package:komiut/shared/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>> login(String phone, [String? password]);
@@ -16,7 +16,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> login(String phoneOrEmail, [String? password]) async {
-    final response = await _apiClient.post(
+    final response = await _apiClient.postDriver(
       ApiEndpoints.login,
       data: {
         'email': phoneOrEmail, // v2 Swagger uses 'email' in MobileLoginCommand
@@ -36,7 +36,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> verifyOtp(String verificationId, String otp) async {
-    final response = await _apiClient.post(
+    final response = await _apiClient.postDriver(
       ApiEndpoints.verifyOtp,
       data: {
         'verification_id': verificationId,
@@ -53,12 +53,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> logout() async {
-    await _apiClient.post(ApiEndpoints.logout);
+    await _apiClient.postDriver(ApiEndpoints.logout);
   }
 
   @override
   Future<Map<String, dynamic>> refreshToken() async {
-    final response = await _apiClient.post(ApiEndpoints.refreshToken);
+    final response = await _apiClient.postDriver(ApiEndpoints.refreshToken);
     return response.data['data'] as Map<String, dynamic>;
   }
 }

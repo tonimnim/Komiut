@@ -1,7 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:komiut_app/core/network/network_info.dart';
+import 'package:komiut/core/network/network_info.dart';
 
 class MockConnectivity extends Mock implements Connectivity {}
 

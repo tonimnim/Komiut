@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
-import 'package:komiut_app/driver/earnings/domain/entities/earnings.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
+import 'package:komiut/driver/earnings/domain/entities/earnings.dart';
 
 class TripHistoryDetails extends Equatable {
   final String tripId;

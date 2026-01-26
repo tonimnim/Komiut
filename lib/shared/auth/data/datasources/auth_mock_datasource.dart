@@ -1,4 +1,4 @@
-import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_remote_datasource.dart';
 
 class AuthMockDataSource implements AuthRemoteDataSource {
   @override

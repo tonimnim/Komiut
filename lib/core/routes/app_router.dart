@@ -1,21 +1,26 @@
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:komiut_app/core/routes/route_names.dart';
+import 'package:komiut/core/routes/route_names.dart';
 
-import 'package:komiut_app/shared/auth/presentation/screens/splash_screen.dart';
-import 'package:komiut_app/shared/auth/presentation/screens/login_screen.dart';
-import 'package:komiut_app/shared/auth/presentation/screens/otp_screen.dart';
-import 'package:komiut_app/driver/dashboard/presentation/screens/driver_dashboard_screen.dart';
-import 'package:komiut_app/driver/queue/presentation/screens/join_queue_screen.dart';
-import 'package:komiut_app/driver/queue/presentation/screens/driver_queue_screen.dart';
-import 'package:komiut_app/driver/earnings/presentation/screens/earnings_screen.dart';
-import 'package:komiut_app/driver/trip/presentation/screens/start_trip_screen.dart';
-import 'package:komiut_app/driver/trip/presentation/screens/trip_in_progress_screen.dart';
-import 'package:komiut_app/driver/trip/presentation/screens/end_trip_screen.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
-import 'package:komiut_app/driver/settings/presentation/screens/edit_profile_screen.dart';
-import 'package:komiut_app/driver/earnings/presentation/screens/trip_history_screen.dart';
-import 'package:komiut_app/driver/earnings/presentation/screens/trip_history_details_screen.dart';
+import 'package:komiut/shared/auth/presentation/screens/splash_screen.dart';
+import 'package:komiut/shared/auth/presentation/screens/login_screen.dart';
+import 'package:komiut/shared/auth/presentation/screens/otp_screen.dart';
+import 'package:komiut/driver/dashboard/presentation/screens/driver_dashboard_screen.dart';
+import 'package:komiut/driver/queue/presentation/screens/join_queue_screen.dart';
+import 'package:komiut/driver/queue/presentation/screens/driver_queue_screen.dart';
+import 'package:komiut/driver/earnings/presentation/screens/earnings_screen.dart';
+import 'package:komiut/driver/trip/presentation/screens/start_trip_screen.dart';
+import 'package:komiut/driver/trip/presentation/screens/trip_in_progress_screen.dart';
+import 'package:komiut/driver/trip/presentation/screens/end_trip_screen.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/settings/presentation/screens/edit_profile_screen.dart';
+import 'package:komiut/driver/earnings/presentation/screens/trip_history_screen.dart';
+import 'package:komiut/driver/earnings/presentation/screens/trip_history_details_screen.dart';
+
+final appRouterProvider = Provider<GoRouter>((ref) {
+  return AppRouter.router;
+});
 
 class AppRouter {
   static final router = GoRouter(
@@ -116,4 +121,3 @@ class AppRouter {
     ],
   );
 }
-

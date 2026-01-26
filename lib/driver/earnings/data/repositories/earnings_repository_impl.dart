@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/earnings/domain/entities/earnings.dart';
-import 'package:komiut_app/driver/earnings/domain/entities/earnings_summary.dart';
-import 'package:komiut_app/driver/earnings/domain/repositories/earnings_repository.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/earnings/domain/entities/earnings.dart';
+import 'package:komiut/driver/earnings/domain/entities/earnings_summary.dart';
+import 'package:komiut/driver/earnings/domain/repositories/earnings_repository.dart';
 import '../datasources/earnings_remote_datasource.dart';
 
 class EarningsRepositoryImpl implements EarningsRepository {

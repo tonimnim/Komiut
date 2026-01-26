@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komiut_app/driver/dashboard/presentation/widgets/dashboard_widgets.dart';
-import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/routes/route_names.dart';
-import 'package:komiut_app/driver/queue/presentation/screens/driver_queue_screen.dart';
-import 'package:komiut_app/driver/queue/presentation/screens/join_queue_screen.dart';
-import 'package:komiut_app/driver/earnings/presentation/screens/earnings_screen.dart';
-import 'package:komiut_app/driver/settings/presentation/screens/profile_screen.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
-import 'package:komiut_app/driver/dashboard/domain/repositories/dashboard_repository.dart';
-import 'package:komiut_app/di/injection_container.dart';
+import 'package:komiut/driver/dashboard/presentation/widgets/dashboard_widgets.dart';
+import 'package:komiut/core/theme/app_colors.dart';
+import 'package:komiut/core/theme/app_text_styles.dart';
+import 'package:komiut/core/routes/route_names.dart';
+import 'package:komiut/driver/queue/presentation/screens/driver_queue_screen.dart';
+import 'package:komiut/driver/queue/presentation/screens/join_queue_screen.dart';
+import 'package:komiut/driver/earnings/presentation/screens/earnings_screen.dart';
+import 'package:komiut/driver/settings/presentation/screens/profile_screen.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:komiut/di/injection_container.dart';
 
 class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});

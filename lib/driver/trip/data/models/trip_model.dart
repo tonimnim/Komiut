@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/trip/domain/entities/trip.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
 
 class TripModel extends Trip {
   const TripModel({

@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/history/data/datasources/history_remote_datasource.dart';
-import 'package:komiut_app/driver/history/data/models/trip_history_model.dart';
+import 'package:komiut/driver/history/data/datasources/history_remote_datasource.dart';
+import 'package:komiut/driver/history/data/models/trip_history_model.dart';
 
 class HistoryMockDataSource implements HistoryRemoteDataSource {
   @override

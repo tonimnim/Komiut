@@ -1,4 +1,4 @@
-import 'package:komiut_app/driver/trip/domain/entities/trip_entities.dart';
+import 'package:komiut/driver/trip/domain/entities/trip_entities.dart';
 
 class TripDtoModel extends TripDto {
   const TripDtoModel({

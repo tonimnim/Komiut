@@ -1,9 +1,9 @@
-import 'package:komiut_app/core/network/network_info.dart';
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
-import 'package:komiut_app/shared/auth/domain/repositories/auth_repository.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_local_datasource.dart';
-import 'package:komiut_app/shared/auth/data/models/user_model.dart';
+import 'package:komiut/core/network/network_info.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_local_datasource.dart';
+import 'package:komiut/shared/auth/data/models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;

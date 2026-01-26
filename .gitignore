@@ -61,12 +61,9 @@ app.*.map.json
 # IDE
 .vscode/
 .fleet/
-<<<<<<< HEAD
+
+# Custom Ignores
 *.txt
 *.json
-=======
->>>>>>> 257fd9ba02dbf6b32a6aad0ed7168f738b4d315d
 docs/
-*.txt
-*.json
 .env

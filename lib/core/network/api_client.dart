@@ -57,10 +57,45 @@ class ApiClient {
     ]);
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Driver Compatibility Methods (Internal)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  Future<DriverResponse> getDriver(String path, {Map<String, dynamic>? queryParameters, Options? options}) async {
+    final result = await get<dynamic>(path, queryParameters: queryParameters, options: options);
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => DriverResponse(data),
+    );
+  }
+
+  Future<DriverResponse> postDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+    final result = await post<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => DriverResponse(data),
+    );
+  }
+
+  Future<DriverResponse> putDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+    final result = await put<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => DriverResponse(data),
+    );
+  }
+
+  Future<DriverResponse> deleteDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
+    final result = await delete<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+    return result.fold(
+      (failure) => throw ServerFailure(failure.message),
+      (data) => DriverResponse(data),
+    );
+  }
+
   late final Dio _dio;
   final NetworkInfo _networkInfo;
 
-  /// The underlying Dio instance (for advanced use cases).
   Dio get dio => _dio;
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -287,4 +322,9 @@ class ApiClient {
         return ServerFailure(e.message ?? 'Unknown error');
     }
   }
+}
+
+class DriverResponse {
+  final dynamic data;
+  DriverResponse(this.data);
 }

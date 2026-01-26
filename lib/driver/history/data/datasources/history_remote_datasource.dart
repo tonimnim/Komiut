@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
 
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/history/data/models/trip_history_model.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/history/data/models/trip_history_model.dart';
 
 
 abstract class HistoryRemoteDataSource {
@@ -40,7 +40,7 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
     if (routeId != null) queryParams['RouteId'] = routeId;
 
     try {
-      final response = await apiClient.get(
+      final response = await apiClient.getDriver(
         ApiEndpoints.tripHistory,
         queryParameters: queryParams,
       );
@@ -56,7 +56,7 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
   @override
   Future<dynamic> getTripHistoryDetails(String tripId) async {
     try {
-      final response = await apiClient.get(ApiEndpoints.tripDetails(tripId));
+      final response = await apiClient.getDriver(ApiEndpoints.tripDetails(tripId));
       final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
       return data;
     } on DioException catch (e) {

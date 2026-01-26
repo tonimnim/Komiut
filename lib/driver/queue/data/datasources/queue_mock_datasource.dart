@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/queue/data/datasources/queue_remote_datasource.dart';
-import 'package:komiut_app/driver/queue/data/models/queue_model.dart';
+import 'package:komiut/driver/queue/data/datasources/queue_remote_datasource.dart';
+import 'package:komiut/driver/queue/data/models/queue_model.dart';
 
 class QueueMockDataSource implements QueueRemoteDataSource {
   @override

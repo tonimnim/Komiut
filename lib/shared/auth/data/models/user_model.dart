@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
 
 class UserModel extends User {
   const UserModel({

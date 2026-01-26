@@ -2,48 +2,48 @@ import 'package:get_it/get_it.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/network/network_info.dart';
-import 'package:komiut_app/core/config/app_config.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/network/network_info.dart';
+import 'package:komiut/core/config/app_config.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_mock_datasource.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_local_datasource.dart';
-import 'package:komiut_app/shared/auth/data/repositories/auth_repository_impl.dart';
-import 'package:komiut_app/shared/auth/domain/repositories/auth_repository.dart';
-import 'package:komiut_app/shared/auth/presentation/bloc/auth_bloc.dart';
-import 'package:komiut_app/core/theme/theme_bloc.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_mock_datasource.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_local_datasource.dart';
+import 'package:komiut/shared/auth/data/repositories/auth_repository_impl.dart';
+import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
+import 'package:komiut/shared/auth/presentation/bloc/auth_bloc.dart';
+import 'package:komiut/core/theme/theme_bloc.dart';
 
-import 'package:komiut_app/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
-import 'package:komiut_app/driver/dashboard/data/datasources/dashboard_mock_datasource.dart';
-import 'package:komiut_app/driver/dashboard/data/repositories/dashboard_repository_impl.dart';
-import 'package:komiut_app/driver/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_mock_datasource.dart';
+import 'package:komiut/driver/dashboard/data/repositories/dashboard_repository_impl.dart';
+import 'package:komiut/driver/dashboard/domain/repositories/dashboard_repository.dart';
 
-import 'package:komiut_app/driver/queue/data/datasources/queue_remote_datasource.dart';
-import 'package:komiut_app/driver/queue/data/datasources/queue_mock_datasource.dart';
-import 'package:komiut_app/driver/queue/data/repositories/queue_repository_impl.dart';
-import 'package:komiut_app/driver/queue/domain/repositories/queue_repository.dart';
+import 'package:komiut/driver/queue/data/datasources/queue_remote_datasource.dart';
+import 'package:komiut/driver/queue/data/datasources/queue_mock_datasource.dart';
+import 'package:komiut/driver/queue/data/repositories/queue_repository_impl.dart';
+import 'package:komiut/driver/queue/domain/repositories/queue_repository.dart';
 
-import 'package:komiut_app/driver/trip/data/datasources/trip_remote_datasource.dart';
-import 'package:komiut_app/driver/trip/data/datasources/trip_mock_datasource.dart';
-import 'package:komiut_app/driver/trip/data/repositories/trip_repository_impl.dart';
-import 'package:komiut_app/driver/trip/domain/repositories/trip_repository.dart';
+import 'package:komiut/driver/trip/data/datasources/trip_remote_datasource.dart';
+import 'package:komiut/driver/trip/data/datasources/trip_mock_datasource.dart';
+import 'package:komiut/driver/trip/data/repositories/trip_repository_impl.dart';
+import 'package:komiut/driver/trip/domain/repositories/trip_repository.dart';
 
-import 'package:komiut_app/driver/earnings/data/datasources/earnings_remote_datasource.dart';
-import 'package:komiut_app/driver/earnings/data/datasources/earnings_mock_datasource.dart';
-import 'package:komiut_app/driver/earnings/data/repositories/earnings_repository_impl.dart';
-import 'package:komiut_app/driver/earnings/domain/repositories/earnings_repository.dart';
+import 'package:komiut/driver/earnings/data/datasources/earnings_remote_datasource.dart';
+import 'package:komiut/driver/earnings/data/datasources/earnings_mock_datasource.dart';
+import 'package:komiut/driver/earnings/data/repositories/earnings_repository_impl.dart';
+import 'package:komiut/driver/earnings/domain/repositories/earnings_repository.dart';
 
-import 'package:komiut_app/driver/history/data/datasources/history_remote_datasource.dart';
-import 'package:komiut_app/driver/history/data/datasources/history_mock_datasource.dart';
-import 'package:komiut_app/driver/history/data/repositories/history_repository_impl.dart';
-import 'package:komiut_app/driver/history/domain/repositories/history_repository.dart';
+import 'package:komiut/driver/history/data/datasources/history_remote_datasource.dart';
+import 'package:komiut/driver/history/data/datasources/history_mock_datasource.dart';
+import 'package:komiut/driver/history/data/repositories/history_repository_impl.dart';
+import 'package:komiut/driver/history/domain/repositories/history_repository.dart';
 
-import 'package:komiut_app/driver/settings/data/datasources/settings_remote_datasource.dart';
-import 'package:komiut_app/driver/settings/data/datasources/settings_mock_datasource.dart';
-import 'package:komiut_app/driver/settings/data/repositories/settings_repository_impl.dart';
-import 'package:komiut_app/driver/settings/domain/repositories/settings_repository.dart';
+import 'package:komiut/driver/settings/data/datasources/settings_remote_datasource.dart';
+import 'package:komiut/driver/settings/data/datasources/settings_mock_datasource.dart';
+import 'package:komiut/driver/settings/data/repositories/settings_repository_impl.dart';
+import 'package:komiut/driver/settings/domain/repositories/settings_repository.dart';
 
 final getIt = GetIt.instance;
 

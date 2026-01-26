@@ -1,13 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart' show DriverProfile;
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-import 'package:komiut_app/driver/settings/domain/entities/driver_settings.dart';
-import 'package:komiut_app/driver/settings/domain/repositories/settings_repository.dart';
-import 'package:komiut_app/driver/settings/data/datasources/settings_remote_datasource.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart' show DriverProfile;
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/settings/domain/entities/driver_settings.dart';
+import 'package:komiut/driver/settings/domain/repositories/settings_repository.dart';
+import 'package:komiut/driver/settings/data/datasources/settings_remote_datasource.dart';
 
 class SettingsRepositoryImpl implements SettingsRepository {
   final SettingsRemoteDataSource remoteDataSource;

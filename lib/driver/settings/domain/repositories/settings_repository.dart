@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../entities/driver_settings.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart' show DriverProfile;
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart' show DriverProfile;
 
 abstract class SettingsRepository {
   Future<Either<Failure, DriverSettings>> getSettings();

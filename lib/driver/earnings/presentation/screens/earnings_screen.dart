@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../widgets/earnings_widgets.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
 import '../../../../core/routes/route_names.dart';
 
 class EarningsScreen extends StatefulWidget {

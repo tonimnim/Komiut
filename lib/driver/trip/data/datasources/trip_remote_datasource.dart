@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
 
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/trip/data/models/trip_model.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/trip/data/models/trip_model.dart';
 
 abstract class TripRemoteDataSource {
   Future<TripModel> startTrip(String routeId, String vehicleId);
@@ -21,7 +21,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel> startTrip(String routeId, String vehicleId) async {
     try {
-      final response = await apiClient.post(
+      final response = await apiClient.postDriver(
         ApiEndpoints.tripStart,
         data: {
           'routeId': routeId,
@@ -44,7 +44,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
       };
       if (data != null) body.addAll(data);
       
-      final response = await apiClient.put(
+      final response = await apiClient.putDriver(
         ApiEndpoints.tripUpdate(tripId),
         data: body,
       );
@@ -58,7 +58,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel> endTrip(String tripId, {required int finalPassengers, required double finalEarnings}) async {
     try {
-      final response = await apiClient.post(
+      final response = await apiClient.postDriver(
         ApiEndpoints.tripEnd(tripId),
         data: {
           'passengerCount': finalPassengers,
@@ -75,7 +75,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel?> getActiveTrip() async {
     try {
-      final response = await apiClient.get(ApiEndpoints.tripActive);
+      final response = await apiClient.getDriver(ApiEndpoints.tripActive);
       final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
       if (data == null || (data is List && data.isEmpty)) return null;
       final result = data is List ? data.first : data;
@@ -89,7 +89,7 @@ class TripRemoteDataSourceImpl implements TripRemoteDataSource {
   @override
   Future<TripModel> getTripById(String tripId) async {
     try {
-      final response = await apiClient.get(ApiEndpoints.tripDetails(tripId));
+      final response = await apiClient.getDriver(ApiEndpoints.tripDetails(tripId));
       final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
       return TripModel.fromJson(data);
     } on DioException catch (e) {

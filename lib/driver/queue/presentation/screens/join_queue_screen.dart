@@ -6,7 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../shared/widgets/komiut_map.dart';
 import '../widgets/queue_widgets.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
 
 class JoinQueueScreen extends StatelessWidget {
   final DriverProfile? profile;

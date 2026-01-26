@@ -1,7 +1,7 @@
-import 'package:komiut_app/core/network/network_info.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
-import 'package:komiut_app/driver/dashboard/domain/repositories/dashboard_repository.dart';
-import 'package:komiut_app/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
+import 'package:komiut/core/network/network_info.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/repositories/dashboard_repository.dart';
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_remote_datasource.dart';
 
 class DashboardRepositoryImpl implements DashboardRepository {
   final DashboardRemoteDataSource remoteDataSource;

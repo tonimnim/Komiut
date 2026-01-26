@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/settings/domain/entities/driver_settings.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/settings/domain/entities/driver_settings.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
 
 
 class DriverSettingsModel extends DriverSettings {

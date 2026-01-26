@@ -1,4 +1,4 @@
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
 
 class DriverProfileModel extends DriverProfile {
   const DriverProfileModel({

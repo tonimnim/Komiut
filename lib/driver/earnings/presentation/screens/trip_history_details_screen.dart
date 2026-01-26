@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:komiut_app/core/theme/app_colors.dart';
-import 'package:komiut_app/core/theme/app_text_styles.dart';
-import 'package:komiut_app/shared/widgets/komiut_map.dart';
+import 'package:komiut/core/theme/app_colors.dart';
+import 'package:komiut/core/theme/app_text_styles.dart';
+import 'package:komiut/shared/widgets/komiut_map.dart';
 
 class TripHistoryDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> trip;

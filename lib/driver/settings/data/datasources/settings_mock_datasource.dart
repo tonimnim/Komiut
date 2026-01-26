@@ -1,6 +1,6 @@
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-import 'package:komiut_app/driver/settings/data/datasources/settings_remote_datasource.dart';
-import 'package:komiut_app/driver/settings/data/models/driver_settings_model.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/settings/data/datasources/settings_remote_datasource.dart';
+import 'package:komiut/driver/settings/data/models/driver_settings_model.dart';
 
 class SettingsMockDataSource implements SettingsRemoteDataSource {
   @override

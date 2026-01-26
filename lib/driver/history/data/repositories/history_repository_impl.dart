@@ -1,13 +1,13 @@
 import 'package:dartz/dartz.dart';
 
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/history/domain/entities/trip_history.dart';
-import 'package:komiut_app/driver/history/domain/entities/trip_history_details.dart';
-import 'package:komiut_app/driver/history/domain/repositories/history_repository.dart';
-import 'package:komiut_app/driver/history/data/datasources/history_remote_datasource.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
-import 'package:komiut_app/driver/earnings/data/models/earnings_model.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/history/domain/entities/trip_history.dart';
+import 'package:komiut/driver/history/domain/entities/trip_history_details.dart';
+import 'package:komiut/driver/history/domain/repositories/history_repository.dart';
+import 'package:komiut/driver/history/data/datasources/history_remote_datasource.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/earnings/data/models/earnings_model.dart';
 
 class HistoryRepositoryImpl implements HistoryRepository {
   final HistoryRemoteDataSource remoteDataSource;
