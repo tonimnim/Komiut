@@ -30,6 +30,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -45,10 +46,11 @@ android {
         applicationId "com.example.komiut_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -64,11 +66,18 @@ flutter {
     source '../..'
 }
 
-dependencies {}
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.1'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+}
 
 configurations.all {
     resolutionStrategy {
         force 'androidx.core:core-ktx:1.13.1'
         force 'androidx.core:core:1.13.1'
+        force 'androidx.activity:activity-ktx:1.9.3'
+        force 'androidx.activity:activity:1.9.3'
+        force 'androidx.fragment:fragment-ktx:1.8.5'
+        force 'androidx.fragment:fragment:1.8.5'
     }
 }

@@ -97,8 +97,8 @@ class AppConfig {
 
   /// DEV MODE: Skip authentication and go directly to home screen.
   /// Set to true to preview UI without logging in.
-  /// ⚠️ Set to false before release!
-  static const bool skipAuth = true; // Set to true for internal testing
+  /// ⚠️ PRODUCTION: Must be false before deployment!
+  static const bool skipAuth = true; // Dev mode: No backend APIs available yet
 
   /// Whether to enable loyalty points feature.
   static const bool enableLoyalty = true;
@@ -123,5 +123,6 @@ class AppConfig {
   static String get googleMapsApiKey => dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
 
   /// Whether to enable mock data for development/testing.
-  static bool get enableMockData => true; // Forced to true for debugging
+  /// ⚠️ PRODUCTION: Must be false to use real API!
+  static bool get enableMockData => true; // Dev mode: No backend available yet
 }

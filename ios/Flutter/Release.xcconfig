@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 #include "Generated.xcconfig"
+=======
+#include "Generated.xcconfig"
+>>>>>>> 257fd9ba02dbf6b32a6aad0ed7168f738b4d315d
