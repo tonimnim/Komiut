@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/routes/route_names.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../di/injection_container.dart';
-import '../../../widgets/custom_button.dart';
 import '../bloc/auth_bloc.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,22 +16,24 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _showPassword = false;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
   void _onLogin(BuildContext context) {
     if (_formKey.currentState?.validate() ?? false) {
-      // Use clean number for logic
-      final rawNumber = _phoneController.text.trim();
-      final phone = rawNumber.startsWith('0') ? rawNumber.substring(1) : rawNumber;
-      
       context.read<AuthBloc>().add(
-        AuthLoginRequested(phone: '+254$phone'),
+        AuthLoginRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        ),
       );
     }
   }
@@ -43,33 +44,36 @@ class _LoginScreenState extends State<LoginScreen> {
       create: (_) => getIt<AuthBloc>(),
       child: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
-          if (state is AuthOtpSent) {
-            context.push(RouteNames.otp, extra: state.verificationId);
+          if (state is AuthAuthenticated) {
+            context.go(RouteNames.driverDashboard);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              SnackBar(content: Text(state.message), backgroundColor: AppColors.error),
             );
           }
         },
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            title: const Text(
-              'Log in', 
-              style: TextStyle(
-                color: Color(0xFF1E293B),
-                fontSize: 16, 
-                fontWeight: FontWeight.bold
-              )
-            ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B), size: 20),
-              onPressed: () => context.pop(),
-            ),
-          ),
+        child: Builder(
+          builder: (context) {
+            final theme = Theme.of(context);
+            return Scaffold(
+              backgroundColor: theme.scaffoldBackgroundColor,
+              appBar: AppBar(
+                backgroundColor: theme.scaffoldBackgroundColor,
+                elevation: 0,
+                title: Text(
+                  'Log in', 
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 16, 
+                    fontWeight: FontWeight.bold
+                  )
+                ),
+                centerTitle: true,
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface, size: 20),
+                  onPressed: () => context.pop(),
+                ),
+              ),
           body: SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -79,87 +83,106 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 16),
-                    const Text(
+                    Text(
                       'Get Moving',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
-                        color: Color(0xFF1E293B), // Slate 900
+                        color: theme.colorScheme.onSurface, // Slate 900
                         letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Enter your mobile number to get started.',
+                    Text(
+                      'Enter your email and password to get started.',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Color(0xFF64748B), // Slate 500
+                        color: theme.colorScheme.onSurfaceVariant, // Slate 500
                         height: 1.5,
                       ),
                     ),
                     
                     const SizedBox(height: 48),
 
-                    const Text(
-                      'Phone number',
+                    Text(
+                      'Email address',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 8),
                     Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC), // Slate 50
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: const Color(0xFFE2E8F0)), // Slate 200
+                        border: Border.all(color: theme.dividerColor),
                       ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            decoration: const BoxDecoration(
-                              border: Border(right: BorderSide(color: Color(0xFFE2E8F0))),
+                      child: TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          hintText: 'name@example.com',
+                          hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) return 'Required';
+                          if (!value.contains('@')) return 'Invalid email';
+                          return null;
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Password',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: theme.cardColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: theme.dividerColor),
+                      ),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_showPassword,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.transparent,
+                          hintText: '••••••••',
+                          hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _showPassword ? Icons.visibility_off : Icons.visibility,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
-                            child: Row(
-                              children: const [
-                                Text(
-                                  '+254',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color(0xFF1E293B),
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Color(0xFF64748B)),
-                              ],
-                            ),
+                            onPressed: () => setState(() => _showPassword = !_showPassword),
                           ),
-                          Expanded(
-                            child: TextFormField(
-                              controller: _phoneController,
-                              keyboardType: TextInputType.phone,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1E293B),
-                              ),
-                              decoration: const InputDecoration(
-                                hintText: '711 000 000',
-                                hintStyle: TextStyle(color: Color(0xFF94A3B8)),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) return 'Required';
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
 
@@ -173,10 +196,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: ElevatedButton(
                             onPressed: (state is AuthLoading) ? null : () => _onLogin(context),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF2563EB), // Primary Blue
+                              backgroundColor: theme.colorScheme.primary,
                               elevation: 0,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              disabledBackgroundColor: const Color(0xFF2563EB).withOpacity(0.5),
+                              disabledBackgroundColor: theme.colorScheme.primary.withOpacity(0.5),
                             ),
                             child: (state is AuthLoading)
                                 ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
@@ -193,12 +216,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
                     const SizedBox(height: 24),
-                    const Text(
+                    Text(
                       'By continuing, you agree to our Terms of Service and Privacy Policy.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF94A3B8), // Slate 400
+                        color: theme.colorScheme.onSurfaceVariant, // Slate 400
                         height: 1.5,
                       ),
                     ),
@@ -208,6 +231,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
+            );
+          },
         ),
       ),
     );

@@ -1,11 +1,10 @@
 import 'package:dartz/dartz.dart';
 
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/trip/domain/entities/trip.dart';
-import 'package:komiut_app/driver/trip/domain/repositories/trip_repository.dart';
-import 'package:komiut_app/driver/trip/data/datasources/trip_remote_datasource.dart';
-import 'package:komiut_app/driver/trip/data/models/trip_model.dart';
+import 'package:komiut/core/errors/failures.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/trip/domain/repositories/trip_repository.dart';
+import 'package:komiut/driver/trip/data/datasources/trip_remote_datasource.dart';
 
 class TripRepositoryImpl implements TripRepository {
   final TripRemoteDataSource remoteDataSource;
@@ -27,7 +26,6 @@ class TripRepositoryImpl implements TripRepository {
   @override
   Future<Either<Failure, Trip>> updateTripStatus(String tripId, TripStatus status, {Map<String, dynamic>? data}) async {
     try {
-      // Map enum to string expected by API
       String statusStr;
       switch (status) {
         case TripStatus.scheduled: statusStr = 'scheduled'; break;

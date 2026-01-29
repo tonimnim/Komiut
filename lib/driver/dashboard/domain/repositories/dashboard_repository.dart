@@ -13,5 +13,6 @@ abstract class DashboardRepository {
 
   Future<EarningsSummary> getTodayEarnings();
   Future<List<Map<String, dynamic>>> getNotifications();
+  Future<void> markNotificationAsRead(String id);
   Future<int> getCurrentPassengers();
 }

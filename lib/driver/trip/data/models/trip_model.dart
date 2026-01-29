@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/trip/domain/entities/trip.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
 
 class TripModel extends Trip {
   const TripModel({
@@ -36,8 +36,7 @@ class TripModel extends Trip {
   Map<String, dynamic> toJson() {
     return {
       'trip_id': id,
-      // 'route': (route as CircleRouteModel).toJson(), // Assuming cast is safe or map it
-      'status': status.toString().split('.').last, // simplified
+      'status': status.toString().split('.').last,
       'passenger_count': currentPassengerCount,
       'current_earnings': currentEarnings,
     };

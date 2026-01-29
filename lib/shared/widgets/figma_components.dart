@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:komiut_app/core/theme/app_colors.dart';
+import 'package:komiut/core/theme/app_colors.dart';
 
 class FigmaButton extends StatelessWidget {
   final String text;

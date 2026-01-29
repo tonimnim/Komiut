@@ -1,276 +1,258 @@
 import 'package:flutter/material.dart';
-import '../../data/datasources/earnings_mock_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+import 'package:komiut/core/theme/app_colors.dart';
+import 'package:komiut/core/theme/app_text_styles.dart';
+import 'package:komiut/driver/earnings/presentation/widgets/earnings_widgets.dart';
+import 'package:komiut/driver/dashboard/presentation/widgets/dashboard_widgets.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/core/routes/route_names.dart';
+import 'package:komiut/shared/widgets/komiut_app_bar.dart';
+import 'package:komiut/di/injection_container.dart';
+import '../bloc/earnings_bloc.dart';
+import '../bloc/earnings_event.dart';
+import '../bloc/earnings_state.dart';
+import '../../../../core/widgets/feedback/app_empty_state.dart';
+import '../../../../core/widgets/buttons/app_button.dart';
 
-class EarningsScreen extends StatelessWidget {
-  const EarningsScreen({super.key});
+class EarningsScreen extends StatefulWidget {
+  final bool isTab;
+  final DriverProfile? profile;
+  const EarningsScreen({super.key, this.isTab = false, this.profile});
+
+  @override
+  State<EarningsScreen> createState() => _EarningsScreenState();
+}
+
+class _EarningsScreenState extends State<EarningsScreen> {
+  bool _isWeekly = true;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF8FAFC),
-        elevation: 0,
-        title: const Text(
-          'Earnings',
-          style: TextStyle(
-            color: Color(0xFF1E293B), // Slate 900
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+    final theme = Theme.of(context);
+    return BlocProvider(
+      create: (context) => getIt<EarningsBloc>()..add(GetEarningsSummaryEvent(period: _isWeekly ? 'weekly' : 'daily')),
+      child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: KomiutAppBar(
+          title: 'Earnings',
+          imageUrl: widget.profile?.imageUrl,
+          showProfileIcon: true,
+          leading: widget.isTab ? null : IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface, size: 20),
+            onPressed: () => context.pop(),
           ),
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF1E293B), size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-         actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_today, color: Color(0xFF1E293B), size: 20),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildBalanceCard(),
-            const SizedBox(height: 24),
-            _buildChartSection(),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Recent Trips',
-                  style: TextStyle(
-                    color: Color(0xFF1E293B),
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('See All'),
-                ),
-              ],
+          onProfileTap: () {
+            // Logic to switch to profile tab if needed
+          },
+          actions: [
+            IconButton(
+              icon: Icon(Icons.info_outline_rounded, color: theme.colorScheme.onSurface),
+              onPressed: () {},
             ),
-             const SizedBox(height: 12),
-            _buildTransactionsList(),
+          ],
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: BlocBuilder<EarningsBloc, EarningsState>(
+                builder: (context, state) {
+                  if (state is EarningsLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is EarningsError) {
+                    return Center(child: Text('Error: ${state.message}'));
+                  } else if (state is EarningsLoaded) {
+                    final summary = state.summary;
+                    final trips = state.tripHistory;
+                    
+                    final String balance = NumberFormat('#,##0.00').format(summary.netEarnings);
+                    const String trend = '8%'; // Still hardcoded if not in summary or calculations
+                    
+                    // Simple chart values from state
+                    final List<double> chartValues = _isWeekly 
+                        ? [0.2, 0.4, 0.3, 0.6, 0.8, 0.5, 0.1]
+                        : [0.3, 0.5, 0.7];
+                    final List<String> chartLabels = _isWeekly
+                        ? ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+                        : ['08:00', '12:00', '16:00'];
+                    final String periodText = _isWeekly ? 'Current Week' : 'Today';
+
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 20),
+                          EarningsToggle(
+                            isWeekly: _isWeekly,
+                            onToggle: (val) {
+                              setState(() => _isWeekly = val);
+                              context.read<EarningsBloc>().add(GetEarningsSummaryEvent(period: val ? 'weekly' : 'daily'));
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          BalanceCard(amount: balance, trend: trend),
+                          const SizedBox(height: 32),
+                          EarningsChart(
+                            values: chartValues,
+                            labels: chartLabels,
+                            period: periodText,
+                          ),
+                          const SizedBox(height: 32),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Recent Trips',
+                                style: AppTextStyles.heading3,
+                              ),
+                              TextButton(
+                                onPressed: () => context.push(RouteNames.tripHistory, extra: widget.profile),
+                                child: Text(
+                                  'See All',
+                                  style: AppTextStyles.body2.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          if (trips.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              child: AppEmptyState.noTrips(
+                                message: 'No recent trips found for this period',
+                                compact: true,
+                              ),
+                            )
+                          else
+                            ...trips.take(5).map((trip) => TransactionItem(
+                              title: trip.routeName,
+                              date: trip.time,
+                              status: trip.status,
+                              amount: NumberFormat('#,##0.00').format(trip.earnings),
+                              icon: Icons.directions_bus_rounded,
+                              iconColor: Theme.of(context).colorScheme.primary,
+                              onTap: () => _showTripDetail(context, trip.routeName, 'KES ${NumberFormat('#,##0.00').format(trip.earnings)}', trip.date, trip.passengers),
+                            )),
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+            if (widget.isTab) _buildBottomAction(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBalanceCard() {
+  Widget _buildBottomAction() {
+    final theme = Theme.of(context);
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B), // Dark card for earnings
-        borderRadius: BorderRadius.circular(20),
+        color: theme.scaffoldBackgroundColor,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          const Text(
-            EarningsMockData.earningsLabel,
-            style: TextStyle(
-              color: Color(0xFF94A3B8), // Slate 400
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            EarningsMockData.totalEarnings,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
-              letterSpacing: -1,
-            ),
-          ),
-          const SizedBox(height: 8),
-           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-               mainAxisSize: MainAxisSize.min,
-              children: const [
-                 Icon(Icons.trending_up, color: Color(0xFF10B981), size: 16),
-                 SizedBox(width: 4),
-                 Text(
-                  '+12% vs last week',
-                  style: TextStyle(
-                    color: Color(0xFF10B981),
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildChartSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: theme.shadowColor.withOpacity(0.05),
             blurRadius: 10,
-            offset: const Offset(0, 4),
+            offset: const Offset(0, -5),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text(
-                'Weekly Summary',
-                style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-              Icon(Icons.more_horiz, color: Color(0xFF94A3B8)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: EarningsMockData.weeklyChart.map((data) => _buildBar(data)).toList(),
-          ),
-        ],
+      child: AppButton.primary(
+        onPressed: () {},
+        icon: Icons.payments_rounded,
+        label: 'Request Payout',
+        size: ButtonSize.large,
+        isFullWidth: true,
+        gradient: AppColors.primaryGradient,
       ),
     );
   }
 
-  Widget _buildBar(Map<String, dynamic> data) {
-    final height = 120.0 * (data['pct'] as double);
-    final isMax = (data['pct'] as double) == 1.0;
-
-    return Column(
-      children: [
-        Container(
-          width: 12,
-          height: height,
-          decoration: BoxDecoration(
-            color: isMax ? const Color(0xFF2563EB) : const Color(0xFFE2E8F0),
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          data['day'],
-          style: TextStyle(
-            color: isMax ? const Color(0xFF2563EB) : const Color(0xFF94A3B8),
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTransactionsList() {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: EarningsMockData.transactions.length,
-      itemBuilder: (context, index) {
-        final tx = EarningsMockData.transactions[index];
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-          ),
-          child: Row(
+  void _showTripDetail(BuildContext context, String title, String total, DateTime date, int passengers) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        final dialogTheme = Theme.of(context);
+        return Dialog(
+          backgroundColor: dialogTheme.scaffoldBackgroundColor,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.directions_car, color: Color(0xFF64748B), size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tx['id']!,
-                      style: const TextStyle(
-                        color: Color(0xFF1E293B),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      tx['date']!,
-                      style: const TextStyle(
-                        color: Color(0xFF94A3B8),
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    tx['amount']!,
-                    style: const TextStyle(
-                      color: Color(0xFF10B981),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    tx['status']!,
-                    style: const TextStyle(
-                      color: Color(0xFF64748B),
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Text('Trip Details', style: AppTextStyles.heading3),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded),
+                    onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-            ],
+              const SizedBox(height: 24),
+              _buildDetailRow('Route', title),
+              const SizedBox(height: 16),
+              _buildDetailRow('Date', DateFormat('MMMM dd, yyyy').format(date)),
+              const SizedBox(height: 16),
+              _buildDetailRow('Passengers', passengers.toString()),
+              const SizedBox(height: 16),
+              _buildDetailRow('Distance', '12.5 km'),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 24),
+              _buildDetailRow('Gross Fare', total),
+              const SizedBox(height: 12),
+              _buildDetailRow('Platform Fee (10%)', '- KES 250.00', isRed: true),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Net Earnings', style: AppTextStyles.heading4),
+                  Text(total, style: AppTextStyles.heading4.copyWith(color: AppColors.success)),
+                ],
+              ),
+              const SizedBox(height: 32),
+              AppButton.primary(
+                onPressed: () => Navigator.pop(context),
+                label: 'GOT IT',
+                size: ButtonSize.large,
+                isFullWidth: true,
+              ),
+              ],
+            ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, {bool isRed = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: AppTextStyles.body1.copyWith(color: AppColors.textSecondary)),
+        Text(
+          value,
+          style: AppTextStyles.body1.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isRed ? AppColors.redAccent : AppColors.textPrimary,
+          ),
+        ),
+      ],
     );
   }
 }

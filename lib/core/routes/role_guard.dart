@@ -13,25 +13,6 @@ class RoleGuard {
     RouteNames.otp,
   ];
 
-  static const List<String> driverRoutes = [
-    RouteNames.driverDashboard,
-    RouteNames.preQueue,
-    RouteNames.queueManagement,
-    RouteNames.startTrip,
-    RouteNames.tripEarnings,
-    RouteNames.tripHistory,
-    RouteNames.driverSettings,
-  ];
-
-  static const List<String> passengerRoutes = [
-    RouteNames.passengerHome,
-    RouteNames.passengerQueuing,
-    RouteNames.passengerTrip,
-    RouteNames.passengerPayment,
-    RouteNames.passengerHistory,
-    RouteNames.passengerSettings,
-  ];
-
   static Future<String?> guard(
     BuildContext context,
     GoRouterState state,
@@ -49,35 +30,13 @@ class RoleGuard {
       return RouteNames.login;
     }
 
-    final userRole = await authRepository.getUserRole();
-
-    if (userRole == AppConstants.roleDriver) {
-      if (_isPassengerRoute(currentPath)) {
-        return RouteNames.driverDashboard;
-      }
-    } else if (userRole == AppConstants.rolePassenger) {
-      if (_isDriverRoute(currentPath)) {
-        return RouteNames.passengerHome;
-      }
-    }
-
     return null;
-  }
-
-  static bool _isDriverRoute(String path) {
-    return path.startsWith('/driver');
-  }
-
-  static bool _isPassengerRoute(String path) {
-    return path.startsWith('/passenger');
   }
 
   static String getHomeRoute(String role) {
     switch (role) {
       case AppConstants.roleDriver:
         return RouteNames.driverDashboard;
-      case AppConstants.rolePassenger:
-        return RouteNames.passengerHome;
       default:
         return RouteNames.login;
     }

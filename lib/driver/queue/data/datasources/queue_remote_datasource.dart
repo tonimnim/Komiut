@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import '../../../../core/network/api_endpoints.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
 import '../models/queue_model.dart';
@@ -19,8 +20,11 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<QueueStatusModel> getQueueStatus(String routeId) async {
     try {
-      final response = await _apiClient.get('/api/queues/$routeId/status');
-      return QueueStatusModel.fromJson(response.data['data']);
+      final response = await _apiClient.getDriver(
+        ApiEndpoints.queueByRoute(routeId),
+      );
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      return QueueStatusModel.fromJson(data);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -29,11 +33,16 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<QueuePositionModel> joinQueue(String routeId, double lat, double lng) async {
     try {
-      final response = await _apiClient.post(
-        '/api/queues/$routeId/join',
-        data: {'lat': lat, 'lng': lng},
+      final response = await _apiClient.postDriver(
+        ApiEndpoints.queueJoin,
+        data: {
+          'routeId': routeId,
+          'latitude': lat,
+          'longitude': lng,
+        },
       );
-      return QueuePositionModel.fromJson(response.data['data']);
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      return QueuePositionModel.fromJson(data);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -42,8 +51,11 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<QueuePositionModel> getQueuePosition() async {
     try {
-      final response = await _apiClient.get('/api/queues/position');
-      return QueuePositionModel.fromJson(response.data['data']);
+      final response = await _apiClient.getDriver(
+        ApiEndpoints.queueMyPosition,
+      );
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      return QueuePositionModel.fromJson(data);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -52,7 +64,9 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<void> leaveQueue() async {
     try {
-      await _apiClient.post('/api/queues/leave');
+      await _apiClient.postDriver(
+        ApiEndpoints.queueLeave,
+      );
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -61,8 +75,11 @@ class QueueRemoteDataSourceImpl implements QueueRemoteDataSource {
   @override
   Future<List<QueuePositionModel>> getQueueList(String routeId) async {
     try {
-      final response = await _apiClient.get('/api/queues/$routeId/list');
-      final List list = response.data['data'];
+      final response = await _apiClient.getDriver(
+        ApiEndpoints.queueByRoute(routeId),
+      );
+      final dynamic data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      final List list = data is List ? data : (data['items'] ?? []);
       return list.map((item) => QueuePositionModel.fromJson(item)).toList();
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);

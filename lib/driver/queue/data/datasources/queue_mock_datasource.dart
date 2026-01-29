@@ -1,5 +1,7 @@
-import 'package:komiut_app/driver/queue/data/datasources/queue_remote_datasource.dart';
-import 'package:komiut_app/driver/queue/data/models/queue_model.dart';
+import 'package:komiut/driver/queue/data/datasources/queue_remote_datasource.dart';
+import 'package:komiut/driver/queue/data/models/queue_model.dart';
+
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_mock_datasource.dart';
 
 class QueueMockDataSource implements QueueRemoteDataSource {
   @override
@@ -16,7 +18,14 @@ class QueueMockDataSource implements QueueRemoteDataSource {
 
   @override
   Future<QueuePositionModel> joinQueue(String routeId, double lat, double lng) async {
-    await Future.delayed(const Duration(seconds: 1));
+    _isInQueueInternal = true;
+    
+    DashboardMockDataSource.addNotification(
+      'Joined Queue',
+      'You are now #16 in the queue. Est. wait: 45 min',
+      'status',
+    );
+    
     return QueuePositionModel(
       queueEntryId: 'mock-entry-123',
       position: 16,
@@ -27,9 +36,14 @@ class QueueMockDataSource implements QueueRemoteDataSource {
     );
   }
 
+  static bool _isInQueueInternal = false;
+
   @override
   Future<QueuePositionModel> getQueuePosition() async {
     await Future.delayed(const Duration(milliseconds: 500));
+    if (!_isInQueueInternal) {
+      throw Exception('Not in queue');
+    }
     return QueuePositionModel(
       queueEntryId: 'mock-entry-123',
       position: 3,
@@ -40,9 +54,13 @@ class QueueMockDataSource implements QueueRemoteDataSource {
     );
   }
 
+  static void setInQueue(bool inQueue) {
+    _isInQueueInternal = inQueue;
+  }
+
   @override
   Future<void> leaveQueue() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    _isInQueueInternal = false;
   }
 
   @override

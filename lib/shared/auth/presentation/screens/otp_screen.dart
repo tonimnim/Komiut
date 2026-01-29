@@ -82,11 +82,9 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _verifyOtp(BuildContext context) {
     if (_otp.length == 6) {
-      context.read<AuthBloc>().add(
-        AuthOtpVerifyRequested(
-          verificationId: widget.verificationId,
-          otp: _otp,
-        ),
+      // TODO: Re-integrate OTP if backend adds /verify-otp to MobileAppAuth
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP verification is temporarily disabled.')),
       );
     }
   }

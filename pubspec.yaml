@@ -1,5 +1,5 @@
-name: komiut_app
-description: Komiut Transportation App - Driver & Passenger Platform
+name: komiut
+description: "Seamless public transport platform for African cities"
 publish_to: "none"
 version: 1.0.0+1
 
@@ -12,18 +12,22 @@ dependencies:
 
   # State Management
   flutter_bloc: ^8.1.6
-  equatable: ^2.0.5
-
-  # Networking
-  dio: ^5.4.0
-  connectivity_plus: ^6.0.3
-
-  # Local Storage
-  shared_preferences: ^2.2.2
-  flutter_secure_storage: ^9.0.0
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  equatable: ^2.0.7
 
   # Navigation
-  go_router: ^13.2.0
+  go_router: ^14.6.2
+
+  # Database
+  drift: ^2.23.0
+  sqlite3_flutter_libs: ^0.5.27
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+  # Secure Storage
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
 
   # Dependency Injection
   get_it: ^7.6.7
@@ -31,31 +35,68 @@ dependencies:
 
   # Maps & Location
   google_maps_flutter: ^2.5.3
-  geolocator: ^12.0.0
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  geolocator: ^13.0.2
   geocoding: ^2.1.1
 
   # UI Components
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
+  image_picker: ^1.2.1
 
   # Utilities
-  intl: ^0.19.0
+  intl: ^0.20.1
   logger: ^2.0.2+1
   flutter_dotenv: ^5.1.0
   dartz: ^0.10.1
+  crypto: ^3.0.6
+  package_info_plus: ^8.1.3
+
+  # Networking
+  dio: ^5.4.0
+  connectivity_plus: ^6.0.3
+
+  # Real-time Communication
+  signalr_netcore: ^1.3.7
+
+  # Splash Screen
+  flutter_native_splash: ^2.4.1
 
   # Icons
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
+  mobile_scanner: ^7.1.4
+
+  # QR Code
+  qr_flutter: ^4.1.0
+
+  # Notifications
+  flutter_local_notifications: ^18.0.0
+  timezone: ^0.10.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+
+  # Linting
+  flutter_lints: ^5.0.0
+
+  # Code Generation
+  build_runner: ^2.4.14
+  riverpod_generator: ^2.6.3
+  drift_dev: ^2.23.0
+  injectable_generator: ^2.4.1
+
+  # Testing
   mockito: ^5.4.4
   bloc_test: ^9.1.7
-  build_runner: ^2.4.8
-  injectable_generator: ^2.4.1
+  mocktail: ^1.0.4
+  test: any
+
+  # App Icon & Splash
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -80,11 +121,28 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+
+# App Icon Configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/appicon.jpg"
+  adaptive_icon_background: "#0066CC"
+  adaptive_icon_foreground: "assets/images/appicon.jpg"
+  min_sdk_android: 21
+  remove_alpha_ios: true
+
+# Splash Screen Configuration
+flutter_native_splash:
+  color: "#0066CC"
+  image: "assets/images/appicon.jpg"
+  image_dark: "assets/images/appicon.jpg"
+  color_dark: "#004C99"
+  android_12:
+    color: "#0066CC"
+    image: "assets/images/appicon.jpg"
+    color_dark: "#004C99"
+    image_dark: "assets/images/appicon.jpg"
+  android: true
+  ios: true
+  fullscreen: true

@@ -1,12 +1,11 @@
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/config/api_endpoints.dart';
-import 'package:komiut_app/shared/auth/data/models/user_model.dart';
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
+import 'package:komiut/shared/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
-  Future<String> login(String phone, [String? password]);
-  Future<Map<String, dynamic>> verifyOtp(String verificationId, String otp);
-  Future<void> logout();
-  Future<Map<String, dynamic>> refreshToken();
+  Future<Map<String, dynamic>> login(String email, String password);
+  Future<Map<String, dynamic>> registration(Map<String, dynamic> data);
+  Future<Map<String, dynamic>> resetPassword(String phoneNumber);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -15,47 +14,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this._apiClient);
 
   @override
-  Future<String> login(String phone, [String? password]) async {
-    final response = await _apiClient.post(
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final response = await _apiClient.postDriver(
       ApiEndpoints.login,
       data: {
-        'phone': phone,
-        if (password != null) 'password': password,
+        'email': email,
+        'password': password,
       },
     );
 
     final data = response.data;
-    if (data['success'] == true) {
-      return data['data']['verification_id'] as String;
+    final result = data is Map && data.containsKey('data') ? data['data'] : data;
+    
+    if (result is List) {
+      return result.first as Map<String, dynamic>;
     }
-    throw Exception(data['error']?['message'] ?? 'Login failed');
+    return result as Map<String, dynamic>;
   }
 
   @override
-  Future<Map<String, dynamic>> verifyOtp(String verificationId, String otp) async {
-    final response = await _apiClient.post(
-      ApiEndpoints.verifyOtp,
+  Future<Map<String, dynamic>> registration(Map<String, dynamic> data) async {
+    final response = await _apiClient.postDriver(
+      ApiEndpoints.registration,
+      data: data,
+    );
+
+    final responseData = response.data;
+    final result = responseData is Map && responseData.containsKey('data') ? responseData['data'] : responseData;
+    
+    if (result is List) {
+      return result.first as Map<String, dynamic>;
+    }
+    return result as Map<String, dynamic>;
+  }
+
+  @override
+  Future<Map<String, dynamic>> resetPassword(String phoneNumber) async {
+    final response = await _apiClient.postDriver(
+      ApiEndpoints.resetPassword,
       data: {
-        'verification_id': verificationId,
-        'otp': otp,
+        'phoneNumber': phoneNumber,
       },
     );
 
     final data = response.data;
-    if (data['success'] == true) {
-      return data['data'] as Map<String, dynamic>;
+    final result = data is Map && data.containsKey('data') ? data['data'] : data;
+    
+    if (result is List) {
+      return result.first as Map<String, dynamic>;
     }
-    throw Exception(data['error']?['message'] ?? 'OTP verification failed');
-  }
-
-  @override
-  Future<void> logout() async {
-    await _apiClient.post(ApiEndpoints.logout);
-  }
-
-  @override
-  Future<Map<String, dynamic>> refreshToken() async {
-    final response = await _apiClient.post(ApiEndpoints.refreshToken);
-    return response.data['data'] as Map<String, dynamic>;
+    return result as Map<String, dynamic>;
   }
 }

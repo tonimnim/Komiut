@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart' show CircleRoute;
 
 enum TripStatus { scheduled, started, inProgress, completed, cancelled }
 
@@ -26,8 +26,8 @@ class Trip extends Equatable {
 
   int get passengerCount => currentPassengerCount;
   double get earnings => currentEarnings;
-  String get destination => route.endPoint.name;
-  String get origin => route.startPoint.name;
+  String get destination => route.name.split(' - ').length > 1 ? route.name.split(' - ')[1] : route.name;
+  String get origin => route.name.split(' - ').isNotEmpty ? route.name.split(' - ')[0] : '...';
 
   @override
   List<Object?> get props => [id, route, scheduledTime, status, currentPassengerCount, currentEarnings, passengers, stops];

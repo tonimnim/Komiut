@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:komiut/core/config/api_endpoints.dart';
 
-import 'package:komiut_app/core/network/api_client.dart';
-import 'package:komiut_app/core/network/api_exceptions.dart';
-import 'package:komiut_app/driver/history/data/models/trip_history_model.dart';
-import 'package:komiut_app/driver/history/domain/entities/trip_history_details.dart';
-// Note: We might need a Model for TripHistoryDetails too if serialization logic is complex, 
-// but for now assuming we can map it or create a model if needed. 
-// For strict clean architecture, let's assume we'll parse it manually here or add a model later.
+import 'package:komiut/core/network/api_client.dart';
+import 'package:komiut/core/network/api_exceptions.dart';
+import 'package:komiut/driver/history/data/models/trip_history_model.dart';
+
 
 abstract class HistoryRemoteDataSource {
   Future<List<TripHistoryModel>> getTripHistory({
@@ -17,7 +15,7 @@ abstract class HistoryRemoteDataSource {
     String? routeId,
   });
 
-  Future<dynamic> getTripHistoryDetails(String tripId); // Returns raw JSON or Model
+  Future<dynamic> getTripHistoryDetails(String tripId);
 }
 
 class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
@@ -34,21 +32,22 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
     String? routeId,
   }) async {
     final Map<String, dynamic> queryParams = {
-      'page': page,
-      'limit': limit,
+      'PageNumber': page,
+      'PageSize': limit,
     };
-    if (startDate != null) queryParams['start_date'] = startDate.toIso8601String();
-    if (endDate != null) queryParams['end_date'] = endDate.toIso8601String();
-    if (routeId != null) queryParams['route_id'] = routeId;
+    if (startDate != null) queryParams['FromDate'] = startDate.toIso8601String();
+    if (endDate != null) queryParams['ToDate'] = endDate.toIso8601String();
+    if (routeId != null) queryParams['RouteId'] = routeId;
 
     try {
-      final response = await apiClient.get(
-        '/api/trips/history',
+      final response = await apiClient.getDriver(
+        ApiEndpoints.tripHistory,
         queryParameters: queryParams,
       );
       
-      final List data = response.data['data']['trips'];
-      return data.map((e) => TripHistoryModel.fromJson(e)).toList();
+      final dynamic data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      final List list = data is List ? data : (data['items'] ?? []);
+      return list.map((e) => TripHistoryModel.fromJson(e)).toList();
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -57,8 +56,9 @@ class HistoryRemoteDataSourceImpl implements HistoryRemoteDataSource {
   @override
   Future<dynamic> getTripHistoryDetails(String tripId) async {
     try {
-      final response = await apiClient.get('/api/trips/$tripId');
-      return response.data['data'];
+      final response = await apiClient.getDriver(ApiEndpoints.tripDetails(tripId));
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      return data;
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }

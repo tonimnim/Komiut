@@ -1,5 +1,5 @@
 class EarningsMockData {
-  static const String totalEarnings = "\$1,240.50";
+  static const String totalEarnings = "KSH 1,240.50";
   static const String earningsLabel = "Total Earnings";
   static const String period = "This Week";
 
@@ -17,25 +17,25 @@ class EarningsMockData {
     {
       "id": "Trip #TR-8832",
       "date": "Today, 10:30 AM",
-      "amount": "+\$25.50",
+      "amount": "+KSH 25.50",
       "status": "Completed"
     },
     {
       "id": "Trip #TR-8831",
       "date": "Today, 09:15 AM",
-      "amount": "+\$18.00",
+      "amount": "+KSH 18.00",
       "status": "Completed"
     },
     {
       "id": "Trip #TR-8830",
       "date": "Yesterday, 06:45 PM",
-      "amount": "+\$42.00",
+      "amount": "+KSH 42.00",
       "status": "Completed"
     },
      {
       "id": "Trip #TR-8829",
       "date": "Yesterday, 04:20 PM",
-      "amount": "+\$15.50",
+      "amount": "+KSH 15.50",
       "status": "Completed"
     },
   ];

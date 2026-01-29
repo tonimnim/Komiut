@@ -1,6 +1,6 @@
-import 'package:komiut_app/driver/earnings/data/datasources/earnings_remote_datasource.dart';
-import 'package:komiut_app/driver/earnings/data/models/earnings_model.dart';
-import 'package:komiut_app/driver/earnings/data/models/earnings_summary_model.dart';
+import 'package:komiut/driver/earnings/data/datasources/earnings_remote_datasource.dart';
+import 'package:komiut/driver/earnings/data/models/earnings_model.dart';
+import 'package:komiut/driver/earnings/data/models/earnings_summary_model.dart';
 
 class EarningsMockDataSource implements EarningsRemoteDataSource {
   @override
@@ -9,9 +9,20 @@ class EarningsMockDataSource implements EarningsRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    // Mock data based on period
+    if (period == 'daily') {
+      return EarningsSummaryModel(
+        period: period,
+        totalTrips: 12,
+        totalPassengers: 112,
+        grossEarnings: 5200.00,
+        platformFees: 520.00,
+        netEarnings: 4680.00,
+        averagePerTrip: 433.33,
+      );
+    }
     
-    // Default mock data for charts and summary
+    // Default to weekly/monthly
     return EarningsSummaryModel(
       period: period,
       totalTrips: 142,

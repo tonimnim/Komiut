@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
-import 'package:komiut_app/shared/auth/domain/repositories/auth_repository.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
 
 abstract class AuthEvent extends Equatable {
   @override
@@ -12,23 +12,39 @@ abstract class AuthEvent extends Equatable {
 class AuthCheckRequested extends AuthEvent {}
 
 class AuthLoginRequested extends AuthEvent {
-  final String phone;
-  final String? password;
+  final String email;
+  final String password;
 
-  AuthLoginRequested({required this.phone, this.password});
+  AuthLoginRequested({required this.email, required this.password});
 
   @override
-  List<Object?> get props => [phone, password];
+  List<Object?> get props => [email, password];
 }
 
-class AuthOtpVerifyRequested extends AuthEvent {
-  final String verificationId;
-  final String otp;
+class AuthRegisterRequested extends AuthEvent {
+  final String email;
+  final String phoneNumber;
+  final String password;
+  final String userName;
 
-  AuthOtpVerifyRequested({required this.verificationId, required this.otp});
+  AuthRegisterRequested({
+    required this.email,
+    required this.phoneNumber,
+    required this.password,
+    required this.userName,
+  });
 
   @override
-  List<Object?> get props => [verificationId, otp];
+  List<Object?> get props => [email, phoneNumber, password, userName];
+}
+
+class AuthResetPasswordRequested extends AuthEvent {
+  final String phoneNumber;
+
+  AuthResetPasswordRequested({required this.phoneNumber});
+
+  @override
+  List<Object?> get props => [phoneNumber];
 }
 
 class AuthLogoutRequested extends AuthEvent {}
@@ -42,14 +58,6 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-class AuthOtpSent extends AuthState {
-  final String verificationId;
-
-  AuthOtpSent({required this.verificationId});
-
-  @override
-  List<Object?> get props => [verificationId];
-}
 
 class AuthAuthenticated extends AuthState {
   final User user;
@@ -77,7 +85,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   AuthBloc({required this.authRepository}) : super(AuthInitial()) {
     on<AuthCheckRequested>(_onCheckRequested);
     on<AuthLoginRequested>(_onLoginRequested);
-    on<AuthOtpVerifyRequested>(_onOtpVerifyRequested);
+    on<AuthRegisterRequested>(_onRegisterRequested);
+    on<AuthResetPasswordRequested>(_onResetPasswordRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);
   }
 
@@ -109,21 +118,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      final verificationId = await authRepository.login(event.phone, event.password);
-      emit(AuthOtpSent(verificationId: verificationId));
+      await authRepository.login(event.email, event.password);
+      final user = await authRepository.getCurrentUser();
+      if (user != null) {
+        emit(AuthAuthenticated(user: user));
+      } else {
+        emit(AuthError(message: 'Login successful but user data missing'));
+      }
     } catch (e) {
       emit(AuthError(message: e.toString()));
     }
   }
 
-  Future<void> _onOtpVerifyRequested(
-    AuthOtpVerifyRequested event,
+  Future<void> _onRegisterRequested(
+    AuthRegisterRequested event,
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
     try {
-      final user = await authRepository.verifyOtp(event.verificationId, event.otp);
-      emit(AuthAuthenticated(user: user));
+      await authRepository.register(
+        email: event.email,
+        phoneNumber: event.phoneNumber,
+        password: event.password,
+        userName: event.userName,
+      );
+      final user = await authRepository.getCurrentUser();
+      if (user != null) {
+        emit(AuthAuthenticated(user: user));
+      } else {
+        emit(AuthError(message: 'Registration successful but user data missing'));
+      }
+    } catch (e) {
+      emit(AuthError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onResetPasswordRequested(
+    AuthResetPasswordRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      await authRepository.resetPassword(event.phoneNumber);
+      emit(AuthUnauthenticated()); // Or a specific PasswordResetSuccess state
     } catch (e) {
       emit(AuthError(message: e.toString()));
     }

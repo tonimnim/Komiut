@@ -1,139 +1,76 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/routes/route_names.dart';
-import '../../data/datasources/trip_mock_data.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/buttons/app_button.dart';
 
 class EndTripScreen extends StatelessWidget {
-  const EndTripScreen({super.key});
+  final Map<String, dynamic>? tripData;
+  const EndTripScreen({super.key, this.tripData});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 32),
+              const SizedBox(height: 60),
               // Success Icon
               Container(
-                padding: const EdgeInsets.all(20),
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFDCFCE7),
+                  color: AppColors.success.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check, color: Color(0xFF166534), size: 40),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'Trip Complete!',
-                style: TextStyle(
-                  color: Color(0xFF1E293B),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+                child: const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.success,
+                  size: 64,
                 ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                'Trip Complete!',
+                style: AppTextStyles.heading2,
               ),
               const SizedBox(height: 8),
-              const Text(
-                'You have successfully completed the trip',
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 16),
+              Text(
+                'You have arrived at Westlands Terminal',
+                textAlign: TextAlign.center,
+                style: AppTextStyles.body1.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
               const SizedBox(height: 48),
-
-              // Trip Summary Card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    _buildSummaryRow(Icons.route, 'Route', TripMockData.routeName),
-                    const Divider(height: 32, color: Color(0xFFF1F5F9)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildStatItem('Duration', '${TripMockData.estimatedDurationMins} min'),
-                        _buildStatItem('Distance', '${TripMockData.totalDistanceKm} km'),
-                        _buildStatItem('Passengers', '${TripMockData.maxCapacity}'),
-                      ],
-                    ),
-                  ],
-                ),
+              
+              // Stats Card
+              _buildStatsCard(),
+              
+              const SizedBox(height: 32),
+              
+              // Earnings Card
+              _buildEarningsCard(),
+              
+              const Spacer(),
+              
+              // Action Buttons
+              AppButton.primary(
+                label: 'BACK TO DASHBOARD',
+                onPressed: () => context.go(RouteNames.driverDashboard, extra: {'refresh': true}),
+                size: ButtonSize.large,
+                isFullWidth: true,
+              ),
+              const SizedBox(height: 16),
+              AppButton.text(
+                onPressed: () => _showTripDetail(context),
+                label: 'View Trip Details',
+                foregroundColor: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-
-              // Earnings Card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'EARNINGS',
-                      style: TextStyle(
-                        color: Color(0xFF64748B),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildEarningsRow('Gross Fare', 1400, isBold: false), // 14 * 100
-                    const SizedBox(height: 12),
-                    _buildEarningsRow('Platform Fee (10%)', -140, isBold: false, isNegative: true),
-                    const Divider(height: 32, color: Color(0xFFE2E8F0)),
-                    _buildEarningsRow('Net Earnings', 1260, isBold: true, isTotal: true),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 48),
-
-              // Back to Dashboard
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => context.go(RouteNames.driverDashboard), // Use go to reset stack? Or push? go is safer to clear stack.
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2563EB),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'BACK TO DASHBOARD',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ),
@@ -141,59 +78,169 @@ class EndTripScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, color: const Color(0xFF94A3B8), size: 20),
-        const SizedBox(width: 12),
-        Column(
+  void _showTripDetail(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        final sheetTheme = Theme.of(context);
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.75,
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: sheetTheme.scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          ),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
-            Text(
-              value,
-              style: const TextStyle(
-                color: Color(0xFF1E293B),
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Trip Details', style: AppTextStyles.heading3),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
             ),
-          ],
-        ),
-      ],
+            const SizedBox(height: 32),
+            _buildTripDetailRow('Route', 'Nairobi CBD -> Westlands'),
+            const SizedBox(height: 20),
+            _buildTripDetailRow('Date', 'October 25, 2026'),
+            const SizedBox(height: 20),
+            _buildTripDetailRow('Passengers', '14'),
+            const SizedBox(height: 20),
+            _buildTripDetailRow('Distance', '8.5 km'),
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 32),
+            _buildTripDetailRow('Gross Fare', 'KES 1,400'),
+            const SizedBox(height: 12),
+            _buildTripDetailRow('Platform Fee (10%)', '- KES 140', isRed: true),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Net Earnings', style: AppTextStyles.heading4),
+                Text('KES 1,260', style: AppTextStyles.heading4.copyWith(color: AppColors.success)),
+              ],
+            ),
+            const Spacer(),
+            AppButton.primary(
+              onPressed: () => Navigator.pop(context),
+              label: 'CLOSE',
+              size: ButtonSize.large,
+              isFullWidth: true,
+            ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(value, style: const TextStyle(color: Color(0xFF1E293B), fontSize: 18, fontWeight: FontWeight.bold)),
-        Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 12)),
-      ],
-    );
-  }
-
-  Widget _buildEarningsRow(String label, int amount, {bool isBold = false, bool isNegative = false, bool isTotal = false}) {
-    final color = isTotal ? const Color(0xFF166534) : (isNegative ? const Color(0xFFDC2626) : const Color(0xFF1E293B));
-    final valueStr = isNegative ? '- KES ${amount.abs()}' : 'KES $amount';
+  Widget _buildTripDetailRow(String label, String value, {bool isRed = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Text(label, style: AppTextStyles.body1.copyWith(color: AppColors.textSecondary)),
         Text(
-          label,
-          style: TextStyle(
-            color: const Color(0xFF64748B),
-            fontSize: 14,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          value,
+          style: AppTextStyles.body1.copyWith(
+            fontWeight: FontWeight.bold,
+            color: isRed ? AppColors.redAccent : AppColors.textPrimary,
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildStatsCard() {
+    return Builder(builder: (context) {
+      final theme = Theme.of(context);
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerLow,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildStat(tripData?['duration'] ?? '32 min', 'Duration'),
+            Container(width: 1, height: 40, color: theme.dividerColor),
+            _buildStat(tripData?['distance'] ?? '8.5 km', 'Distance'),
+            Container(width: 1, height: 40, color: theme.dividerColor),
+            _buildStat('${tripData?['passengers'] ?? 14}', 'Passengers'),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildStat(String value, String label) {
+    return Column(
+      children: [
+        Text(value, style: AppTextStyles.heading4),
+        const SizedBox(height: 4),
+        Text(label, style: AppTextStyles.overline.copyWith(color: AppColors.textSecondary)),
+      ],
+    );
+  }
+
+  Widget _buildEarningsCard() {
+    final double gross = (tripData?['fare'] ?? 1400.0).toDouble();
+    final double fee = gross * 0.1;
+    final double net = gross - fee;
+
+    return Builder(builder: (context) {
+      final theme = Theme.of(context);
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          border: Border.all(color: theme.dividerColor),
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('EARNINGS', style: AppTextStyles.label.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.2)),
+            const SizedBox(height: 20),
+            _buildEarningsRow('Gross Fare', 'KES ${gross.toInt()}'),
+            const SizedBox(height: 12),
+            _buildEarningsRow('Platform Fee (10%)', '- KES ${fee.toInt()}', isNegative: true),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Divider(color: theme.dividerColor),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Net Earnings', style: AppTextStyles.body1.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  'KES ${net.toInt()}',
+                  style: AppTextStyles.heading3.copyWith(color: AppColors.success),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildEarningsRow(String label, String value, {bool isNegative = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: AppTextStyles.body2.copyWith(color: AppColors.textSecondary)),
         Text(
-          valueStr,
-          style: TextStyle(
-            color: color,
-            fontSize: isTotal ? 20 : 14,
-            fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+          value,
+          style: AppTextStyles.body1.copyWith(
+            color: isNegative ? AppColors.error : AppColors.textPrimary,
+            fontWeight: isNegative ? FontWeight.normal : FontWeight.w600,
           ),
         ),
       ],

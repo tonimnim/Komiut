@@ -1,27 +1,43 @@
-import 'package:komiut_app/driver/dashboard/domain/entities/dashboard_entities.dart';
+import 'package:komiut/driver/dashboard/domain/entities/dashboard_entities.dart';
 
 class DriverProfileModel extends DriverProfile {
   const DriverProfileModel({
     required super.id,
+    required super.organizationId,
     required super.name,
+    required super.email,
     required super.phone,
-    super.email,
-    super.profileImage,
-    required super.rating,
-    required super.totalTrips,
+    super.role,
     required super.status,
+    required super.createdAt,
+    super.imageUrl,
+    super.rating,
+    super.totalTrips,
   });
 
   factory DriverProfileModel.fromJson(Map<String, dynamic> json) {
     return DriverProfileModel(
       id: json['id'] as String,
-      name: json['name'] as String,
-      phone: json['phone'] as String,
-      email: json['email'] as String?,
-      profileImage: json['profile_image'] as String?,
-      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
-      totalTrips: json['total_trips'] as int? ?? 0,
-      status: json['status'] as String? ?? 'offline',
+      organizationId: json['organizationId'] as String,
+      name: json['name'] as String? ?? 'Driver',
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      role: json['role'],
+      status: json['status'] is int ? json['status'] as int : (json['status'] == 'Active' ? 1 : 0),
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      imageUrl: json['imageUrl'] as String? ?? 'https://i.pravatar.cc/150?u=${json['id']}', // Mock image
+      rating: (json['rating'] as num?)?.toDouble() ?? 5.0, // Mock rating
+      totalTrips: json['totalTrips'] as int? ?? 1420, // Mock trips
+    );
+  }
+}
+
+class RegistrationNumberModel extends RegistrationNumber {
+  const RegistrationNumberModel({required super.value});
+
+  factory RegistrationNumberModel.fromJson(Map<String, dynamic> json) {
+    return RegistrationNumberModel(
+      value: json['value'] as String? ?? 'UNKNOWN',
     );
   }
 }
@@ -29,28 +45,51 @@ class DriverProfileModel extends DriverProfile {
 class VehicleModel extends Vehicle {
   const VehicleModel({
     required super.id,
-    required super.plateNumber,
-    required super.type,
+    required super.registrationNumber,
     required super.capacity,
-    required super.model,
-    required super.year,
-    required super.color,
     required super.status,
+    super.currentRouteId,
+    required super.organizationId,
+    required super.domainId,
+    required super.createdAt,
+    super.updatedAt,
+    super.model,
+    super.year,
+    super.color,
+    super.type,
+    super.insuranceExpiry,
+    super.inspectionExpiry,
   });
 
   factory VehicleModel.fromJson(Map<String, dynamic> json) {
     return VehicleModel(
       id: json['id'] as String,
-      plateNumber: json['plate_number'] as String,
-      type: json['type'] as String,
-      capacity: json['capacity'] as int,
-      model: json['model'] as String,
-      year: json['year'] as int,
-      color: json['color'] as String,
-      status: json['status'] as String? ?? 'active',
+      registrationNumber: json['registrationNumber'] != null 
+          ? RegistrationNumberModel.fromJson(json['registrationNumber'] as Map<String, dynamic>)
+          : const RegistrationNumberModel(value: 'KBA 000X'),
+      capacity: json['capacity'] as int? ?? 14,
+      status: json['status']?.toString() ?? 'active',
+      currentRouteId: json['currentRouteId'] as String?,
+      organizationId: json['organizationId'] as String? ?? '',
+      domainId: json['domainId'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt'] as String) : null,
+      
+      // Default values for fields missing in Swagger
+      model: json['model'] as String? ?? 'Toyota Hiace',
+      year: json['year'] as int? ?? 2021,
+      color: json['color'] as String? ?? 'White',
+      type: json['type'] as String? ?? 'PSV',
+      insuranceExpiry: json['insuranceExpiry'] != null 
+          ? DateTime.parse(json['insuranceExpiry'] as String) 
+          : DateTime.now().add(const Duration(days: 90)), // Mock 90 days out
+      inspectionExpiry: json['inspectionExpiry'] != null 
+          ? DateTime.parse(json['inspectionExpiry'] as String) 
+          : DateTime.now().add(const Duration(days: 60)), // Mock 60 days out
     );
   }
 }
+
 
 class CircleModel extends Circle {
   const CircleModel({
@@ -78,36 +117,29 @@ class CircleModel extends Circle {
 class CircleRouteModel extends CircleRoute {
   const CircleRouteModel({
     required super.id,
-    required super.number,
     required super.name,
-    super.description,
-    required super.circleId,
-    required super.startPoint,
-    required super.endPoint,
-    required super.stops,
-    required super.fare,
-    required super.estimatedDurationMins,
+    required super.code,
+    required super.status,
+    required super.organizationId,
+    required super.createdAt,
+    super.circleName,
+    super.pickupPoint,
   });
 
   factory CircleRouteModel.fromJson(Map<String, dynamic> json) {
-    final startJson = json['start_point'] as Map<String, dynamic>;
-    final endJson = json['end_point'] as Map<String, dynamic>;
-    final stopsJson = json['stops'] as List<dynamic>? ?? [];
-
     return CircleRouteModel(
       id: json['id'] as String,
-      number: json['number'] as String? ?? '',
-      name: json['name'] as String,
-      description: json['description'] as String?,
-      circleId: json['circle_id'] as String,
-      startPoint: RoutePointModel.fromJson(startJson),
-      endPoint: RoutePointModel.fromJson(endJson),
-      stops: stopsJson.map((s) => RoutePointModel.fromJson(s)).toList(),
-      fare: (json['fare'] as num).toDouble(),
-      estimatedDurationMins: json['estimated_duration_mins'] as int,
+      name: json['name'] as String? ?? '',
+      code: json['code'] as String? ?? '',
+      status: json['status']?.toString() ?? 'active',
+      organizationId: json['organizationId'] as String? ?? '',
+      createdAt: DateTime.parse(json['createdAt'] as String? ?? DateTime.now().toIso8601String()),
+      circleName: json['circle_name'] as String? ?? json['domainName'] as String?,
+      pickupPoint: json['pickup_point'] as String?,
     );
   }
 }
+
 
 class RoutePointModel extends RoutePoint {
   const RoutePointModel({

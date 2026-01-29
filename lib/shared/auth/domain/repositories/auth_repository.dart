@@ -1,9 +1,16 @@
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
 
 abstract class AuthRepository {
-  Future<String> login(String phone, [String? password]);
+  Future<void> login(String email, String password);
 
-  Future<User> verifyOtp(String verificationId, String otp);
+  Future<void> register({
+    required String email,
+    required String phoneNumber,
+    required String password,
+    required String userName,
+  });
+
+  Future<void> resetPassword(String phoneNumber);
 
   Future<void> logout();
 
@@ -12,6 +19,4 @@ abstract class AuthRepository {
   Future<User?> getCurrentUser();
 
   Future<String?> getUserRole();
-
-  Future<bool> refreshToken();
 }

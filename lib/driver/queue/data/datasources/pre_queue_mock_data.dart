@@ -7,7 +7,7 @@ class PreQueueMockData {
   
   static const List<Map<String, String>> stats = [
     {"label": "AVAILABLE", "value": "12 seats", "icon": "seats"},
-    {"label": "FIXED FARE", "value": "\$2.50", "icon": "money"},
+    {"label": "FIXED FARE", "value": "KSH 2.50", "icon": "money"},
     {"label": "DEPARTURE", "value": "5 mins", "icon": "time"},
   ];
 
@@ -15,7 +15,7 @@ class PreQueueMockData {
     {
       "id": "#BUS-4021",
       "status": "In 3 min",
-      "location": "Approaching Broadway & 5th St",
+      "location": "Approaching Kenyatta Avenue",
       "icon": "bus"
     }
   ];

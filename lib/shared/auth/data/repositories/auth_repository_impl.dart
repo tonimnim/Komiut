@@ -1,9 +1,9 @@
-import 'package:komiut_app/core/network/network_info.dart';
-import 'package:komiut_app/shared/auth/domain/entities/user.dart';
-import 'package:komiut_app/shared/auth/domain/repositories/auth_repository.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:komiut_app/shared/auth/data/datasources/auth_local_datasource.dart';
-import 'package:komiut_app/shared/auth/data/models/user_model.dart';
+import 'package:komiut/core/network/network_info.dart';
+import 'package:komiut/shared/auth/domain/entities/user.dart';
+import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:komiut/shared/auth/data/datasources/auth_local_datasource.dart';
+import 'package:komiut/shared/auth/data/models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remoteDataSource;
@@ -17,38 +17,58 @@ class AuthRepositoryImpl implements AuthRepository {
   });
 
   @override
-  Future<String> login(String phone, [String? password]) async {
+  Future<void> login(String email, String password) async {
     if (!await networkInfo.isConnected) {
       throw Exception('No internet connection');
     }
-    return await remoteDataSource.login(phone, password);
+    final data = await remoteDataSource.login(email, password);
+    await _saveLoginData(data);
   }
 
   @override
-  Future<User> verifyOtp(String verificationId, String otp) async {
+  Future<void> register({
+    required String email,
+    required String phoneNumber,
+    required String password,
+    required String userName,
+  }) async {
     if (!await networkInfo.isConnected) {
       throw Exception('No internet connection');
     }
-
-    final data = await remoteDataSource.verifyOtp(verificationId, otp);
-    
-    await localDataSource.saveTokens(
-      data['access_token'] as String,
-      data['refresh_token'] as String,
-    );
-
-    final userModel = UserModel.fromJson(data['user'] as Map<String, dynamic>);
-    await localDataSource.saveUser(userModel);
-
-    return userModel;
+    final data = await remoteDataSource.registration({
+      'email': email,
+      'phoneNumber': phoneNumber,
+      'password': password,
+      'confirmPassword': password,
+      'userName': userName,
+    });
+    await _saveLoginData(data);
   }
+
+  @override
+  Future<void> resetPassword(String phoneNumber) async {
+    if (!await networkInfo.isConnected) {
+      throw Exception('No internet connection');
+    }
+    await remoteDataSource.resetPassword(phoneNumber);
+  }
+
+  Future<void> _saveLoginData(Map<String, dynamic> data) async {
+    final accessToken = (data['accessToken'] ?? data['access_token']) as String;
+    final refreshToken = (data['refreshToken'] ?? data['refresh_token']) as String;
+    
+    await localDataSource.saveTokens(accessToken, refreshToken);
+
+    final userJson = data['user'] ?? data;
+    final userModel = UserModel.fromJson(userJson as Map<String, dynamic>);
+    await localDataSource.saveUser(userModel);
+  }
+
 
   @override
   Future<void> logout() async {
     try {
-      if (await networkInfo.isConnected) {
-        await remoteDataSource.logout();
-      }
+      // Local cleanup only as logout is not in the shared spec
     } finally {
       await localDataSource.clearTokens();
       await localDataSource.clearUser();
@@ -72,19 +92,4 @@ class AuthRepositoryImpl implements AuthRepository {
     return user?.role;
   }
 
-  @override
-  Future<bool> refreshToken() async {
-    try {
-      if (!await networkInfo.isConnected) return false;
-      
-      final data = await remoteDataSource.refreshToken();
-      await localDataSource.saveTokens(
-        data['access_token'] as String,
-        data['refresh_token'] as String,
-      );
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
 }

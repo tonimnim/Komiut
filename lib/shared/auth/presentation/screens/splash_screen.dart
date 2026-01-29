@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               child: const Icon(
                 Icons.directions_bus,
-                size: 64,
+                size: 56,
                 color: Colors.white,
               ),
             ),

@@ -1,8 +1,6 @@
-import 'package:komiut_app/driver/settings/domain/entities/driver_settings.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-// Note: dashboard/data/models might not exist yet if dashboard was partially implemented. 
-// I will create simple local models if imports fail, but logically they belong in dashboard. 
-// For now, let's implement the model assuming standard JSON structure.
+import 'package:komiut/driver/settings/domain/entities/driver_settings.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+
 
 class DriverSettingsModel extends DriverSettings {
   const DriverSettingsModel({
@@ -12,7 +10,6 @@ class DriverSettingsModel extends DriverSettings {
   });
 
   factory DriverSettingsModel.fromJson(Map<String, dynamic> json) {
-    // This assumes the API returns a composite object or we compose it from multiple calls
     return DriverSettingsModel(
       profile: DriverProfileModel.fromJson(json['profile']),
       vehicle: VehicleModel.fromJson(json['vehicle']),

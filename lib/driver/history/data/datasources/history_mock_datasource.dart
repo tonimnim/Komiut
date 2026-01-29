@@ -1,5 +1,5 @@
-import 'package:komiut_app/driver/history/data/datasources/history_remote_datasource.dart';
-import 'package:komiut_app/driver/history/data/models/trip_history_model.dart';
+import 'package:komiut/driver/history/data/datasources/history_remote_datasource.dart';
+import 'package:komiut/driver/history/data/models/trip_history_model.dart';
 
 class HistoryMockDataSource implements HistoryRemoteDataSource {
   @override
@@ -45,14 +45,24 @@ class HistoryMockDataSource implements HistoryRemoteDataSource {
   @override
   Future<dynamic> getTripHistoryDetails(String tripId) async {
     await Future.delayed(const Duration(milliseconds: 500));
+    final now = DateTime.now();
     return {
-      'id': tripId,
-      'route_name': 'CBD - Kikuyu',
-      'start_time': DateTime.now().subtract(const Duration(hours: 2)).toIso8601String(),
-      'end_time': DateTime.now().subtract(const Duration(hours: 1, minutes: 15)).toIso8601String(),
-      'passenger_count': 14,
-      'earnings': 1200.0,
+      'trip_id': tripId,
       'status': 'completed',
+      'started_at': now.subtract(const Duration(hours: 2)).toIso8601String(),
+      'ended_at': now.subtract(const Duration(hours: 1, minutes: 15)).toIso8601String(),
+      'duration_mins': 45,
+      'distance_km': 15.5,
+      'passenger_count': 14,
+      'route': {
+        'name': 'CBD - Kikuyu',
+        'id': 'route-123',
+      },
+      'earnings': {
+        'gross_fare': 1400.0,
+        'platform_fee': 140.0,
+        'net_earnings': 1260.0,
+      },
       'stops': [
         {'name': 'Kikuyu Stage', 'time': '14:00', 'passengers_in': 14, 'passengers_out': 0},
         {'name': 'Uthiru', 'time': '14:15', 'passengers_in': 0, 'passengers_out': 2},

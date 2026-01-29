@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
+import '../../../../core/config/api_endpoints.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exceptions.dart';
-import '../../../../core/config/api_endpoints.dart';
 import '../models/earnings_model.dart';
 import '../models/earnings_summary_model.dart';
 
@@ -27,23 +27,23 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
-    final queryParams = {'period': period};
+    final queryParams = <String, dynamic>{};
     if (startDate != null) {
-      queryParams['start_date'] = startDate.toIso8601String();
+      queryParams['FromDate'] = startDate.toIso8601String();
     }
     if (endDate != null) {
-      queryParams['end_date'] = endDate.toIso8601String();
+      queryParams['ToDate'] = endDate.toIso8601String();
     }
 
     try {
-      final response = await apiClient.get(
-        // Assuming API Endpoint constant exists. If not, using raw string based on API Reference.
-        // TODO: Update with ApiEndpoints.earningsSummary when available
-        '/api/earnings/summary', 
+      final response = await apiClient.getDriver(
+        ApiEndpoints.dailyTotals, 
         queryParameters: queryParams,
       );
       
-      return EarningsSummaryModel.fromJson(response.data['data']);
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      final result = data is List ? data.first : data;
+      return EarningsSummaryModel.fromJson(result as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }
@@ -52,12 +52,14 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
   @override
   Future<EarningsModel> getTripEarnings(String tripId) async {
     try {
-      final response = await apiClient.get(
-        // TODO: Update with ApiEndpoints.tripEarnings when available
-        '/api/earnings/trip/$tripId',
+      final response = await apiClient.getDriver(
+        ApiEndpoints.payments,
+        queryParameters: {'BookingId': tripId},
       );
 
-      return EarningsModel.fromJson(response.data['data']);
+      final data = response.data is Map && response.data.containsKey('data') ? response.data['data'] : response.data;
+      final result = data is List ? data.first : data;
+      return EarningsModel.fromJson(result as Map<String, dynamic>);
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     }

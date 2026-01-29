@@ -1,95 +1,89 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
+import '../../domain/repositories/earnings_repository.dart';
+import '../../../history/domain/repositories/history_repository.dart';
+import 'earnings_event.dart';
+import 'earnings_state.dart';
 
-import 'package:komiut_app/core/errors/failures.dart';
-import 'package:komiut_app/driver/earnings/domain/entities/earnings.dart';
-import 'package:komiut_app/driver/earnings/domain/entities/earnings_summary.dart';
-import 'package:komiut_app/driver/earnings/domain/repositories/earnings_repository.dart';
-
-// Events
-abstract class EarningsEvent extends Equatable {
-  const EarningsEvent();
-  @override
-  List<Object?> get props => [];
-}
-
-class EarningsLoadSummaryRequested extends EarningsEvent {
-  final String period; // 'daily', 'weekly', 'monthly'
-  const EarningsLoadSummaryRequested({this.period = 'daily'});
-
-  @override
-  List<Object?> get props => [period];
-}
-
-class EarningsLoadTripEarningsRequested extends EarningsEvent {
-  final String tripId;
-  const EarningsLoadTripEarningsRequested(this.tripId);
-  @override
-  List<Object?> get props => [tripId];
-}
-
-// States
-abstract class EarningsState extends Equatable {
-  const EarningsState();
-  @override
-  List<Object?> get props => [];
-}
-
-class EarningsInitial extends EarningsState {}
-
-class EarningsLoading extends EarningsState {}
-
-class EarningsSummaryLoaded extends EarningsState {
-  final EarningsSummary summary;
-  const EarningsSummaryLoaded(this.summary);
-  @override
-  List<Object?> get props => [summary];
-}
-
-class EarningsTripDetailsLoaded extends EarningsState {
-  final Earnings earnings;
-  const EarningsTripDetailsLoaded(this.earnings);
-  @override
-  List<Object?> get props => [earnings];
-}
-
-class EarningsError extends EarningsState {
-  final String message;
-  const EarningsError(this.message);
-  @override
-  List<Object?> get props => [message];
-}
-
-// Bloc
 class EarningsBloc extends Bloc<EarningsEvent, EarningsState> {
-  final EarningsRepository repository;
+  final EarningsRepository earningsRepository;
+  final HistoryRepository historyRepository;
 
-  EarningsBloc({required this.repository}) : super(EarningsInitial()) {
-    on<EarningsLoadSummaryRequested>(_onLoadSummary);
-    on<EarningsLoadTripEarningsRequested>(_onLoadTripEarnings);
+  EarningsBloc({
+    required this.earningsRepository,
+    required this.historyRepository,
+  }) : super(EarningsInitial()) {
+    on<GetEarningsSummaryEvent>(_onGetEarningsSummary);
+    on<GetTripHistoryEvent>(_onGetTripHistory);
+    on<GetTripHistoryDetailsEvent>(_onGetTripHistoryDetails);
   }
 
-  Future<void> _onLoadSummary(EarningsLoadSummaryRequested event, Emitter<EarningsState> emit) async {
+  Future<void> _onGetTripHistoryDetails(
+    GetTripHistoryDetailsEvent event,
+    Emitter<EarningsState> emit,
+  ) async {
     emit(EarningsLoading());
-    final result = await repository.getEarningsSummary(period: event.period);
+    final result = await historyRepository.getTripHistoryDetails(event.tripId);
     result.fold(
-      (failure) => emit(EarningsError(_mapFailureToMessage(failure))),
-      (summary) => emit(EarningsSummaryLoaded(summary)),
+      (failure) => emit(EarningsError(failure.message)),
+      (details) => emit(TripHistoryDetailsLoaded(details)),
     );
   }
 
-  Future<void> _onLoadTripEarnings(EarningsLoadTripEarningsRequested event, Emitter<EarningsState> emit) async {
+  Future<void> _onGetEarningsSummary(
+    GetEarningsSummaryEvent event,
+    Emitter<EarningsState> emit,
+  ) async {
     emit(EarningsLoading());
-    final result = await repository.getTripEarnings(event.tripId);
-    result.fold(
-      (failure) => emit(EarningsError(_mapFailureToMessage(failure))),
-      (earnings) => emit(EarningsTripDetailsLoaded(earnings)),
+
+    final summaryResult = await earningsRepository.getEarningsSummary(
+      period: event.period,
+      startDate: event.startDate,
+      endDate: event.endDate,
+    );
+
+    final historyResult = await historyRepository.getTripHistory(
+      limit: 5, // Get recent few for the summary screen
+    );
+
+    summaryResult.fold(
+      (failure) => emit(EarningsError(failure.message)),
+      (summary) {
+        historyResult.fold(
+          (failure) => emit(EarningsLoaded(summary: summary, tripHistory: const [])),
+          (history) => emit(EarningsLoaded(summary: summary, tripHistory: history)),
+        );
+      },
     );
   }
 
-  String _mapFailureToMessage(Failure failure) {
-    if (failure is ServerFailure) return failure.message;
-    if (failure is CacheFailure) return "Cache Error";
-    return "Unexpected Error";
+  Future<void> _onGetTripHistory(
+    GetTripHistoryEvent event,
+    Emitter<EarningsState> emit,
+  ) async {
+    // This could update a separate HistoryLoaded state if needed, 
+    // or we can just refill the current one.
+    // For simplicity, let's keep it in one loaded state for now.
+    
+    final currentState = state;
+    if (currentState is EarningsLoaded) {
+      final historyResult = await historyRepository.getTripHistory(
+        page: event.page,
+        limit: event.limit,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        routeId: event.routeId,
+      );
+
+      historyResult.fold(
+        (failure) => emit(EarningsError(failure.message)),
+        (history) => emit(EarningsLoaded(
+          summary: currentState.summary,
+          tripHistory: history,
+        )),
+      );
+    } else {
+      // If summary isn't loaded, we might need a dummy summary or load it first.
+      add(GetEarningsSummaryEvent(period: 'weekly'));
+    }
   }
 }

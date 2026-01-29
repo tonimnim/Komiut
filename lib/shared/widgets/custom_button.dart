@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:komiut_app/core/theme/app_spacing.dart';
+import 'package:komiut/core/theme/app_spacing.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;

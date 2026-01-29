@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:equatable/equatable.dart';
 
 import '../../../../core/errors/failures.dart';
 import '../entities/trip_history.dart';

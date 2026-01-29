@@ -1,21 +1,19 @@
-import 'package:komiut_app/driver/trip/data/datasources/trip_remote_datasource.dart';
-import 'package:komiut_app/driver/trip/data/models/trip_model.dart';
-import 'package:komiut_app/driver/dashboard/data/models/dashboard_models.dart';
-import 'package:komiut_app/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/trip/data/datasources/trip_remote_datasource.dart';
+import 'package:komiut/driver/trip/data/models/trip_model.dart';
+import 'package:komiut/driver/dashboard/data/models/dashboard_models.dart';
+import 'package:komiut/driver/trip/domain/entities/trip.dart';
+import 'package:komiut/driver/dashboard/data/datasources/dashboard_mock_datasource.dart';
 
 class TripMockDataSource implements TripRemoteDataSource {
   TripModel? _currentTrip;
 
   final _mockRoute = CircleRouteModel(
     id: 'mock-route-123',
-    number: '102',
     name: 'CBD - Kikuyu',
-    circleId: 'mock-circle-123',
-    startPoint: const RoutePointModel(name: 'Kikuyu', lat: -1.24, lng: 36.67),
-    endPoint: const RoutePointModel(name: 'CBD', lat: -1.28, lng: 36.82),
-    stops: const [],
-    fare: 100.0,
-    estimatedDurationMins: 45,
+    code: '102',
+    status: 'active',
+    organizationId: 'mock-org-123',
+    createdAt: DateTime.now().subtract(const Duration(days: 100)),
   );
 
   @override
@@ -29,6 +27,13 @@ class TripMockDataSource implements TripRemoteDataSource {
       currentEarnings: 800.0,
       scheduledTime: DateTime.now(),
     );
+
+    DashboardMockDataSource.addNotification(
+      'Trip Started',
+      'Your trip to ${_mockRoute.name} has started successfully.',
+      'trip',
+    );
+    
     return _currentTrip!;
   }
 
@@ -48,6 +53,16 @@ class TripMockDataSource implements TripRemoteDataSource {
   @override
   Future<TripModel> endTrip(String tripId, {required int finalPassengers, required double finalEarnings}) async {
     await Future.delayed(const Duration(seconds: 1));
+    
+    // Update dashboard stats
+    DashboardMockDataSource.addTrip(finalEarnings);
+
+    DashboardMockDataSource.addNotification(
+      'Trip Completed',
+      'Trip ended. Earnings: KES ${finalEarnings.toStringAsFixed(0)}',
+      'payment',
+    );
+
     final trip = TripModel(
       id: tripId,
       route: _mockRoute,

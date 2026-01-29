@@ -1,33 +1,57 @@
 class ApiEndpoints {
   static const String baseUrl = '/api';
   
-  static const String login = '$baseUrl/auth/login';
-  static const String verifyOtp = '$baseUrl/auth/verify-otp';
-  static const String refreshToken = '$baseUrl/auth/refresh';
-  static const String logout = '$baseUrl/auth/logout';
+  // Auth
+  static const String login = '$baseUrl/MobileAppAuth/login';
+  static const String registration = '$baseUrl/MobileAppAuth/registration';
+  static const String resetPassword = '$baseUrl/MobileAppAuth/reset-password';
   
-  static const String driverProfile = '$baseUrl/driver/profile';
-  static const String driverStatus = '$baseUrl/driver/status';
-  static const String driverVehicle = '$baseUrl/driver/vehicle';
-  static const String driverCircle = '$baseUrl/driver/circle';
-  static const String driverRoute = '$baseUrl/driver/route';
+  // Personnel (Profile)
+  static const String personnel = '$baseUrl/Personnel';
+  static const String assignVehicle = '$baseUrl/Personnel/assign-vehicle';
   
-  static const String queueStatus = '$baseUrl/queue/status';
-  static const String queueJoin = '$baseUrl/queue/join';
-  static const String queuePosition = '$baseUrl/queue/position';
-  static const String queueLeave = '$baseUrl/queue/leave';
-  static const String queueList = '$baseUrl/queue/list';
+  // Vehicles
+  static const String vehicles = '$baseUrl/Vehicles';
+  static const String assignRoute = '$baseUrl/Vehicles/assign-route';
   
-  static const String tripStart = '$baseUrl/trips/start';
-  static String tripUpdate(String tripId) => '$baseUrl/trips/$tripId/update';
-  static String tripEnd(String tripId) => '$baseUrl/trips/$tripId/end';
-  static String tripDetails(String tripId) => '$baseUrl/trips/$tripId';
-  static const String tripActive = '$baseUrl/trips/active';
-  static const String tripHistory = '$baseUrl/trips/history';
+  // Routes & Stops
+  static const String routes = '$baseUrl/Routes';
+  static const String routeStops = '$baseUrl/RouteStops';
+  static const String routeFares = '$baseUrl/RouteFares';
   
-  static const String earningsSummary = '$baseUrl/earnings/summary';
-  static String earningsTrip(String tripId) => '$baseUrl/earnings/trip/$tripId';
+  // Trips
+  static const String trips = '$baseUrl/Trips';
   
-  static const String notifications = '$baseUrl/notifications';
-  static String notificationRead(String id) => '$baseUrl/notifications/$id/read';
+  // Earnings & Totals
+  static const String dailyTotals = '$baseUrl/DailyVehicleTotals';
+  static const String payments = '$baseUrl/Payments';
+  
+  // Domains (Queue/Terminals)
+  static const String domains = '$baseUrl/Domains';
+  
+  // Bookings
+  static const String bookings = '$baseUrl/Bookings';
+
+  // --- API COMPATIBILITY ALIASES (Legacy Support) ---
+  static const String driverProfile = personnel;
+  static const String driverVehicle = vehicles;
+  static const String driverCircle = domains;
+  static const String driverRoute = routes;
+  static const String driverProfilePhoto = personnel;
+  static const String tripStart = trips;
+  static const String tripActive = trips;
+  static const String tripHistory = trips;
+  static const String earningsSummary = dailyTotals;
+  static const String queueStatus = bookings;
+  static const String queueJoin = bookings;
+  static const String queuePosition = bookings;
+  static const String queueLeave = bookings;
+  static const String queueList = bookings;
+  static const String notifications = '$baseUrl/Notifications';
+
+  static String tripUpdate(String id) => trips;
+  static String tripEnd(String id) => trips;
+  static String tripDetails(String id) => trips;
+  static String earningsTrip(String id) => dailyTotals;
+  static String notificationRead(String id) => '$baseUrl/Notifications/$id/read';
 }
