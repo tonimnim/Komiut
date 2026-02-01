@@ -319,81 +319,74 @@ class _HomeTab extends StatelessWidget {
           floating: true,
           pinned: true,
           automaticallyImplyLeading: false,
-          toolbarHeight: 70,
+          toolbarHeight: 80,
           title: Row(
             children: [
               GestureDetector(
                 onTap: () => onChangeTab?.call(3), // Go to profile
                 child: Container(
-                  padding: const EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primaryBlue.withOpacity(0.2), width: 2),
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primaryBlue.withOpacity(0.3),
+                        AppColors.primaryGreen.withOpacity(0.2),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryBlue.withOpacity(0.15),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                   child: CircleAvatar(
-                    radius: 20,
+                    radius: 22,
                     backgroundColor: theme.colorScheme.surfaceContainerHighest,
                     backgroundImage: profile?.imageUrl != null ? NetworkImage(profile!.imageUrl!) : null,
-                    child: profile?.imageUrl == null ? Icon(Icons.person, color: theme.colorScheme.onSurfaceVariant) : null,
+                    child: profile?.imageUrl == null 
+                      ? Icon(Icons.person_rounded, color: theme.colorScheme.onSurfaceVariant, size: 24) 
+                      : null,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Driver Dashboard',
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      _getGreeting(),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 2),
-                  const SizedBox(height: 2),
-                  if (profile?.status == 1)
-                    Row(
-                      children: [
-                        Text(
-                          'ON DUTY',
-                          style: TextStyle(
-                            color: AppColors.primaryBlue,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Text('•', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
-                        ),
-                        Text(
-                          'LIVE',
-                          style: TextStyle(
-                            color: AppColors.primaryBlue,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    )
-                  else
-                    Row(
-                      children: [
-                        Text(
-                          'OFFLINE',
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 3),
+                    Text(
+                      profile?.name ?? 'Driver',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.3,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                ],
+                    const SizedBox(height: 4),
+                    if (profile?.status == 1)
+                      _OnlineStatusIndicator(isOnline: true)
+                    else
+                      _OnlineStatusIndicator(isOnline: false),
+                  ],
+                ),
               ),
             ],
           ),
@@ -422,47 +415,21 @@ class _HomeTab extends StatelessWidget {
               const SizedBox(height: 24),
               
               // Assigned Route Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'YOUR ROUTE',
-                    style: AppTextStyles.label.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.2),
-                  ),
-                  if (route != null)
-                   Container(
-                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                     decoration: BoxDecoration(
-                       color: AppColors.primaryBlue.withOpacity(0.1),
-                       borderRadius: BorderRadius.circular(4),
-                     ),
-                     child: Text(
-                       'Active',
-                       style: TextStyle(color: AppColors.primaryBlue, fontSize: 10, fontWeight: FontWeight.bold),
-                     ),
-                   ),
-                ],
-              ),
+              _SectionTitle(title: 'YOUR ROUTE', badge: route != null ? 'Active' : null),
               const SizedBox(height: 12),
               AssignedSaccoCard(route: route),
               
               const SizedBox(height: 24),
               
               // Vehicle Load Section
-              Text(
-                'VEHICLE LOAD',
-                style: AppTextStyles.label.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.2),
-              ),
+              _SectionTitle(title: 'VEHICLE LOAD'),
               const SizedBox(height: 12),
               VehicleCapacityCard(vehicle: vehicle, currentPax: currentPax),
               
               const SizedBox(height: 24),
               
               // Quick Actions
-              Text(
-                'QUICK ACTIONS',
-                style: AppTextStyles.label.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.2),
-              ),
+              _SectionTitle(title: 'QUICK ACTIONS'),
               const SizedBox(height: 12),
               DashboardActionButtons(
                 route: route, 
@@ -473,10 +440,7 @@ class _HomeTab extends StatelessWidget {
               const SizedBox(height: 24),
               
               // Today's Stats
-              Text(
-                'TODAY\'S PERFORMANCE',
-                style: AppTextStyles.label.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.2),
-              ),
+              _SectionTitle(title: 'TODAY\'S PERFORMANCE'),
               const SizedBox(height: 12),
               DashboardStatsGrid(earnings: earnings),
               
@@ -498,9 +462,10 @@ class _HomeTab extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: AppColors.primaryBlue.withOpacity(0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: -5,
           ),
         ],
       ),
@@ -567,9 +532,10 @@ class _HomeTab extends StatelessWidget {
           border: Border.all(color: AppColors.primaryBlue.withOpacity(0.15), width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primaryBlue.withOpacity(0.08),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: AppColors.primaryBlue.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 6),
+              spreadRadius: -3,
             ),
           ],
         ),
@@ -911,4 +877,153 @@ class _HomeTab extends StatelessWidget {
   // Refresh dashboard badge on close
   onRefresh?.call();
 }
+}
+
+/// Animated online status indicator with pulsing effect
+class _OnlineStatusIndicator extends StatefulWidget {
+  final bool isOnline;
+  const _OnlineStatusIndicator({required this.isOnline});
+
+  @override
+  State<_OnlineStatusIndicator> createState() => _OnlineStatusIndicatorState();
+}
+
+class _OnlineStatusIndicatorState extends State<_OnlineStatusIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.4, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    )..addListener(() => setState(() {}));
+
+    if (widget.isOnline) {
+      _controller.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _OnlineStatusIndicator oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isOnline && !_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    } else if (!widget.isOnline && _controller.isAnimating) {
+      _controller.stop();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.isOnline ? AppColors.primaryGreen : AppColors.grey400;
+    final label = widget.isOnline ? 'On Duty Live' : 'Offline';
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+            boxShadow: widget.isOnline
+                ? [
+                    BoxShadow(
+                      color: color.withOpacity(_animation.value * 0.6),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : null,
+          ),
+        ),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: TextStyle(
+            color: widget.isOnline ? AppColors.primaryGreen : AppColors.grey500,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Premium section title with accent indicator
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final String? badge;
+  
+  const _SectionTitle({required this.title, this.badge});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Row(
+      children: [
+        Container(
+          width: 3,
+          height: 16,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.primaryBlue, AppColors.primaryGreen],
+            ),
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: theme.colorScheme.onSurfaceVariant,
+            letterSpacing: 1.0,
+          ),
+        ),
+        if (badge != null) ...[
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primaryBlue.withOpacity(0.15),
+                  AppColors.primaryGreen.withOpacity(0.1),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              badge!,
+              style: const TextStyle(
+                color: AppColors.primaryBlue,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
 }

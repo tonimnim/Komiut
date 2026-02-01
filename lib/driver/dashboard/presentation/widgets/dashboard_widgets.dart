@@ -24,15 +24,17 @@ class AssignedSaccoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primaryBlue.withOpacity(0.06),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+            spreadRadius: -4,
           ),
         ],
       ),
@@ -44,12 +46,21 @@ class AssignedSaccoCard extends StatelessWidget {
             children: [
               Text(
                 'ASSIGNED SACCO',
-                style: AppTextStyles.overline.copyWith(color: theme.colorScheme.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.bold),
+                style: AppTextStyles.overline.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant, 
+                  fontSize: 10, 
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 route?.circleName ?? 'Matatu Sacco',
-                style: AppTextStyles.heading3.copyWith(fontSize: 20, color: theme.colorScheme.onSurface),
+                style: AppTextStyles.heading3.copyWith(
+                  fontSize: 20, 
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
+                ),
               ),
             ],
           ),
@@ -58,20 +69,31 @@ class AssignedSaccoCard extends StatelessWidget {
             children: [
               Text(
                 'ROUTE',
-                style: AppTextStyles.overline.copyWith(color: theme.colorScheme.onSurfaceVariant, fontSize: 10, fontWeight: FontWeight.bold),
+                style: AppTextStyles.overline.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant, 
+                  fontSize: 10, 
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.pillBlueBg,
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.primaryBlue.withOpacity(0.12),
+                      AppColors.primaryGreen.withOpacity(0.08),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   route?.code ?? '102',
                   style: AppTextStyles.label.copyWith(
-                    color: theme.colorScheme.primary,
+                    color: AppColors.primaryBlue,
                     fontWeight: FontWeight.w800,
+                    fontSize: 14,
                   ),
                 ),
               ),
@@ -100,12 +122,14 @@ class VehicleCapacityCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.dividerColor.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: theme.shadowColor.withOpacity(0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: (isFull ? AppColors.primaryGreen : AppColors.primaryBlue).withOpacity(0.08),
+            blurRadius: 28,
+            offset: const Offset(0, 12),
+            spreadRadius: -6,
           ),
         ],
       ),
@@ -117,12 +141,21 @@ class VehicleCapacityCard extends StatelessWidget {
               SizedBox(
                 width: 140,
                 height: 140,
-                child: CircularProgressIndicator(
-                  value: percent,
-                  strokeWidth: 12,
-                  backgroundColor: theme.dividerColor,
-                  valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                  strokeCap: StrokeCap.round,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0, end: percent),
+                  duration: const Duration(milliseconds: 800),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return CircularProgressIndicator(
+                      value: value,
+                      strokeWidth: 12,
+                      backgroundColor: theme.dividerColor.withOpacity(0.3),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        isFull ? AppColors.primaryGreen : AppColors.primaryBlue,
+                      ),
+                      strokeCap: StrokeCap.round,
+                    );
+                  },
                 ),
               ),
               Column(
@@ -130,11 +163,18 @@ class VehicleCapacityCard extends StatelessWidget {
                 children: [
                   Text(
                     '$currentCount/$totalCapacity',
-                    style: AppTextStyles.heading1.copyWith(fontSize: 32, color: theme.colorScheme.onSurface),
+                    style: AppTextStyles.heading1.copyWith(
+                      fontSize: 32, 
+                      color: theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                   Text(
                     'Seats filled',
-                    style: AppTextStyles.caption.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    style: AppTextStyles.caption.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ],
               ),
@@ -143,7 +183,11 @@ class VehicleCapacityCard extends StatelessWidget {
           const SizedBox(height: 24),
           Text(
             'Vehicle Capacity',
-            style: AppTextStyles.heading4.copyWith(fontSize: 18, color: theme.colorScheme.onSurface),
+            style: AppTextStyles.heading4.copyWith(
+              fontSize: 18, 
+              color: theme.colorScheme.onSurface,
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -152,23 +196,38 @@ class VehicleCapacityCard extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          Divider(color: theme.dividerColor),
-          const SizedBox(height: 12),
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  theme.dividerColor.withOpacity(0),
+                  theme.dividerColor,
+                  theme.dividerColor.withOpacity(0),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Status', style: AppTextStyles.body2.copyWith(color: theme.colorScheme.onSurfaceVariant)),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                 decoration: BoxDecoration(
-                  color: isFull ? AppColors.pillGreenBg : AppColors.pillBlueBg,
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: isFull 
+                      ? [AppColors.primaryGreen.withOpacity(0.15), AppColors.primaryGreen.withOpacity(0.08)]
+                      : [AppColors.primaryBlue.withOpacity(0.12), AppColors.primaryGreen.withOpacity(0.06)],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   isFull ? 'Full' : 'Loading',
                   style: AppTextStyles.body2.copyWith(
-                    color: isFull ? AppColors.success : theme.colorScheme.primary, 
-                    fontWeight: FontWeight.bold,
+                    color: isFull ? AppColors.primaryGreen : AppColors.primaryBlue, 
+                    fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
                 ),
@@ -477,22 +536,38 @@ class UpcomingRouteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return GestureDetector(
       onTap: () => context.push(RouteNames.preQueue),
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: AppColors.pillBlueBg.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.primaryBlue.withOpacity(0.1), width: 1.5),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppColors.primaryBlue.withOpacity(0.08),
+              AppColors.primaryGreen.withOpacity(0.04),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: AppColors.primaryBlue.withOpacity(0.12), width: 1.5),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.primaryBlue,
-                borderRadius: BorderRadius.circular(12),
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primaryBlue.withOpacity(0.25),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                    spreadRadius: -2,
+                  ),
+                ],
               ),
               child: const Icon(Icons.map_rounded, color: Colors.white, size: 24),
             ),
@@ -502,19 +577,21 @@ class UpcomingRouteCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Upcoming Route',
+                    'UPCOMING ROUTE',
                     style: AppTextStyles.overline.copyWith(
-                      color: AppColors.textMuted,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      fontSize: 10,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Text(
-                    route?.name ?? 'Central Station \u2192 West End',
+                    route?.name ?? 'Central Station → West End',
                     style: AppTextStyles.body1.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 15,
                     ),
                   ),
                 ],
@@ -523,21 +600,35 @@ class UpcomingRouteCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  '15:30',
-                  style: AppTextStyles.label.copyWith(
-                    color: AppColors.primaryBlue,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '15:30',
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'EST KES 350',
-                  style: AppTextStyles.caption.copyWith(
-                    color: AppColors.success,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryGreen.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'KES 350',
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.primaryGreen,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
                   ),
                 ),
               ],
