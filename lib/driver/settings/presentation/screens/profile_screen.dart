@@ -10,8 +10,9 @@ import 'package:komiut/di/injection_container.dart';
 import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
 import 'package:komiut/driver/dashboard/presentation/widgets/dashboard_widgets.dart';
 import 'package:komiut/core/widgets/buttons/app_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   final DriverProfile? profile;
   final Vehicle? vehicle;
   final VoidCallback? onRefresh;
@@ -24,6 +25,39 @@ class ProfileScreen extends StatelessWidget {
     this.onRefresh,
     this.onStatusChanged,
   });
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _notificationsEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference();
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _notificationsEnabled = prefs.getBool('notificationsEnabled') ?? true;
+    });
+  }
+
+  Future<void> _toggleNotifications(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notificationsEnabled', value);
+    setState(() {
+      _notificationsEnabled = value;
+    });
+  }
+
+  DriverProfile? get profile => widget.profile;
+  Vehicle? get vehicle => widget.vehicle;
+  VoidCallback? get onRefresh => widget.onRefresh;
+  Function(bool)? get onStatusChanged => widget.onStatusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -86,15 +120,15 @@ class ProfileScreen extends StatelessWidget {
                         _buildToggleRow(
                           Icons.notifications_none_rounded, 
                           'Notifications', 
-                          'Enabled',
-                          true, 
-                          (val) {},
+                          _notificationsEnabled ? 'Enabled' : 'Disabled',
+                          _notificationsEnabled, 
+                          (val) => _toggleNotifications(val),
                           theme,
                         ),
                          _buildToggleRow(
                           Icons.online_prediction_rounded, 
                           'Active Status', 
-                          profile?.status == 1 ? 'Online' : 'Offline',
+                          profile?.status == 1 ? 'On Duty' : 'Off Duty',
                           profile?.status == 1, 
                           (val) {
                             if (onStatusChanged != null) {
