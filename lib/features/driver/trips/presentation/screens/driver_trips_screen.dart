@@ -45,6 +45,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
 
 /// Driver trips screen widget.
 ///
@@ -126,7 +127,7 @@ class _DriverTripsScreenState extends ConsumerState<DriverTripsScreen>
         ],
       ),
       floatingActionButton: _buildFloatingActionButton(context),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: const DriverBottomNav(currentIndex: 2),
     );
   }
 
@@ -597,50 +598,5 @@ class _DriverTripsScreenState extends ConsumerState<DriverTripsScreen>
       );
     }
     return null;
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 2, // Trips tab
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.format_list_numbered_outlined),
-          activeIcon: Icon(Icons.format_list_numbered),
-          label: 'Queue',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.directions_bus_outlined),
-          activeIcon: Icon(Icons.directions_bus),
-          label: 'Trips',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          activeIcon: Icon(Icons.account_balance_wallet),
-          label: 'Earnings',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(RouteConstants.driverHome);
-            break;
-          case 1:
-            context.go(RouteConstants.driverQueue);
-            break;
-          case 2:
-            // Already on trips
-            break;
-          case 3:
-            context.go(RouteConstants.driverEarnings);
-            break;
-        }
-      },
-    );
   }
 }

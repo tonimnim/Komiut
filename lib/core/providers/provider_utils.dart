@@ -274,7 +274,7 @@ class DebouncedNotifier<T> extends StateNotifier<T> {
 
   void _applyPending() {
     if (_pendingValue != null) {
-      state = _pendingValue!;
+      state = _pendingValue as T;
       _lastUpdate = DateTime.now();
       _pendingValue = null;
     }

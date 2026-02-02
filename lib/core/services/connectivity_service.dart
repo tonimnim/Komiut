@@ -172,7 +172,8 @@ class ConnectivityServiceImpl implements ConnectivityService {
   ConnectionState _currentState = const ConnectionState.offline();
 
   @override
-  Stream<ConnectionState> get onConnectionStateChanged => _stateController.stream;
+  Stream<ConnectionState> get onConnectionStateChanged =>
+      _stateController.stream;
 
   @override
   ConnectionState get currentState => _currentState;

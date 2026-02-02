@@ -25,5 +25,6 @@ class User extends Equatable {
   bool get isPassenger => role == 'passenger';
 
   @override
-  List<Object?> get props => [id, name, phone, email, role, profileImage, rating, totalTrips];
+  List<Object?> get props =>
+      [id, name, phone, email, role, profileImage, rating, totalTrips];
 }

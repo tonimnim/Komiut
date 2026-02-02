@@ -18,13 +18,13 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
       final prefs = await SharedPreferences.getInstance();
       final themeValue = prefs.get(_themeKey);
       int? themeIndex;
-      
+
       if (themeValue is int) {
         themeIndex = themeValue;
       } else if (themeValue is String) {
         themeIndex = int.tryParse(themeValue);
       }
-      
+
       if (themeIndex != null && themeIndex < ThemeMode.values.length) {
         state = ThemeMode.values[themeIndex];
       }

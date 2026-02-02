@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:komiut/core/theme/app_colors.dart';
 import 'package:komiut/core/theme/app_spacing.dart';
-import 'custom_button.dart';
 
 class ErrorDialog extends StatelessWidget {
   final String title;
@@ -182,6 +181,7 @@ class ConfirmDialog extends StatelessWidget {
     );
   }
 }
+
 class AppDialogs {
   static Future<void> showError(
     BuildContext context, {

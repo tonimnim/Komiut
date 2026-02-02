@@ -30,14 +30,17 @@ class FigmaButton extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: isPrimary ? BorderSide.none : const BorderSide(color: AppColors.border),
+            side: isPrimary
+                ? BorderSide.none
+                : const BorderSide(color: AppColors.border),
           ),
         ),
         child: isLoading
             ? const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.white),
+                child: CircularProgressIndicator(
+                    strokeWidth: 2, color: AppColors.white),
               )
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -227,7 +230,8 @@ class FigmaInput extends StatelessWidget {
               prefixIcon: prefix,
               suffixIcon: suffix,
               border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
         ),

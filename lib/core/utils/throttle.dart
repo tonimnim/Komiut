@@ -85,7 +85,8 @@ class Throttler {
 
     final remaining = milliseconds - timeSinceLast;
 
-    _trailingTimer = Timer(Duration(milliseconds: remaining.clamp(0, milliseconds)), () {
+    _trailingTimer =
+        Timer(Duration(milliseconds: remaining.clamp(0, milliseconds)), () {
       _isThrottled = false;
       _trailingTimer = null;
       if (_lastAction != null) {

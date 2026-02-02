@@ -156,7 +156,8 @@ class ShimmerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           if (hasLeading) ...[
@@ -235,17 +236,17 @@ class ShimmerCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ShimmerBox(height: 18, width: 180),
-          const SizedBox(height: 12),
-          const ShimmerBox(height: 14, width: 140),
-          const Spacer(),
+          ShimmerBox(height: 18, width: 180),
+          SizedBox(height: 12),
+          ShimmerBox(height: 14, width: 140),
+          Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(height: 14, width: 80),
+              ShimmerBox(height: 14, width: 80),
               ShimmerBox(height: 32, width: 80, borderRadius: 16),
             ],
           ),
@@ -289,13 +290,13 @@ class ShimmerWalletCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ShimmerBoxLight(height: 14, width: 100),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           _ShimmerBoxLight(height: 32, width: 150),
-          const Spacer(),
+          Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -303,7 +304,7 @@ class ShimmerWalletCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _ShimmerBoxLight(height: 12, width: 60),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _ShimmerBoxLight(height: 14, width: 100),
                 ],
               ),
@@ -422,10 +423,10 @@ class ShimmerTripCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Date and status row
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(height: 12, width: 80),
+              ShimmerBox(height: 12, width: 80),
               ShimmerBox(height: 24, width: 70, borderRadius: 12),
             ],
           ),
@@ -435,7 +436,7 @@ class ShimmerTripCard extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  ShimmerCircle(size: 12),
+                  const ShimmerCircle(size: 12),
                   Container(
                     width: 2,
                     height: 24,
@@ -445,17 +446,17 @@ class ShimmerTripCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
-                  ShimmerCircle(size: 12),
+                  const ShimmerCircle(size: 12),
                 ],
               ),
               const SizedBox(width: 12),
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const ShimmerBox(height: 14, width: 140),
-                    const SizedBox(height: 20),
-                    const ShimmerBox(height: 14, width: 160),
+                    ShimmerBox(height: 14, width: 140),
+                    SizedBox(height: 20),
+                    ShimmerBox(height: 14, width: 160),
                   ],
                 ),
               ),
@@ -463,11 +464,11 @@ class ShimmerTripCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Bottom row - price and details
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(height: 16, width: 60),
-              const ShimmerBox(height: 12, width: 80),
+              ShimmerBox(height: 16, width: 60),
+              ShimmerBox(height: 12, width: 80),
             ],
           ),
         ],
@@ -503,10 +504,9 @@ class ShimmerList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
-      separatorBuilder: separatorBuilder ??
-          (context, index) => const Divider(height: 1),
-      itemBuilder: itemBuilder ??
-          (context, index) => const ShimmerListTile(),
+      separatorBuilder:
+          separatorBuilder ?? (context, index) => const Divider(height: 1),
+      itemBuilder: itemBuilder ?? (context, index) => const ShimmerListTile(),
     );
   }
 }
@@ -555,7 +555,7 @@ class ShimmerGrid extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
       ),
       itemCount: itemCount,
-      itemBuilder: (context, index) => ShimmerCard(
+      itemBuilder: (context, index) => const ShimmerCard(
         height: double.infinity,
         margin: EdgeInsets.zero,
       ),

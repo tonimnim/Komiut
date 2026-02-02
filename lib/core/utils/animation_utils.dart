@@ -75,8 +75,7 @@ class StaggeredAnimation {
   }) {
     final totalDuration =
         baseDuration.inMilliseconds + (staggerDelay.inMilliseconds * itemCount);
-    final start =
-        (staggerDelay.inMilliseconds * index) / totalDuration;
+    final start = (staggerDelay.inMilliseconds * index) / totalDuration;
     final end =
         (staggerDelay.inMilliseconds * index + baseDuration.inMilliseconds) /
             totalDuration;

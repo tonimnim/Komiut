@@ -37,9 +37,7 @@ class _SaccosScreenState extends ConsumerState<SaccosScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: _isSearchExpanded
-            ? null
-            : const Text('Discover Saccos'),
+        title: _isSearchExpanded ? null : const Text('Discover Saccos'),
         centerTitle: false,
         backgroundColor: theme.colorScheme.surface,
         surfaceTintColor: Colors.transparent,
@@ -137,7 +135,8 @@ class _SaccosScreenState extends ConsumerState<SaccosScreen> {
                         final sacco = saccos[index];
                         return SaccoCard(
                           sacco: sacco,
-                          onTap: () => _navigateToSaccoDetail(context, sacco.id),
+                          onTap: () =>
+                              _navigateToSaccoDetail(context, sacco.id),
                         );
                       },
                       childCount: saccos.length,

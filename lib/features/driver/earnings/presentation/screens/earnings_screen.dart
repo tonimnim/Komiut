@@ -65,6 +65,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
 
 /// Earnings screen widget.
 ///
@@ -137,7 +138,7 @@ class _EarningsScreenState extends ConsumerState<EarningsScreen>
           _buildHistoryTab(context),
         ],
       ),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: const DriverBottomNav(currentIndex: 3),
     );
   }
 
@@ -654,51 +655,6 @@ class _EarningsScreenState extends ConsumerState<EarningsScreen>
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 3, // Earnings tab
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.format_list_numbered_outlined),
-          activeIcon: Icon(Icons.format_list_numbered),
-          label: 'Queue',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.directions_bus_outlined),
-          activeIcon: Icon(Icons.directions_bus),
-          label: 'Trips',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          activeIcon: Icon(Icons.account_balance_wallet),
-          label: 'Earnings',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(RouteConstants.driverHome);
-            break;
-          case 1:
-            context.go(RouteConstants.driverQueue);
-            break;
-          case 2:
-            context.go(RouteConstants.driverTrips);
-            break;
-          case 3:
-            // Already on earnings
-            break;
-        }
-      },
     );
   }
 }

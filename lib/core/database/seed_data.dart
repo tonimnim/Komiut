@@ -38,7 +38,7 @@ class DatabaseSeeder {
   }
 
   Future<int> _createTestUser() async {
-    final password = 'Password123';
+    const password = 'Password123';
     final hash = sha256.convert(utf8.encode(password)).toString();
 
     return await _database.createUser(
@@ -63,11 +63,46 @@ class DatabaseSeeder {
 
   Future<void> _createTrips(int userId) async {
     final trips = [
-      ('Nairobi CBD - Westlands', 'Nairobi CBD', 'Westlands', 120.0, 'completed', DateTime.now().subtract(const Duration(hours: 2))),
-      ('Westlands - Karen', 'Westlands', 'Karen', 350.0, 'completed', DateTime.now().subtract(const Duration(days: 1))),
-      ('Karen - Nairobi CBD', 'Karen', 'Nairobi CBD', 280.0, 'completed', DateTime.now().subtract(const Duration(days: 2))),
-      ('Nairobi CBD - Kilimani', 'Nairobi CBD', 'Kilimani', 150.0, 'failed', DateTime.now().subtract(const Duration(days: 3))),
-      ('Kilimani - Westlands', 'Kilimani', 'Westlands', 200.0, 'completed', DateTime.now().subtract(const Duration(days: 5))),
+      (
+        'Nairobi CBD - Westlands',
+        'Nairobi CBD',
+        'Westlands',
+        120.0,
+        'completed',
+        DateTime.now().subtract(const Duration(hours: 2))
+      ),
+      (
+        'Westlands - Karen',
+        'Westlands',
+        'Karen',
+        350.0,
+        'completed',
+        DateTime.now().subtract(const Duration(days: 1))
+      ),
+      (
+        'Karen - Nairobi CBD',
+        'Karen',
+        'Nairobi CBD',
+        280.0,
+        'completed',
+        DateTime.now().subtract(const Duration(days: 2))
+      ),
+      (
+        'Nairobi CBD - Kilimani',
+        'Nairobi CBD',
+        'Kilimani',
+        150.0,
+        'failed',
+        DateTime.now().subtract(const Duration(days: 3))
+      ),
+      (
+        'Kilimani - Westlands',
+        'Kilimani',
+        'Westlands',
+        200.0,
+        'completed',
+        DateTime.now().subtract(const Duration(days: 5))
+      ),
     ];
 
     for (final trip in trips) {
@@ -87,11 +122,46 @@ class DatabaseSeeder {
 
   Future<void> _createPayments(int userId) async {
     final payments = [
-      (500.0, 'top-up', 'completed', 'Top-up via M-Pesa', 'TXN-001', DateTime.now().subtract(const Duration(hours: 3))),
-      (120.0, 'trip', 'completed', 'Nairobi CBD - Westlands', 'TXN-002', DateTime.now().subtract(const Duration(hours: 2))),
-      (350.0, 'trip', 'completed', 'Westlands - Karen', 'TXN-003', DateTime.now().subtract(const Duration(days: 1))),
-      (1000.0, 'top-up', 'completed', 'Top-up via Card', 'TXN-004', DateTime.now().subtract(const Duration(days: 2))),
-      (280.0, 'trip', 'completed', 'Karen - Nairobi CBD', 'TXN-005', DateTime.now().subtract(const Duration(days: 2))),
+      (
+        500.0,
+        'top-up',
+        'completed',
+        'Top-up via M-Pesa',
+        'TXN-001',
+        DateTime.now().subtract(const Duration(hours: 3))
+      ),
+      (
+        120.0,
+        'trip',
+        'completed',
+        'Nairobi CBD - Westlands',
+        'TXN-002',
+        DateTime.now().subtract(const Duration(hours: 2))
+      ),
+      (
+        350.0,
+        'trip',
+        'completed',
+        'Westlands - Karen',
+        'TXN-003',
+        DateTime.now().subtract(const Duration(days: 1))
+      ),
+      (
+        1000.0,
+        'top-up',
+        'completed',
+        'Top-up via Card',
+        'TXN-004',
+        DateTime.now().subtract(const Duration(days: 2))
+      ),
+      (
+        280.0,
+        'trip',
+        'completed',
+        'Karen - Nairobi CBD',
+        'TXN-005',
+        DateTime.now().subtract(const Duration(days: 2))
+      ),
     ];
 
     for (final payment in payments) {

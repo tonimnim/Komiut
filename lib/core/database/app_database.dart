@@ -8,7 +8,15 @@ import 'tables.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Users, Wallets, Trips, Payments, AuthTokens, BusRoutes, FavoriteRoutes])
+@DriftDatabase(tables: [
+  Users,
+  Wallets,
+  Trips,
+  Payments,
+  AuthTokens,
+  BusRoutes,
+  FavoriteRoutes
+])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -42,7 +50,8 @@ class AppDatabase extends _$AppDatabase {
   // USER OPERATIONS
 
   Future<User?> getUserByEmail(String email) async {
-    return (select(users)..where((u) => u.email.equals(email))).getSingleOrNull();
+    return (select(users)..where((u) => u.email.equals(email)))
+        .getSingleOrNull();
   }
 
   Future<User?> getUserById(int id) async {
@@ -57,12 +66,15 @@ class AppDatabase extends _$AppDatabase {
     return update(users).replace(user);
   }
 
-  Future<bool> updateUserProfile(int userId, {String? fullName, String? phone, String? profileImage}) async {
-    final result = await (update(users)..where((u) => u.id.equals(userId))).write(
+  Future<bool> updateUserProfile(int userId,
+      {String? fullName, String? phone, String? profileImage}) async {
+    final result =
+        await (update(users)..where((u) => u.id.equals(userId))).write(
       UsersCompanion(
         fullName: fullName != null ? Value(fullName) : const Value.absent(),
         phone: phone != null ? Value(phone) : const Value.absent(),
-        profileImage: profileImage != null ? Value(profileImage) : const Value.absent(),
+        profileImage:
+            profileImage != null ? Value(profileImage) : const Value.absent(),
         updatedAt: Value(DateTime.now()),
       ),
     );
@@ -72,11 +84,13 @@ class AppDatabase extends _$AppDatabase {
   // WALLET OPERATIONS
 
   Future<Wallet?> getWalletByUserId(int userId) async {
-    return (select(wallets)..where((w) => w.userId.equals(userId))).getSingleOrNull();
+    return (select(wallets)..where((w) => w.userId.equals(userId)))
+        .getSingleOrNull();
   }
 
   Stream<Wallet?> watchWalletByUserId(int userId) {
-    return (select(wallets)..where((w) => w.userId.equals(userId))).watchSingleOrNull();
+    return (select(wallets)..where((w) => w.userId.equals(userId)))
+        .watchSingleOrNull();
   }
 
   Future<int> createWallet(WalletsCompanion wallet) async {
@@ -84,7 +98,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<bool> updateWalletBalance(int walletId, double newBalance) async {
-    final result = await (update(wallets)..where((w) => w.id.equals(walletId))).write(
+    final result =
+        await (update(wallets)..where((w) => w.id.equals(walletId))).write(
       WalletsCompanion(
         balance: Value(newBalance),
         updatedAt: Value(DateTime.now()),
@@ -152,7 +167,8 @@ class AppDatabase extends _$AppDatabase {
   // AUTH TOKEN OPERATIONS
 
   Future<AuthToken?> getAuthTokenByUserId(int userId) async {
-    return (select(authTokens)..where((t) => t.userId.equals(userId))).getSingleOrNull();
+    return (select(authTokens)..where((t) => t.userId.equals(userId)))
+        .getSingleOrNull();
   }
 
   Future<void> saveAuthToken(AuthTokensCompanion token) async {
@@ -184,7 +200,9 @@ class AppDatabase extends _$AppDatabase {
   }
 
   Future<bool> hasRoutes() async {
-    final count = await (selectOnly(busRoutes)..addColumns([busRoutes.id.count()])).getSingle();
+    final count = await (selectOnly(busRoutes)
+          ..addColumns([busRoutes.id.count()]))
+        .getSingle();
     return (count.read(busRoutes.id.count()) ?? 0) > 0;
   }
 

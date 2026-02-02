@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeEvent {}
+
 class ToggleTheme extends ThemeEvent {
   final bool isDark;
   ToggleTheme(this.isDark);
 }
+
 class LoadTheme extends ThemeEvent {}
 
 class ThemeState {

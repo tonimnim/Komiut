@@ -34,8 +34,11 @@ class UserModel {
       role: _parseRole(json['role']),
       organizationId: _parseStringOrNull(json['organizationId']),
       status: _parseStatus(json['status']),
-      fullName: json['fullName'] as String? ?? json['userName'] as String? ?? json['name'] as String?,
-      profileImage: json['profileImage'] as String? ?? json['avatar'] as String?,
+      fullName: json['fullName'] as String? ??
+          json['userName'] as String? ??
+          json['name'] as String?,
+      profileImage:
+          json['profileImage'] as String? ?? json['avatar'] as String?,
       createdAt: _parseDateTime(json['createdAt']),
       updatedAt: _parseDateTime(json['updatedAt']),
     );

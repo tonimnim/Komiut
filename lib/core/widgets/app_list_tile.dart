@@ -76,7 +76,9 @@ class AppListTile extends StatelessWidget {
                         subtitle,
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                          color: isDark
+                              ? Colors.grey[400]
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ],
@@ -102,7 +104,10 @@ class AppListTile extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: trailingSubtitleColor ?? (isDark ? Colors.grey[400] : AppColors.textSecondary),
+                            color: trailingSubtitleColor ??
+                                (isDark
+                                    ? Colors.grey[400]
+                                    : AppColors.textSecondary),
                           ),
                         ),
                       ],

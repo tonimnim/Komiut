@@ -58,7 +58,6 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
-
 class AuthAuthenticated extends AuthState {
   final User user;
 
@@ -146,7 +145,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (user != null) {
         emit(AuthAuthenticated(user: user));
       } else {
-        emit(AuthError(message: 'Registration successful but user data missing'));
+        emit(AuthError(
+            message: 'Registration successful but user data missing'));
       }
     } catch (e) {
       emit(AuthError(message: e.toString()));

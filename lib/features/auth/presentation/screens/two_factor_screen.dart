@@ -135,9 +135,9 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                         const SizedBox(height: 8),
 
                         // Subtitle
-                        Text(
+                        const Text(
                           'Enter the ${AppConstants.otpLength}-digit code sent to your device',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
                             color: Colors.white70,
                           ),
@@ -177,18 +177,18 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                                 width: 1,
                               ),
                             ),
-                            child: Row(
+                            child: const Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.info_outline,
                                   size: 18,
                                   color: Colors.white,
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     'Demo code: ${AppConstants.mockOtp}',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.white,
                                     ),
@@ -209,7 +209,8 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                context.showSnackBar('Code resent successfully');
+                                context
+                                    .showSnackBar('Code resent successfully');
                               },
                               style: TextButton.styleFrom(
                                 foregroundColor: Colors.white,

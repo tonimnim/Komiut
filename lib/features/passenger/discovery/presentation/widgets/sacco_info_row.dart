@@ -68,7 +68,8 @@ class SaccoInfoRow extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: (iconColor ?? AppColors.primaryBlue).withValues(alpha: 0.1),
+              color:
+                  (iconColor ?? AppColors.primaryBlue).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(

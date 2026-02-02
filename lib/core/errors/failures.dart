@@ -54,7 +54,8 @@ class PaymentFailure extends Failure {
   final String? transactionId;
 
   @override
-  List<Object> get props => [message, if (transactionId != null) transactionId!];
+  List<Object> get props =>
+      [message, if (transactionId != null) transactionId!];
 }
 
 class UnknownFailure extends Failure {

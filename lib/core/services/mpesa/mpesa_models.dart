@@ -35,7 +35,10 @@ enum MpesaPaymentState {
 
   /// Whether the transaction is in a terminal state.
   bool get isTerminal =>
-      this == completed || this == failed || this == cancelled || this == timeout;
+      this == completed ||
+      this == failed ||
+      this == cancelled ||
+      this == timeout;
 
   /// Whether the transaction is in progress.
   bool get isInProgress =>
@@ -189,8 +192,8 @@ class StkPushResponse extends Equatable {
           '-1',
       responseDescription: json['responseDescription'] as String? ??
           json['ResponseDescription'] as String?,
-      customerMessage:
-          json['customerMessage'] as String? ?? json['CustomerMessage'] as String?,
+      customerMessage: json['customerMessage'] as String? ??
+          json['CustomerMessage'] as String?,
     );
   }
 
@@ -253,7 +256,8 @@ class TransactionStatus extends Equatable {
       resultCode == MpesaTransactionResultCode.success;
 
   /// Whether the transaction is still pending.
-  bool get isPending => status == MpesaPaymentState.processing ||
+  bool get isPending =>
+      status == MpesaPaymentState.processing ||
       status == MpesaPaymentState.waitingForPin;
 
   /// Creates from JSON response.

@@ -66,7 +66,8 @@ class SignalRService implements RealtimeService {
   final _connectionStateController =
       StreamController<RealtimeConnectionState>.broadcast();
 
-  RealtimeConnectionState _currentState = const RealtimeConnectionState.initial();
+  RealtimeConnectionState _currentState =
+      const RealtimeConnectionState.initial();
 
   Timer? _heartbeatTimer;
   Timer? _reconnectTimer;
@@ -315,7 +316,8 @@ class SignalRService implements RealtimeService {
       _subscribedRoutes.add(routeId);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure('Failed to join queue updates: ${e.toString()}'));
+      return Left(
+          ServerFailure('Failed to join queue updates: ${e.toString()}'));
     }
   }
 
@@ -331,7 +333,8 @@ class SignalRService implements RealtimeService {
       _subscribedRoutes.remove(routeId);
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure('Failed to leave queue updates: ${e.toString()}'));
+      return Left(
+          ServerFailure('Failed to leave queue updates: ${e.toString()}'));
     }
   }
 
@@ -351,7 +354,8 @@ class SignalRService implements RealtimeService {
   // ─────────────────────────────────────────────────────────────────────────
 
   @override
-  void onVehicleQueueUpdate(RealtimeMessageHandler<VehicleQueueUpdate> handler) {
+  void onVehicleQueueUpdate(
+      RealtimeMessageHandler<VehicleQueueUpdate> handler) {
     _queueUpdateHandlers.add(handler);
   }
 
@@ -465,7 +469,8 @@ class SignalRService implements RealtimeService {
 
     // Calculate delay with exponential backoff
     final delay = min(
-      SignalRConfig.initialReconnectDelayMs * pow(2, _reconnectAttempts).toInt(),
+      SignalRConfig.initialReconnectDelayMs *
+          pow(2, _reconnectAttempts).toInt(),
       SignalRConfig.maxReconnectDelayMs,
     );
 

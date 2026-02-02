@@ -130,8 +130,7 @@ class AppCard extends StatefulWidget {
   State<AppCard> createState() => _AppCardState();
 }
 
-class _AppCardState extends State<AppCard>
-    with SingleTickerProviderStateMixin {
+class _AppCardState extends State<AppCard> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _elevationAnimation;
@@ -208,7 +207,8 @@ class _AppCardState extends State<AppCard>
             boxShadow: currentElevation > 0
                 ? [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05 * currentElevation),
+                      color: Colors.black
+                          .withValues(alpha: 0.05 * currentElevation),
                       blurRadius: 4 * currentElevation,
                       offset: Offset(0, 2 * currentElevation),
                     ),
@@ -375,7 +375,8 @@ class _ExpandableCardState extends State<ExpandableCard>
                         turns: _iconRotation,
                         child: Icon(
                           Icons.expand_more,
-                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurface
+                              .withValues(alpha: 0.6),
                         ),
                       ),
                     ],
@@ -491,7 +492,8 @@ class SelectableCard extends StatelessWidget {
               alpha: isSelected ? 0.1 : 0.05,
             ),
             blurRadius: isSelected ? selectedElevation * 4 : elevation * 4,
-            offset: Offset(0, isSelected ? selectedElevation * 2 : elevation * 2),
+            offset:
+                Offset(0, isSelected ? selectedElevation * 2 : elevation * 2),
           ),
         ],
       ),

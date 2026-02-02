@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/app_constants.dart';
-import '../../../../core/routes/route_names.dart';
 import '../../../../core/routes/role_guard.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -28,7 +27,7 @@ class _OtpScreenState extends State<OtpScreen> {
     (_) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  
+
   int _resendSeconds = AppConstants.otpResendSeconds;
   Timer? _timer;
 
@@ -84,7 +83,8 @@ class _OtpScreenState extends State<OtpScreen> {
     if (_otp.length == 6) {
       // TODO: Re-integrate OTP if backend adds /verify-otp to MobileAppAuth
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP verification is temporarily disabled.')),
+        const SnackBar(
+            content: Text('OTP verification is temporarily disabled.')),
       );
     }
   }
@@ -133,14 +133,12 @@ class _OtpScreenState extends State<OtpScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: AppSpacing.lg),
-                    
                     Text(
                       'Enter the 6-digit code sent to your phone',
                       style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: List.generate(6, (index) {
@@ -162,7 +160,8 @@ class _OtpScreenState extends State<OtpScreen> {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
-                            onChanged: (value) => _onOtpChanged(context, index, value),
+                            onChanged: (value) =>
+                                _onOtpChanged(context, index, value),
                             onTap: () {
                               _controllers[index].selection = TextSelection(
                                 baseOffset: 0,
@@ -174,14 +173,16 @@ class _OtpScreenState extends State<OtpScreen> {
                       }),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-
                     Center(
                       child: _resendSeconds > 0
                           ? Text(
                               'Resend code in ${_resendSeconds}s',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.grey600,
-                              ),
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color: AppColors.grey600,
+                                  ),
                             )
                           : TextButton(
                               onPressed: _resendOtp,
@@ -189,7 +190,6 @@ class _OtpScreenState extends State<OtpScreen> {
                             ),
                     ),
                     const Spacer(),
-
                     CustomButton(
                       text: 'VERIFY',
                       onPressed: () => _verifyOtp(context),

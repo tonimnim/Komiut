@@ -223,9 +223,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                 setState(() => _acceptedTerms = value ?? false);
                               },
                               fillColor: WidgetStateProperty.resolveWith(
-                                (states) => states.contains(WidgetState.selected)
-                                    ? Colors.white
-                                    : Colors.transparent,
+                                (states) =>
+                                    states.contains(WidgetState.selected)
+                                        ? Colors.white
+                                        : Colors.transparent,
                               ),
                               checkColor: AppColors.primaryBlue,
                               side: const BorderSide(color: Colors.white70),
@@ -233,7 +234,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             Expanded(
                               child: GestureDetector(
                                 onTap: () {
-                                  setState(() => _acceptedTerms = !_acceptedTerms);
+                                  setState(
+                                      () => _acceptedTerms = !_acceptedTerms);
                                 },
                                 child: const Text(
                                   'I agree to the Terms & Conditions and Privacy Policy',
@@ -251,7 +253,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         // Sign Up button
                         CustomButton(
                           text: 'Create Account',
-                          onPressed: (isLoading || _isSubmitting) ? null : _handleSignUp,
+                          onPressed: (isLoading || _isSubmitting)
+                              ? null
+                              : _handleSignUp,
                           isLoading: isLoading || _isSubmitting,
                           backgroundColor: Colors.white,
                           foregroundColor: AppColors.primaryBlue,
@@ -268,7 +272,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                             ),
                             TextButton(
                               onPressed: () => context.pop(),
-                              style: TextButton.styleFrom(foregroundColor: Colors.white),
+                              style: TextButton.styleFrom(
+                                  foregroundColor: Colors.white),
                               child: const Text(
                                 'Sign In',
                                 style: TextStyle(fontWeight: FontWeight.bold),

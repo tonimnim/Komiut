@@ -34,8 +34,10 @@ class ApiClient {
     _dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.apiBaseUrl,
-        connectTimeout: const Duration(milliseconds: AppConfig.apiConnectTimeoutMs),
-        receiveTimeout: const Duration(milliseconds: AppConfig.apiReceiveTimeoutMs),
+        connectTimeout:
+            const Duration(milliseconds: AppConfig.apiConnectTimeoutMs),
+        receiveTimeout:
+            const Duration(milliseconds: AppConfig.apiReceiveTimeoutMs),
         sendTimeout: const Duration(milliseconds: AppConfig.apiTimeoutMs),
         headers: {
           'Content-Type': 'application/json',
@@ -61,32 +63,46 @@ class ApiClient {
   // Driver Compatibility Methods (Internal)
   // ─────────────────────────────────────────────────────────────────────────
 
-  Future<DriverResponse> getDriver(String path, {Map<String, dynamic>? queryParameters, Options? options}) async {
-    final result = await get<dynamic>(path, queryParameters: queryParameters, options: options);
+  Future<DriverResponse> getDriver(String path,
+      {Map<String, dynamic>? queryParameters, Options? options}) async {
+    final result = await get<dynamic>(path,
+        queryParameters: queryParameters, options: options);
     return result.fold(
       (failure) => throw ServerFailure(failure.message),
       (data) => DriverResponse(data),
     );
   }
 
-  Future<DriverResponse> postDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
-    final result = await post<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+  Future<DriverResponse> postDriver(String path,
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      Options? options}) async {
+    final result = await post<dynamic>(path,
+        data: data, queryParameters: queryParameters, options: options);
     return result.fold(
       (failure) => throw ServerFailure(failure.message),
       (data) => DriverResponse(data),
     );
   }
 
-  Future<DriverResponse> putDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
-    final result = await put<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+  Future<DriverResponse> putDriver(String path,
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      Options? options}) async {
+    final result = await put<dynamic>(path,
+        data: data, queryParameters: queryParameters, options: options);
     return result.fold(
       (failure) => throw ServerFailure(failure.message),
       (data) => DriverResponse(data),
     );
   }
 
-  Future<DriverResponse> deleteDriver(String path, {dynamic data, Map<String, dynamic>? queryParameters, Options? options}) async {
-    final result = await delete<dynamic>(path, data: data, queryParameters: queryParameters, options: options);
+  Future<DriverResponse> deleteDriver(String path,
+      {dynamic data,
+      Map<String, dynamic>? queryParameters,
+      Options? options}) async {
+    final result = await delete<dynamic>(path,
+        data: data, queryParameters: queryParameters, options: options);
     return result.fold(
       (failure) => throw ServerFailure(failure.message),
       (data) => DriverResponse(data),

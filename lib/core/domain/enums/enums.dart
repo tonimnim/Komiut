@@ -46,7 +46,8 @@ extension UserRoleX on UserRole {
   bool get isCrew => this == UserRole.driver || this == UserRole.tout;
 
   /// Whether this role can manage vehicles.
-  bool get canManageVehicle => this == UserRole.driver || this == UserRole.admin;
+  bool get canManageVehicle =>
+      this == UserRole.driver || this == UserRole.admin;
 }
 
 /// Parse UserRole from string.

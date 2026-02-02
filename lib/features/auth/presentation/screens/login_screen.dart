@@ -159,8 +159,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () => context.push(RouteConstants.forgotPassword),
-                        style: TextButton.styleFrom(foregroundColor: Colors.white),
+                        onPressed: () =>
+                            context.push(RouteConstants.forgotPassword),
+                        style:
+                            TextButton.styleFrom(foregroundColor: Colors.white),
                         child: const Text(
                           'Forgot Password?',
                           style: TextStyle(fontWeight: FontWeight.w500),
@@ -172,7 +174,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     // Login button
                     CustomButton(
                       text: 'Sign In',
-                      onPressed: (isLoading || _isSubmitting) ? null : _handleLogin,
+                      onPressed:
+                          (isLoading || _isSubmitting) ? null : _handleLogin,
                       isLoading: isLoading || _isSubmitting,
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primaryBlue,
@@ -189,7 +192,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         TextButton(
                           onPressed: () => context.push(RouteConstants.signUp),
-                          style: TextButton.styleFrom(foregroundColor: Colors.white),
+                          style: TextButton.styleFrom(
+                              foregroundColor: Colors.white),
                           child: const Text(
                             'Sign Up',
                             style: TextStyle(fontWeight: FontWeight.bold),

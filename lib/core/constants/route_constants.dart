@@ -45,13 +45,17 @@ class RouteConstants {
   static const String passengerLoyalty = '/passenger/loyalty';
 
   // Payment flow routes
-  static const String passengerPaymentMethod = '/passenger/payment/method/:bookingId';
-  static const String passengerPaymentProcessing = '/passenger/payment/processing/:bookingId';
-  static const String passengerPaymentReceipt = '/passenger/payment/receipt/:bookingId';
+  static const String passengerPaymentMethod =
+      '/passenger/payment/method/:bookingId';
+  static const String passengerPaymentProcessing =
+      '/passenger/payment/processing/:bookingId';
+  static const String passengerPaymentReceipt =
+      '/passenger/payment/receipt/:bookingId';
 
   // Wallet routes
   static const String passengerWalletTopup = '/passenger/wallet/topup';
-  static const String passengerWalletTopupProcess = '/passenger/wallet/topup/process';
+  static const String passengerWalletTopupProcess =
+      '/passenger/wallet/topup/process';
   static const String passengerWalletHistory = '/passenger/wallet/history';
 
   /// Get route detail path for a specific route.
@@ -64,16 +68,20 @@ class RouteConstants {
   static String passengerTripDetailPath(String id) => '/passenger/trips/$id';
 
   /// Get ticket path for a specific booking.
-  static String passengerTicketPath(String bookingId) => '/passenger/ticket/$bookingId';
+  static String passengerTicketPath(String bookingId) =>
+      '/passenger/ticket/$bookingId';
 
   /// Get boarding confirmation path for a specific ticket.
-  static String passengerBoardingPath(String ticketId) => '/passenger/boarding/$ticketId';
+  static String passengerBoardingPath(String ticketId) =>
+      '/passenger/boarding/$ticketId';
 
   /// Get active trip tracking path for a specific trip.
-  static String passengerActiveTripPath(String tripId) => '/passenger/trip/$tripId';
+  static String passengerActiveTripPath(String tripId) =>
+      '/passenger/trip/$tripId';
 
   /// Get queue path for a specific route.
-  static String passengerQueuePath(String routeId) => '/passenger/queue/$routeId';
+  static String passengerQueuePath(String routeId) =>
+      '/passenger/queue/$routeId';
 
   /// Get payment method selection path for a specific booking.
   static String passengerPaymentMethodPath(String bookingId) =>
@@ -102,7 +110,8 @@ class RouteConstants {
   static String driverTripDetailPath(String id) => '/driver/trips/$id';
 
   /// Get earnings detail path for a specific date.
-  static String driverEarningsDetailPath(String date) => '/driver/earnings/$date';
+  static String driverEarningsDetailPath(String date) =>
+      '/driver/earnings/$date';
 
   // ─────────────────────────────────────────────────────────────────────────
   // Shared routes

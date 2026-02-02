@@ -14,7 +14,8 @@ import '../providers/role_provider.dart';
 /// Redirect function for authentication guard.
 ///
 /// Redirects unauthenticated users to login page.
-String? authGuardRedirect(BuildContext context, GoRouterState state, WidgetRef ref) {
+String? authGuardRedirect(
+    BuildContext context, GoRouterState state, WidgetRef ref) {
   final isAuthenticated = ref.read(isAuthenticatedProvider);
   final isAuthRoute = _isAuthRoute(state.matchedLocation);
   final isSplash = state.matchedLocation == RouteConstants.splash;
@@ -51,7 +52,8 @@ class PassengerGuard {
   const PassengerGuard._();
 
   /// Check if user can access passenger routes.
-  static String? redirect(BuildContext context, GoRouterState state, WidgetRef ref) {
+  static String? redirect(
+      BuildContext context, GoRouterState state, WidgetRef ref) {
     final role = ref.read(currentRoleProvider);
 
     if (role == null) {
@@ -73,7 +75,8 @@ class DriverGuard {
   const DriverGuard._();
 
   /// Check if user can access driver routes.
-  static String? redirect(BuildContext context, GoRouterState state, WidgetRef ref) {
+  static String? redirect(
+      BuildContext context, GoRouterState state, WidgetRef ref) {
     final role = ref.read(currentRoleProvider);
 
     if (role == null) {

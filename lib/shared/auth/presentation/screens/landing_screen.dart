@@ -17,7 +17,7 @@ class LandingScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Spacer(flex: 2),
-              
+
               // App Logo / Symbol
               Center(
                 child: Container(
@@ -34,9 +34,9 @@ class LandingScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               const Text(
                 'Welcome to Komiut',
                 style: TextStyle(
@@ -47,9 +47,9 @@ class LandingScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               const Text(
                 'Choose how you want to use the platform today.',
                 style: TextStyle(
@@ -59,31 +59,33 @@ class LandingScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const Spacer(flex: 3),
-              
+
               // Role Selection Cards
               _buildRoleCard(
                 context,
                 title: 'I\'m a Passenger',
                 subtitle: 'Find rides and travel seamlessly',
                 icon: Icons.person_outline_rounded,
-                onTap: () => context.push(RouteConstants.login), // Default login
+                onTap: () =>
+                    context.push(RouteConstants.login), // Default login
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildRoleCard(
                 context,
                 title: 'I\'m a Driver / tout',
                 subtitle: 'Manage trips and track earnings',
                 icon: Icons.badge_outlined,
-                onTap: () => context.push(RouteConstants.login), // Same login, but context changes
+                onTap: () => context.push(
+                    RouteConstants.login), // Same login, but context changes
                 isSecondary: true,
               ),
-              
+
               const SizedBox(height: 48),
-              
+
               const Text(
                 'Moving cities together, one ride at a time.',
                 style: TextStyle(
@@ -93,7 +95,7 @@ class LandingScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 24),
             ],
           ),
@@ -134,7 +136,8 @@ class LandingScreen extends StatelessWidget {
             Icon(
               icon,
               size: 32,
-              color: isSecondary ? AppColors.textPrimary : AppColors.primaryBlue,
+              color:
+                  isSecondary ? AppColors.textPrimary : AppColors.primaryBlue,
             ),
             const SizedBox(width: 20),
             Expanded(

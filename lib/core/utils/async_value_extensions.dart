@@ -109,9 +109,8 @@ extension AsyncValueX<T> on AsyncValue<T> {
         title: errorTitle ?? 'Error',
         message: message,
         onRetry: onRetry,
-        type: failure != null
-            ? _failureToErrorType(failure)
-            : ErrorType.generic,
+        type:
+            failure != null ? _failureToErrorType(failure) : ErrorType.generic,
       );
     }
 
@@ -258,7 +257,8 @@ extension AsyncValueListX<T> on AsyncValue<List<T>> {
   /// )
   /// ```
   Widget buildList({
-    required Widget Function(BuildContext context, T item, int index) itemBuilder,
+    required Widget Function(BuildContext context, T item, int index)
+        itemBuilder,
     required Widget shimmer,
     required Widget emptyState,
     VoidCallback? onRetry,
@@ -273,19 +273,20 @@ extension AsyncValueListX<T> on AsyncValue<List<T>> {
         physics: physics,
         shrinkWrap: shrinkWrap,
         itemCount: items.length,
-        separatorBuilder: separatorBuilder ??
-            (context, index) => const Divider(height: 1),
-        itemBuilder: (context, index) => itemBuilder(context, items[index], index),
+        separatorBuilder:
+            separatorBuilder ?? (context, index) => const Divider(height: 1),
+        itemBuilder: (context, index) =>
+            itemBuilder(context, items[index], index),
       ),
       shimmer: shimmer,
       empty: emptyState,
       error: (error) => AppErrorWidget(
         title: 'Error',
-        message: error is Failure ? ErrorHandler.getMessage(error) : error.toString(),
+        message: error is Failure
+            ? ErrorHandler.getMessage(error)
+            : error.toString(),
         onRetry: onRetry,
-        type: error is Failure
-            ? _failureToErrorType(error)
-            : ErrorType.generic,
+        type: error is Failure ? _failureToErrorType(error) : ErrorType.generic,
       ),
     );
   }

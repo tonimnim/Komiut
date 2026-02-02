@@ -33,9 +33,8 @@ class AppDialog {
           AppButton(
             label: confirmLabel,
             onPressed: () => Navigator.of(context).pop(true),
-            variant: isDestructive
-                ? ButtonVariant.primary
-                : ButtonVariant.primary,
+            variant:
+                isDestructive ? ButtonVariant.primary : ButtonVariant.primary,
             size: ButtonSize.small,
             backgroundColor: isDestructive ? Colors.red : null,
           ),

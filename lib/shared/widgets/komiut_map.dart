@@ -25,9 +25,9 @@ class KomiutMap extends StatelessWidget {
   Widget build(BuildContext context) {
     if (showMock) {
       return Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: AppColors.grey100,
-          image: const DecorationImage(
+          image: DecorationImage(
             image: AssetImage('assets/images/mock_map.png'),
             fit: BoxFit.cover,
           ),
@@ -57,12 +57,9 @@ class KomiutMap extends StatelessWidget {
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.example.komiut_app',
         ),
-        if (polylines.isNotEmpty)
-          PolylineLayer(polylines: polylines),
-        if (circles.isNotEmpty)
-          CircleLayer(circles: circles),
-        if (markers.isNotEmpty)
-          MarkerLayer(markers: markers),
+        if (polylines.isNotEmpty) PolylineLayer(polylines: polylines),
+        if (circles.isNotEmpty) CircleLayer(circles: circles),
+        if (markers.isNotEmpty) MarkerLayer(markers: markers),
       ],
     );
   }

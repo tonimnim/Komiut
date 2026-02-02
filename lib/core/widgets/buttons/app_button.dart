@@ -162,7 +162,7 @@ class AppButton extends StatefulWidget {
 
   /// Custom highlight color for pressed state.
   final Color? highlightColor;
-  
+
   /// Optional gradient for the button background (usually for primary).
   final Gradient? gradient;
 
@@ -197,7 +197,9 @@ class _AppButtonState extends State<AppButton>
   }
 
   void _onTapDown(TapDownDetails details) {
-    if (widget.enablePressAnimation && widget.onPressed != null && !widget.isLoading) {
+    if (widget.enablePressAnimation &&
+        widget.onPressed != null &&
+        !widget.isLoading) {
       _scaleController.forward();
     }
   }
@@ -335,8 +337,7 @@ class _AppButtonState extends State<AppButton>
           ).copyWith(
             overlayColor: WidgetStateProperty.resolveWith((states) {
               if (states.contains(WidgetState.pressed)) {
-                return widget.highlightColor ??
-                    Colors.white.withOpacity(0.1);
+                return widget.highlightColor ?? Colors.white.withOpacity(0.1);
               }
               return null;
             }),

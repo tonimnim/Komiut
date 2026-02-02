@@ -40,7 +40,8 @@ final mpesaServiceProvider = Provider<MpesaService>((ref) {
 /// - Timeout handling
 /// - Error handling
 final mpesaPaymentStateProvider =
-    StateNotifierProvider<MpesaPaymentStateNotifier, MpesaPaymentSession>((ref) {
+    StateNotifierProvider<MpesaPaymentStateNotifier, MpesaPaymentSession>(
+        (ref) {
   final mpesaService = ref.watch(mpesaServiceProvider);
   return MpesaPaymentStateNotifier(mpesaService);
 });
@@ -138,7 +139,8 @@ class MpesaPaymentStateNotifier extends StateNotifier<MpesaPaymentSession> {
         } else {
           state = state.copyWith(
             state: MpesaPaymentState.failed,
-            errorMessage: response.responseDescription ?? 'Failed to initiate payment',
+            errorMessage:
+                response.responseDescription ?? 'Failed to initiate payment',
           );
           return false;
         }
@@ -246,12 +248,14 @@ class MpesaPaymentStateNotifier extends StateNotifier<MpesaPaymentSession> {
 
     debugPrint('MpesaPaymentState: Polling status (attempt $_pollAttempts)');
 
-    final result = await _mpesaService.checkTransactionStatus(checkoutRequestId);
+    final result =
+        await _mpesaService.checkTransactionStatus(checkoutRequestId);
 
     result.fold(
       (failure) {
         // Status check failed - don't update state, will retry
-        debugPrint('MpesaPaymentState: Status check failed - ${failure.message}');
+        debugPrint(
+            'MpesaPaymentState: Status check failed - ${failure.message}');
       },
       (status) {
         debugPrint('MpesaPaymentState: Status update - ${status.status.name}');
@@ -327,7 +331,10 @@ final mpesaCheckoutRequestIdProvider = Provider<String?>((ref) {
 
 /// Provider for the M-Pesa receipt number (after successful payment).
 final mpesaReceiptNumberProvider = Provider<String?>((ref) {
-  return ref.watch(mpesaPaymentStateProvider).transactionStatus?.mpesaReceiptNumber;
+  return ref
+      .watch(mpesaPaymentStateProvider)
+      .transactionStatus
+      ?.mpesaReceiptNumber;
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -362,7 +369,8 @@ final stkPushProvider = Provider<
 /// This is a family provider that allows checking status for any checkout request ID.
 /// Useful for checking status of transactions from previous sessions.
 final transactionStatusProvider =
-    FutureProvider.family<TransactionStatus?, String>((ref, checkoutRequestId) async {
+    FutureProvider.family<TransactionStatus?, String>(
+        (ref, checkoutRequestId) async {
   if (checkoutRequestId.isEmpty) return null;
 
   final mpesaService = ref.watch(mpesaServiceProvider);

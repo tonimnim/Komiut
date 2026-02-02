@@ -55,6 +55,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
 
 /// Queue screen widget.
 ///
@@ -137,7 +138,7 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
               ),
             ),
       floatingActionButton: _buildFloatingActionButton(context),
-      bottomNavigationBar: _buildBottomNav(context),
+      bottomNavigationBar: const DriverBottomNav(currentIndex: 1),
     );
   }
 
@@ -455,50 +456,5 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
       );
     }
     return null;
-  }
-
-  Widget _buildBottomNav(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: 1, // Queue tab
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.format_list_numbered_outlined),
-          activeIcon: Icon(Icons.format_list_numbered),
-          label: 'Queue',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.directions_bus_outlined),
-          activeIcon: Icon(Icons.directions_bus),
-          label: 'Trips',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.account_balance_wallet_outlined),
-          activeIcon: Icon(Icons.account_balance_wallet),
-          label: 'Earnings',
-        ),
-      ],
-      onTap: (index) {
-        switch (index) {
-          case 0:
-            context.go(RouteConstants.driverHome);
-            break;
-          case 1:
-            // Already on queue
-            break;
-          case 2:
-            context.go(RouteConstants.driverTrips);
-            break;
-          case 3:
-            context.go(RouteConstants.driverEarnings);
-            break;
-        }
-      },
-    );
   }
 }

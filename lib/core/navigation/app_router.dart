@@ -15,35 +15,35 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/signup_screen.dart';
 import '../../features/auth/presentation/screens/forgot_password_screen.dart';
 import '../../features/auth/presentation/screens/two_factor_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/activity/presentation/screens/activity_screen.dart';
-import '../../features/payment/presentation/screens/payment_screen.dart';
-import '../../features/payment/presentation/screens/payment_method_screen.dart';
-import '../../features/payment/presentation/screens/payment_processing_screen.dart';
-import '../../features/payment/presentation/screens/payment_receipt_screen.dart';
-import '../../features/payment/presentation/screens/topup_screen.dart';
-import '../../features/payment/presentation/screens/topup_processing_screen.dart';
-import '../../features/payment/presentation/screens/wallet_history_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/settings/presentation/screens/about_screen.dart';
-import '../../features/settings/presentation/screens/help_screen.dart';
-import '../../features/settings/presentation/screens/faq_screen.dart';
-import '../../features/settings/presentation/screens/privacy_policy_screen.dart';
-import '../../features/settings/presentation/screens/terms_screen.dart';
-import '../../features/settings/presentation/screens/preferences_screen.dart';
-import '../../features/settings/presentation/screens/saved_routes_screen.dart';
-import '../../features/settings/presentation/screens/saved_saccos_screen.dart';
-import '../../features/settings/presentation/screens/payment_methods_screen.dart';
-import '../../features/notifications/presentation/screens/notification_screen.dart';
-import '../../features/scan/presentation/screens/scan_screen.dart';
+import '../../features/shared/home/presentation/screens/home_screen.dart';
+import '../../features/shared/activity/presentation/screens/activity_screen.dart';
+import '../../features/shared/payment/presentation/screens/payment_screen.dart';
+import '../../features/shared/payment/presentation/screens/payment_method_screen.dart';
+import '../../features/shared/payment/presentation/screens/payment_processing_screen.dart';
+import '../../features/shared/payment/presentation/screens/payment_receipt_screen.dart';
+import '../../features/shared/payment/presentation/screens/topup_screen.dart';
+import '../../features/shared/payment/presentation/screens/topup_processing_screen.dart';
+import '../../features/shared/payment/presentation/screens/wallet_history_screen.dart';
+import '../../features/shared/settings/presentation/screens/settings_screen.dart';
+import '../../features/shared/settings/presentation/screens/about_screen.dart';
+import '../../features/shared/settings/presentation/screens/help_screen.dart';
+import '../../features/shared/settings/presentation/screens/faq_screen.dart';
+import '../../features/shared/settings/presentation/screens/privacy_policy_screen.dart';
+import '../../features/shared/settings/presentation/screens/terms_screen.dart';
+import '../../features/shared/settings/presentation/screens/preferences_screen.dart';
+import '../../features/shared/settings/presentation/screens/saved_routes_screen.dart';
+import '../../features/shared/settings/presentation/screens/saved_saccos_screen.dart';
+import '../../features/shared/settings/presentation/screens/payment_methods_screen.dart';
+import '../../features/shared/notifications/presentation/screens/notification_screen.dart';
+import '../../features/shared/scan/presentation/screens/scan_screen.dart';
 import '../../features/driver/driver.dart';
 import '../../features/shared/shared.dart';
 import '../../features/passenger/discovery/presentation/screens/saccos_screen.dart';
 import '../../features/passenger/discovery/presentation/screens/sacco_detail_screen.dart';
-import '../../features/queue/presentation/screens/queue_screen.dart';
-import '../../features/trips/presentation/screens/active_trip_screen.dart';
-import '../../features/loyalty/presentation/screens/loyalty_screen.dart';
-import '../../features/tickets/tickets.dart';
+import '../../features/shared/queue/presentation/screens/queue_screen.dart';
+import '../../features/passenger/trips/presentation/screens/active_trip_screen.dart';
+import '../../features/shared/loyalty/presentation/screens/loyalty_screen.dart';
+import '../../features/passenger/tickets/tickets.dart';
 import '../config/app_config.dart';
 import '../constants/route_constants.dart';
 
@@ -56,7 +56,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 GoRouter createAppRouter(Ref ref) {
   return GoRouter(
     // Skip auth: go directly to home, otherwise start at splash
-    initialLocation: AppConfig.skipAuth ? RouteConstants.home : RouteConstants.splash,
+    initialLocation:
+        AppConfig.skipAuth ? RouteConstants.home : RouteConstants.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
       // DEV MODE: Skip all auth checks - no redirects at all
@@ -87,12 +88,14 @@ GoRouter createAppRouter(Ref ref) {
       // Authenticated - check role-based access
       if (authState is AuthAuthenticated) {
         // Passenger trying to access driver routes
-        if (currentPath.startsWith('/driver') && !authState.role.usesDriverInterface) {
+        if (currentPath.startsWith('/driver') &&
+            !authState.role.usesDriverInterface) {
           return authState.role.homeRoute;
         }
 
         // Driver trying to access passenger-only routes
-        if (currentPath.startsWith('/passenger') && authState.role.usesDriverInterface) {
+        if (currentPath.startsWith('/passenger') &&
+            authState.role.usesDriverInterface) {
           return authState.role.homeRoute;
         }
       }

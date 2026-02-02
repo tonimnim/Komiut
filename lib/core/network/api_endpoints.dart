@@ -203,8 +203,7 @@ class ApiEndpoints {
   // ─────────────────────────────────────────────────────────────────────────
 
   /// Get trips for a specific driver.
-  static String tripsByDriver(String driverId) =>
-      '/api/Trips/driver/$driverId';
+  static String tripsByDriver(String driverId) => '/api/Trips/driver/$driverId';
 
   /// Get current driver's trips.
   static const String tripsMyDriver = '/api/Trips/driver/my';

@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\antho\\\\komiut\\\\assets\\\\icons\"\" 2>/dev/null || echo \"Icons directory not present \")",
+      "Bash(curl:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(findstr:*)",
+      "Bash(wc:*)",
+      "Bash(powershell -Command \"New-Item -ItemType Directory -Force -Path ''C:\\\\Users\\\\antho\\\\komiut\\\\lib\\\\l10n''\")",
+      "Bash(del \"C:\\\\Users\\\\antho\\\\komiut\\\\l10n.yaml\")",
+      "Bash(git fetch:*)",
+      "Bash(git checkout:*)",
+      "Bash(find:*)"
+    ]
+  }
+}

@@ -62,7 +62,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 
   Future<void> _startMinTimer() async {
-    await Future.delayed(Duration(seconds: AppConstants.splashDuration));
+    await Future.delayed(const Duration(seconds: AppConstants.splashDuration));
     if (!mounted) return;
     _minTimeElapsed = true;
     _tryNavigate();

@@ -16,7 +16,8 @@ class ApiException implements Exception {
   @override
   String toString() => 'ApiException: $message (code: $code)';
 
-  factory ApiException.fromResponse(Map<String, dynamic> response, int? statusCode) {
+  factory ApiException.fromResponse(
+      Map<String, dynamic> response, int? statusCode) {
     final error = response['error'] as Map<String, dynamic>?;
     return ApiException(
       message: error?['message'] ?? 'Unknown error',

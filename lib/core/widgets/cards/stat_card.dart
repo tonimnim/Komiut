@@ -69,9 +69,7 @@ class StatCard extends StatelessWidget {
     return AppCard(
       backgroundColor: backgroundColor,
       onTap: onTap,
-      padding: compact
-          ? const EdgeInsets.all(12)
-          : const EdgeInsets.all(16),
+      padding: compact ? const EdgeInsets.all(12) : const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

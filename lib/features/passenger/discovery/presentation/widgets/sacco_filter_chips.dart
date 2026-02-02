@@ -49,7 +49,8 @@ extension SaccoFilterX on SaccoFilter {
 }
 
 /// Provider for the selected sacco filter.
-final saccoFilterProvider = StateProvider<SaccoFilter>((ref) => SaccoFilter.all);
+final saccoFilterProvider =
+    StateProvider<SaccoFilter>((ref) => SaccoFilter.all);
 
 /// A horizontally scrollable row of filter chips for saccos.
 class SaccoFilterChips extends ConsumerWidget {
