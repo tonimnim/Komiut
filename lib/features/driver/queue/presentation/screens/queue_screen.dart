@@ -5,48 +5,6 @@
 /// - Estimated departure time
 /// - Vehicles ahead in queue
 /// - Queue actions (join, leave, refresh)
-///
-/// ## TODO(Musa): Implement queue management screen
-///
-/// ### High Priority
-/// - [ ] Create `QueueProvider` in `providers/queue_provider.dart`
-/// - [ ] Fetch queue position using `ApiEndpoints.queueMyPosition`
-/// - [ ] Display current position with real-time updates
-/// - [ ] Implement join queue using `ApiEndpoints.queueJoin`
-/// - [ ] Implement leave queue using `ApiEndpoints.queueLeave`
-///
-/// ### Medium Priority
-/// - [ ] Show list of vehicles ahead in queue
-/// - [ ] Calculate and display estimated departure time
-/// - [ ] Add manual refresh and auto-refresh (every 30s)
-/// - [ ] Handle queue notifications (position change, departure time)
-/// - [ ] Show route selection for joining queue
-///
-/// ### Low Priority
-/// - [ ] Add queue position history
-/// - [ ] Implement offline queue status caching
-/// - [ ] Add push notification integration for queue updates
-///
-/// ### API Endpoints to use:
-/// - `ApiEndpoints.queueMyPosition` - Get current position
-/// - `ApiEndpoints.queueJoin` - Join a queue (POST)
-/// - `ApiEndpoints.queueLeave` - Leave queue (POST)
-/// - `ApiEndpoints.queueByRoute(routeId)` - Get queue for a route
-/// - `ApiEndpoints.queueByStage(stageId)` - Get queue by stage
-///
-/// ### Data model needed:
-/// ```dart
-/// class QueuePosition {
-///   final String id;
-///   final String vehicleId;
-///   final String routeId;
-///   final int position;
-///   final DateTime joinedAt;
-///   final DateTime? estimatedDeparture;
-///   final String routeName;
-///   final int vehiclesAhead;
-/// }
-/// ```
 library;
 
 import 'package:flutter/material.dart';
@@ -55,25 +13,22 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/widgets/cards/app_card.dart';
+import '../../../../../core/widgets/feedback/app_error.dart';
+import '../../../../../core/widgets/loading/shimmer_loading.dart';
 import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
+import '../../../../shared/routes/presentation/providers/route_providers.dart';
+import '../providers/queue_providers.dart';
 
 /// Queue screen widget.
-///
-/// Displays the driver's queue position and provides queue management actions.
-class QueueScreen extends ConsumerStatefulWidget {
+class QueueScreen extends ConsumerWidget {
   const QueueScreen({super.key});
 
   @override
-  ConsumerState<QueueScreen> createState() => _QueueScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final queueAsync = ref.watch(driverQueuePositionProvider);
+    final isLoading = ref.watch(queueOperationLoadingProvider);
 
-class _QueueScreenState extends ConsumerState<QueueScreen> {
-  // TODO(Musa): Replace with actual state from provider
-  bool _isInQueue = false;
-  bool _isLoading = false;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Queue Position'),
@@ -83,332 +38,457 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _isLoading
-                ? null
-                : () {
-                    // TODO(Musa): Refresh queue position
-                    // ref.invalidate(queuePositionProvider);
-                    setState(() => _isLoading = true);
-                    Future.delayed(const Duration(seconds: 1), () {
-                      if (mounted) setState(() => _isLoading = false);
-                    });
-                  },
+            icon: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+            onPressed: isLoading ? null : () => refreshQueue(ref),
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ─────────────────────────────────────────────────────────────
-                  // Queue Position Card
-                  // TODO(Musa): Replace with actual data
-                  // ─────────────────────────────────────────────────────────────
-                  _buildQueuePositionCard(context),
-                  const SizedBox(height: 24),
-
-                  // ─────────────────────────────────────────────────────────────
-                  // Queue Info
-                  // ─────────────────────────────────────────────────────────────
-                  _buildQueueInfoSection(context),
-                  const SizedBox(height: 24),
-
-                  // ─────────────────────────────────────────────────────────────
-                  // Vehicles Ahead (if in queue)
-                  // TODO(Musa): Show actual vehicles list
-                  // ─────────────────────────────────────────────────────────────
-                  if (_isInQueue) ...[
-                    _buildVehiclesAheadSection(context),
-                    const SizedBox(height: 24),
-                  ],
-
-                  // ─────────────────────────────────────────────────────────────
-                  // Route Selection (if not in queue)
-                  // TODO(Musa): Show available routes to join
-                  // ─────────────────────────────────────────────────────────────
-                  if (!_isInQueue) ...[
-                    _buildRouteSelectionSection(context),
-                    const SizedBox(height: 24),
-                  ],
-                ],
+      body: RefreshIndicator(
+        onRefresh: () async => refreshQueue(ref),
+        child: queueAsync.when(
+          loading: () => const _LoadingState(),
+          error: (error, _) => SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: AppErrorWidget(
+                title: 'Failed to load queue',
+                message: error.toString(),
+                type: ErrorType.server,
+                onRetry: () => ref.invalidate(driverQueuePositionProvider),
               ),
             ),
-      floatingActionButton: _buildFloatingActionButton(context),
+          ),
+          data: (position) => SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Queue Position Card
+                _QueuePositionCard(position: position),
+                const SizedBox(height: 24),
+
+                // Queue Info or Route Selection
+                if (position != null) ...[
+                  _QueueInfoSection(position: position),
+                  const SizedBox(height: 24),
+                  if (position.vehiclesAhead != null && position.vehiclesAhead! > 0)
+                    _VehiclesAheadSection(position: position),
+                ] else ...[
+                  const _RouteSelectionSection(),
+                ],
+                const SizedBox(height: 80),
+              ],
+            ),
+          ),
+        ),
+      ),
+      floatingActionButton: queueAsync.whenOrNull(
+        data: (position) => position != null ? _LeaveQueueFAB() : null,
+      ),
       bottomNavigationBar: const DriverBottomNav(currentIndex: 1),
     );
   }
+}
 
-  Widget _buildQueuePositionCard(BuildContext context) {
-    // TODO(Musa): Replace with actual queue position data
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            // Position indicator
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                color: _isInQueue
-                    ? AppColors.primaryBlue.withAlpha(26)
-                    : Colors.grey.withAlpha(26),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  _isInQueue ? '#3' : '--',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.bold,
-                    color: _isInQueue ? AppColors.primaryBlue : Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _isInQueue ? 'Your Position' : 'Not in Queue',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _isInQueue
-                  ? 'CBD - Westlands Route'
-                  : 'Join a queue to see your position',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
-                  ),
-            ),
-            if (_isInQueue) ...[
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildInfoItem(
-                    icon: Icons.access_time,
-                    label: 'Est. Wait',
-                    value: '~25 min',
-                  ),
-                  _buildInfoItem(
-                    icon: Icons.directions_car,
-                    label: 'Ahead',
-                    value: '2 vehicles',
-                  ),
-                  _buildInfoItem(
-                    icon: Icons.schedule,
-                    label: 'Joined',
-                    value: '10:30 AM',
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
+// ─────────────────────────────────────────────────────────────────────────────
+// Loading State
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LoadingState extends StatelessWidget {
+  const _LoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          const ShimmerCard(height: 200, margin: EdgeInsets.zero),
+          const SizedBox(height: 24),
+          const ShimmerCard(height: 150, margin: EdgeInsets.zero),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildInfoItem({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
+// ─────────────────────────────────────────────────────────────────────────────
+// Queue Position Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _QueuePositionCard extends StatelessWidget {
+  const _QueuePositionCard({this.position});
+
+  final dynamic position; // QueuePosition?
+
+  @override
+  Widget build(BuildContext context) {
+    final isInQueue = position != null;
+
+    return AppCard(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // Position indicator
+          Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              color: isInQueue
+                  ? AppColors.primaryBlue.withOpacity(0.1)
+                  : AppColors.textSecondary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Text(
+                isInQueue ? '#${position.position}' : '--',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  color: isInQueue ? AppColors.primaryBlue : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            isInQueue ? 'Your Position' : 'Not in Queue',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isInQueue
+                ? position.routeName ?? 'Unknown Route'
+                : 'Join a queue to see your position',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+          ),
+          if (isInQueue) ...[
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _InfoItem(
+                  icon: Icons.access_time,
+                  label: 'Est. Wait',
+                  value: position.displayEstimatedWait ?? '--',
+                ),
+                _InfoItem(
+                  icon: Icons.directions_car,
+                  label: 'Ahead',
+                  value: '${position.vehiclesAhead ?? 0} vehicles',
+                ),
+                _InfoItem(
+                  icon: Icons.timer,
+                  label: 'Waited',
+                  value: position.displayWaitTime ?? '--',
+                ),
+              ],
+            ),
+            if (position.isFirst) ...[
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      "You're next!",
+                      style: TextStyle(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoItem extends StatelessWidget {
+  const _InfoItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: Colors.grey, size: 20),
+        Icon(icon, color: AppColors.textSecondary, size: 20),
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.grey,
-            fontSize: 12,
-          ),
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
         ),
       ],
     );
   }
+}
 
-  Widget _buildQueueInfoSection(BuildContext context) {
-    // TODO(Musa): Show actual queue statistics
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Queue Information',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow('Total in queue', '8 vehicles'),
-            _buildInfoRow('Average wait time', '~45 min'),
-            _buildInfoRow('Next departure', '10:45 AM'),
-            _buildInfoRow('Route', 'CBD - Westlands'),
-          ],
-        ),
+// ─────────────────────────────────────────────────────────────────────────────
+// Queue Info Section
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _QueueInfoSection extends StatelessWidget {
+  const _QueueInfoSection({required this.position});
+
+  final dynamic position;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Queue Information',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          _InfoRow(label: 'Route', value: position.routeName ?? '--'),
+          if (position.stageName != null)
+            _InfoRow(label: 'Stage', value: position.stageName!),
+          _InfoRow(label: 'Status', value: position.statusName ?? '--'),
+          if (position.vehicleRegistration != null)
+            _InfoRow(label: 'Vehicle', value: position.vehicleRegistration!),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildInfoRow(String label, String value) {
+class _InfoRow extends StatelessWidget {
+  const _InfoRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(color: Colors.grey),
+          Text(label, style: const TextStyle(color: AppColors.textSecondary)),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Vehicles Ahead Section
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _VehiclesAheadSection extends ConsumerWidget {
+  const _VehiclesAheadSection({required this.position});
+
+  final dynamic position;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routeQueueAsync = ref.watch(routeQueueProvider(position.routeId));
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Vehicles Ahead',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+          const SizedBox(height: 12),
+          routeQueueAsync.when(
+            loading: () => const ShimmerList(itemCount: 2),
+            error: (_, __) => const Text(
+              'Unable to load queue',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            data: (positions) {
+              final ahead = positions
+                  .where((p) => p.position < position.position)
+                  .toList()
+                ..sort((a, b) => b.position.compareTo(a.position));
+
+              if (ahead.isEmpty) {
+                return const Text(
+                  'No vehicles ahead',
+                  style: TextStyle(color: AppColors.textSecondary),
+                );
+              }
+
+              return Column(
+                children: ahead.take(5).map((p) {
+                  return _VehicleItem(
+                    position: p.position,
+                    registration: p.vehicleRegistration ?? 'Unknown',
+                    status: p.isBoarding ? 'Boarding' : 'Waiting',
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VehicleItem extends StatelessWidget {
+  const _VehicleItem({
+    required this.position,
+    required this.registration,
+    required this.status,
+  });
+
+  final int position;
+  final String registration;
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: CircleAvatar(
+        backgroundColor: AppColors.primaryBlue.withOpacity(0.1),
+        child: Text(
+          '#$position',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryBlue,
+            fontSize: 14,
+          ),
+        ),
+      ),
+      title: Text(registration),
+      subtitle: Text(status),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Route Selection Section
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _RouteSelectionSection extends ConsumerWidget {
+  const _RouteSelectionSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final routesAsync = ref.watch(routesProvider);
+
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Select Route to Join',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          routesAsync.when(
+            loading: () => const ShimmerList(itemCount: 3),
+            error: (_, __) => const Text(
+              'Unable to load routes',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+            data: (routes) {
+              if (routes.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'No routes available',
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
+                );
+              }
+
+              return Column(
+                children: routes.map((route) {
+                  return _RouteOption(
+                    routeId: route.id.toString(),
+                    routeName: route.name,
+                    onTap: () => _showJoinConfirmation(
+                        context, ref, route.id.toString(), route.name),
+                  );
+                }).toList(),
+              );
+            },
           ),
         ],
       ),
     );
   }
 
-  Widget _buildVehiclesAheadSection(BuildContext context) {
-    // TODO(Musa): Show actual vehicles ahead
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Vehicles Ahead',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildVehicleItem(1, 'KAA 111A', 'Departing soon'),
-            const Divider(),
-            _buildVehicleItem(2, 'KBB 222B', '~10 min wait'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVehicleItem(int position, String plate, String status) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
-        backgroundColor: AppColors.primaryBlue.withAlpha(26),
-        child: Text(
-          '#$position',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryBlue,
-          ),
-        ),
-      ),
-      title: Text(plate),
-      subtitle: Text(status),
-    );
-  }
-
-  Widget _buildRouteSelectionSection(BuildContext context) {
-    // TODO(Musa): Fetch and display available routes
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Select Route to Join',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            // TODO(Musa): Replace with actual routes from API
-            _buildRouteOption(
-              'CBD - Westlands',
-              '5 in queue',
-              () {
-                // TODO(Musa): Join this queue
-                _showJoinConfirmation(context, 'CBD - Westlands');
-              },
-            ),
-            const Divider(),
-            _buildRouteOption(
-              'CBD - Langata',
-              '3 in queue',
-              () {
-                _showJoinConfirmation(context, 'CBD - Langata');
-              },
-            ),
-            const Divider(),
-            _buildRouteOption(
-              'CBD - Eastleigh',
-              '7 in queue',
-              () {
-                _showJoinConfirmation(context, 'CBD - Eastleigh');
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRouteOption(String route, String queueInfo, VoidCallback onTap) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      title: Text(route),
-      subtitle: Text(queueInfo),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: onTap,
-    );
-  }
-
-  void _showJoinConfirmation(BuildContext context, String route) {
-    // TODO(Musa): Implement with AppDialog
+  void _showJoinConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    String routeId,
+    String routeName,
+  ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Join Queue?'),
-        content: Text('Do you want to join the queue for $route?'),
+        content: Text('Do you want to join the queue for $routeName?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // TODO(Musa): Call API to join queue
-              setState(() => _isInQueue = true);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Joined queue successfully!')),
-              );
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(joinQueueProvider(routeId).future);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Joined queue successfully!')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to join queue: $e')),
+                  );
+                }
+              }
             },
             child: const Text('Join'),
           ),
@@ -416,45 +496,93 @@ class _QueueScreenState extends ConsumerState<QueueScreen> {
       ),
     );
   }
+}
 
-  Widget? _buildFloatingActionButton(BuildContext context) {
-    if (_isInQueue) {
-      return FloatingActionButton.extended(
-        onPressed: () {
-          // TODO(Musa): Implement leave queue with confirmation
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Leave Queue?'),
-              content: const Text(
-                'Are you sure you want to leave the queue? '
-                'You will lose your current position.',
+class _RouteOption extends StatelessWidget {
+  const _RouteOption({
+    required this.routeId,
+    required this.routeName,
+    required this.onTap,
+  });
+
+  final String routeId;
+  final String routeName;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(routeName),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Leave Queue FAB
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _LeaveQueueFAB extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isLoading = ref.watch(queueOperationLoadingProvider);
+
+    return FloatingActionButton.extended(
+      onPressed: isLoading ? null : () => _showLeaveConfirmation(context, ref),
+      backgroundColor: AppColors.error,
+      icon: isLoading
+          ? const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(Colors.white),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    // TODO(Musa): Call API to leave queue
-                    setState(() => _isInQueue = false);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.error,
-                  ),
-                  child: const Text('Leave'),
-                ),
-              ],
-            ),
-          );
-        },
-        backgroundColor: AppColors.error,
-        icon: const Icon(Icons.exit_to_app),
-        label: const Text('Leave Queue'),
-      );
-    }
-    return null;
+            )
+          : const Icon(Icons.exit_to_app),
+      label: Text(isLoading ? 'Leaving...' : 'Leave Queue'),
+    );
+  }
+
+  void _showLeaveConfirmation(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Leave Queue?'),
+        content: const Text(
+          'Are you sure you want to leave the queue? '
+          'You will lose your current position.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(leaveQueueProvider.future);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Left queue successfully')),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Failed to leave queue: $e')),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
   }
 }
