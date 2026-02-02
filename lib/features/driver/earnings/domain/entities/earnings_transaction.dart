@@ -31,7 +31,8 @@ class EarningsTransaction extends Equatable {
   final String currency;
 
   /// Whether this is a positive transaction (income).
-  bool get isIncome => type != EarningsType.deduction && type != EarningsType.payout;
+  bool get isIncome =>
+      type != EarningsType.deduction && type != EarningsType.payout;
 
   /// Whether this transaction is related to a trip.
   bool get isTrip => tripId != null;

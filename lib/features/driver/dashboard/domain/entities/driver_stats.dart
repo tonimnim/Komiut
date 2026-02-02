@@ -33,8 +33,9 @@ class DriverStats extends Equatable {
       totalTrips > 0 ? totalPassengers / totalTrips : 0;
 
   /// Formatted completion rate for display.
-  String get displayCompletionRate =>
-      completionRate != null ? '${(completionRate! * 100).toStringAsFixed(0)}%' : 'N/A';
+  String get displayCompletionRate => completionRate != null
+      ? '${(completionRate! * 100).toStringAsFixed(0)}%'
+      : 'N/A';
 
   @override
   List<Object?> get props => [

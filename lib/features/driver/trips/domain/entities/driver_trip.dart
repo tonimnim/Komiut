@@ -61,7 +61,8 @@ class DriverTrip extends Equatable {
   bool get isFull => maxCapacity != null && passengerCount >= maxCapacity!;
 
   /// Available seats remaining.
-  int get availableSeats => maxCapacity != null ? maxCapacity! - passengerCount : 0;
+  int get availableSeats =>
+      maxCapacity != null ? maxCapacity! - passengerCount : 0;
 
   /// Trip duration if completed.
   Duration? get duration => endTime?.difference(startTime);

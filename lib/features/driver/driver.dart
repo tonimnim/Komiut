@@ -8,20 +8,26 @@
 /// - Trips (active and historical trips)
 library;
 
-// Dashboard entities
-export 'dashboard/domain/entities/driver_profile.dart';
-export 'dashboard/domain/entities/driver_stats.dart';
+// Dashboard
 export 'dashboard/domain/entities/entities.dart';
+export 'dashboard/data/models/models.dart';
+export 'dashboard/data/datasources/datasources.dart';
+export 'dashboard/data/repositories/repositories.dart';
 
-// Earnings entities
-export 'earnings/domain/entities/earnings_summary.dart';
-export 'earnings/domain/entities/earnings_transaction.dart';
+// Earnings
 export 'earnings/domain/entities/entities.dart';
+export 'earnings/data/models/models.dart';
+export 'earnings/data/datasources/datasources.dart';
+export 'earnings/data/repositories/repositories.dart';
 
-// Queue entities
-export 'queue/domain/entities/queue_position.dart';
+// Queue
 export 'queue/domain/entities/entities.dart';
+export 'queue/data/models/models.dart';
+export 'queue/data/datasources/datasources.dart';
+export 'queue/data/repositories/repositories.dart';
 
-// Trips entities
-export 'trips/domain/entities/driver_trip.dart';
+// Trips
 export 'trips/domain/entities/entities.dart';
+export 'trips/data/models/models.dart';
+export 'trips/data/datasources/datasources.dart';
+export 'trips/data/repositories/repositories.dart';
