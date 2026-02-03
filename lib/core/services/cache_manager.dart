@@ -466,7 +466,8 @@ class CacheManagerImpl implements CacheManager {
       }
     }
 
-    debugPrint('CacheManager: Loaded ${_memoryCache.length} entries from persistence');
+    debugPrint(
+        'CacheManager: Loaded ${_memoryCache.length} entries from persistence');
   }
 
   Future<void> _enforceMaxEntries() async {

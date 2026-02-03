@@ -35,7 +35,8 @@ class TripModel {
   factory TripModel.fromJson(Map<String, dynamic> json) {
     // Handle nested value object format: { "vehicleRegistrationNumber": { "value": "KAA 123A" } }
     String? vehicleReg;
-    final regField = json['vehicleRegistrationNumber'] ?? json['vehicleRegistration'];
+    final regField =
+        json['vehicleRegistrationNumber'] ?? json['vehicleRegistration'];
     if (regField is Map<String, dynamic>) {
       vehicleReg = regField['value'] as String?;
     } else {
@@ -46,7 +47,8 @@ class TripModel {
     TripStatus tripStatus;
     final statusField = json['status'];
     if (statusField is int) {
-      tripStatus = TripStatus.values[statusField.clamp(0, TripStatus.values.length - 1)];
+      tripStatus =
+          TripStatus.values[statusField.clamp(0, TripStatus.values.length - 1)];
     } else {
       tripStatus = tripStatusFromString(statusField as String? ?? 'scheduled');
     }

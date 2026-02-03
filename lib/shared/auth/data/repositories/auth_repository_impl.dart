@@ -55,15 +55,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
   Future<void> _saveLoginData(Map<String, dynamic> data) async {
     final accessToken = (data['accessToken'] ?? data['access_token']) as String;
-    final refreshToken = (data['refreshToken'] ?? data['refresh_token']) as String;
-    
+    final refreshToken =
+        (data['refreshToken'] ?? data['refresh_token']) as String;
+
     await localDataSource.saveTokens(accessToken, refreshToken);
 
     final userJson = data['user'] ?? data;
     final userModel = UserModel.fromJson(userJson as Map<String, dynamic>);
     await localDataSource.saveUser(userModel);
   }
-
 
   @override
   Future<void> logout() async {
@@ -91,5 +91,4 @@ class AuthRepositoryImpl implements AuthRepository {
     final user = await localDataSource.getUser();
     return user?.role;
   }
-
 }

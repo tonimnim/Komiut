@@ -323,8 +323,7 @@ class _RollingNumberState extends State<RollingNumber> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (widget.value < 0)
-          Text('-', style: style),
+        if (widget.value < 0) Text('-', style: style),
         for (var i = 0; i < _digits.length; i++)
           _RollingDigit(
             digit: _digits[i],

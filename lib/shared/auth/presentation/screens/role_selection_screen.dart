@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:komiut/core/routes/route_names.dart';
 import 'package:komiut/core/theme/app_colors.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -32,7 +31,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
-              Text(
+              const Text(
                 'Welcome to Komiut',
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -42,7 +41,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
+              const Text(
                 'Are you driving or riding today?',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
@@ -71,7 +70,9 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRoleButton(BuildContext context, String label, IconData icon, VoidCallback onTap, {required bool isPrimary}) {
+  Widget _buildRoleButton(
+      BuildContext context, String label, IconData icon, VoidCallback onTap,
+      {required bool isPrimary}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -80,13 +81,15 @@ class RoleSelectionScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isPrimary ? AppColors.primary : AppColors.grey100,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: isPrimary ? [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            )
-          ] : null,
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.2),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  )
+                ]
+              : null,
         ),
         child: Row(
           children: [
@@ -96,7 +99,8 @@ class RoleSelectionScreen extends StatelessWidget {
                 color: isPrimary ? Colors.white.withOpacity(0.2) : Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: isPrimary ? Colors.white : AppColors.textPrimary),
+              child: Icon(icon,
+                  color: isPrimary ? Colors.white : AppColors.textPrimary),
             ),
             const SizedBox(width: 20),
             Text(
@@ -108,7 +112,9 @@ class RoleSelectionScreen extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Icon(Icons.arrow_forward_ios, size: 16, color: isPrimary ? Colors.white : AppColors.textSecondary),
+            Icon(Icons.arrow_forward_ios,
+                size: 16,
+                color: isPrimary ? Colors.white : AppColors.textSecondary),
           ],
         ),
       ),

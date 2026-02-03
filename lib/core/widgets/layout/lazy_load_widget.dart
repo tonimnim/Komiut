@@ -114,7 +114,8 @@ class _LazyLoadWidgetState extends State<LazyLoadWidget>
 
       // Check if within viewport (with preload offset)
       final top = offset.offset - widget.preloadOffset;
-      final bottom = offset.offset + (renderObject.paintBounds.height) +
+      final bottom = offset.offset +
+          (renderObject.paintBounds.height) +
           widget.preloadOffset;
 
       if (top < scrollOffset + viewportDimension && bottom > scrollOffset) {
@@ -270,7 +271,8 @@ class VisibilityDetector extends StatefulWidget {
   final Widget child;
 
   /// Called when visibility changes.
-  final void Function(bool isVisible, double visibleFraction) onVisibilityChanged;
+  final void Function(bool isVisible, double visibleFraction)
+      onVisibilityChanged;
 
   /// Fraction of widget that must be visible to count as visible.
   final double threshold;
@@ -319,20 +321,19 @@ class _VisibilityDetectorState extends State<VisibilityDetector> {
     }
 
     final viewport = scrollable.position;
-    final widgetRect = renderBox.localToGlobal(Offset.zero) &
-        renderBox.size;
+    final widgetRect = renderBox.localToGlobal(Offset.zero) & renderBox.size;
 
     // Calculate visible portion
-    final viewportTop = 0.0;
+    const viewportTop = 0.0;
     final viewportBottom = viewport.viewportDimension;
 
     final visibleTop = widgetRect.top.clamp(viewportTop, viewportBottom);
     final visibleBottom = widgetRect.bottom.clamp(viewportTop, viewportBottom);
-    final visibleHeight = (visibleBottom - visibleTop).clamp(0.0, widgetRect.height);
+    final visibleHeight =
+        (visibleBottom - visibleTop).clamp(0.0, widgetRect.height);
 
-    final visibleFraction = widgetRect.height > 0
-        ? visibleHeight / widgetRect.height
-        : 0.0;
+    final visibleFraction =
+        widgetRect.height > 0 ? visibleHeight / widgetRect.height : 0.0;
 
     final isVisible = visibleFraction >= widget.threshold;
 
@@ -445,8 +446,8 @@ class _BatchDeferredWidgetsState extends State<BatchDeferredWidgets> {
     if (!mounted || _builtCount >= widget.children.length) return;
 
     setState(() {
-      _builtCount = (_builtCount + widget.batchSize)
-          .clamp(0, widget.children.length);
+      _builtCount =
+          (_builtCount + widget.batchSize).clamp(0, widget.children.length);
     });
 
     if (_builtCount < widget.children.length) {

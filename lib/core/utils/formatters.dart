@@ -65,9 +65,13 @@ class Formatters {
     final dateOnly = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (dateOnly == today) {
-      return showTime ? 'Today, ${DateFormat('h:mm a').format(dateTime)}' : 'Today';
+      return showTime
+          ? 'Today, ${DateFormat('h:mm a').format(dateTime)}'
+          : 'Today';
     } else if (dateOnly == yesterday) {
-      return showTime ? 'Yesterday, ${DateFormat('h:mm a').format(dateTime)}' : 'Yesterday';
+      return showTime
+          ? 'Yesterday, ${DateFormat('h:mm a').format(dateTime)}'
+          : 'Yesterday';
     } else {
       return DateFormat('MMM d, yyyy').format(dateTime);
     }

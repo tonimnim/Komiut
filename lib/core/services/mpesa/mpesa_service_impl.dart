@@ -74,7 +74,8 @@ class MpesaServiceImpl implements MpesaService {
     final result = await _apiClient.post<StkPushResponse>(
       ApiEndpoints.mpesaStkPush,
       data: request.toJson(),
-      fromJson: (data) => StkPushResponse.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          StkPushResponse.fromJson(data as Map<String, dynamic>),
     );
 
     return result.fold(
@@ -110,7 +111,8 @@ class MpesaServiceImpl implements MpesaService {
 
     final result = await _apiClient.get<TransactionStatus>(
       ApiEndpoints.mpesaStatus(checkoutRequestId),
-      fromJson: (data) => TransactionStatus.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          TransactionStatus.fromJson(data as Map<String, dynamic>),
     );
 
     return result.fold(

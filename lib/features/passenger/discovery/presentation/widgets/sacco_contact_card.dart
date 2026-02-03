@@ -39,8 +39,7 @@ class SaccoContactCard extends StatelessWidget {
   final String? website;
 
   /// Whether any contact information is available.
-  bool get _hasContactInfo =>
-      phone != null || email != null || website != null;
+  bool get _hasContactInfo => phone != null || email != null || website != null;
 
   void _onPhoneTap(BuildContext context) {
     // TODO: Implement phone call using url_launcher

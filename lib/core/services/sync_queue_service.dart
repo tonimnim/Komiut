@@ -191,7 +191,8 @@ class SyncResult {
 typedef SyncActionHandler = Future<SyncResult> Function(SyncAction action);
 
 /// Callback for sync events.
-typedef SyncEventCallback = void Function(SyncAction action, SyncResult? result);
+typedef SyncEventCallback = void Function(
+    SyncAction action, SyncResult? result);
 
 /// Configuration for sync queue.
 class SyncQueueConfig {
@@ -461,7 +462,8 @@ class SyncQueueServiceImpl implements SyncQueueService {
       } else {
         action.status = SyncStatus.failed;
         action.lastError = result.error;
-        debugPrint('SyncQueue: Action ${action.id} failed permanently: ${result.error}');
+        debugPrint(
+            'SyncQueue: Action ${action.id} failed permanently: ${result.error}');
       }
     } catch (e) {
       if (action.canRetry) {

@@ -48,13 +48,12 @@ class ApiInterceptor extends Interceptor {
         try {
           final token = await _storage.read(key: AppConstants.keyAccessToken);
           err.requestOptions.headers['Authorization'] = 'Bearer $token';
-          
+
           final dio = Dio();
           final response = await dio.fetch(err.requestOptions);
           handler.resolve(response);
           return;
-        } catch (e) {
-        }
+        } catch (e) {}
       }
     }
 
@@ -63,7 +62,8 @@ class ApiInterceptor extends Interceptor {
 
   Future<bool> _refreshToken() async {
     try {
-      final refreshToken = await _storage.read(key: AppConstants.keyRefreshToken);
+      final refreshToken =
+          await _storage.read(key: AppConstants.keyRefreshToken);
       if (refreshToken == null) return false;
 
       final dio = Dio();
@@ -86,8 +86,7 @@ class ApiInterceptor extends Interceptor {
         );
         return true;
       }
-    } catch (e) {
-    }
+    } catch (e) {}
     return false;
   }
 }

@@ -96,3 +96,9 @@ export 'empty_state_widget.dart';
 export 'app_list_tile.dart' hide AppListTile; // Hide to avoid conflict
 export 'app_tab_bar.dart';
 export 'list_state_handler.dart';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Navigation
+// ─────────────────────────────────────────────────────────────────────────────
+
+export 'navigation/navigation.dart';

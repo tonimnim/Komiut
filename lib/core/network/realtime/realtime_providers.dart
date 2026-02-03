@@ -87,7 +87,8 @@ final isRealtimeConnectedProvider = Provider<bool>((ref) {
 /// Notifier for controlling real-time connection.
 ///
 /// Provides methods to connect, disconnect, and reconnect.
-class RealtimeConnectionNotifier extends StateNotifier<RealtimeConnectionState> {
+class RealtimeConnectionNotifier
+    extends StateNotifier<RealtimeConnectionState> {
   RealtimeConnectionNotifier(this._service)
       : super(const RealtimeConnectionState.initial()) {
     // Listen to service state changes

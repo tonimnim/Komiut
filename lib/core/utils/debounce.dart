@@ -105,7 +105,7 @@ class AsyncDebouncer<T> {
     // Complete previous completer with error if pending
     if (_completer != null && !_completer!.isCompleted) {
       _completer!.completeError(
-        DebounceCancelledException('Debounce cancelled by new request'),
+        const DebounceCancelledException('Debounce cancelled by new request'),
       );
     }
 
@@ -136,7 +136,7 @@ class AsyncDebouncer<T> {
     _timer = null;
     if (_completer != null && !_completer!.isCompleted) {
       _completer!.completeError(
-        DebounceCancelledException('Debounce manually cancelled'),
+        const DebounceCancelledException('Debounce manually cancelled'),
       );
     }
     _completer = null;

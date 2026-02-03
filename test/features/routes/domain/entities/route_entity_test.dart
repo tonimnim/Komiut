@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komiut/features/routes/domain/entities/route_entity.dart';
+import 'package:komiut/features/shared/routes/domain/entities/route_entity.dart';
 
 void main() {
   group('RouteEntity', () {

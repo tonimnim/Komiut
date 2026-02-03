@@ -70,8 +70,8 @@ class AppListTile extends StatelessWidget {
 
     Widget? leadingWidget = leading;
     if (leadingWidget == null && leadingIcon != null) {
-      final bgColor =
-          leadingIconBackground ?? theme.colorScheme.primary.withValues(alpha: 0.1);
+      final bgColor = leadingIconBackground ??
+          theme.colorScheme.primary.withValues(alpha: 0.1);
       final iconColor = leadingIconColor ?? theme.colorScheme.primary;
 
       leadingWidget = Container(

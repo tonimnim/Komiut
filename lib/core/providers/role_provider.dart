@@ -63,7 +63,8 @@ extension AppRoleX on AppRole {
   }
 
   /// Whether this role uses the driver interface.
-  bool get usesDriverInterface => this == AppRole.driver || this == AppRole.tout;
+  bool get usesDriverInterface =>
+      this == AppRole.driver || this == AppRole.tout;
 }
 
 /// Convert UserRole to AppRole.
@@ -148,7 +149,8 @@ class AuthStateNotifier extends Notifier<AuthState> {
 
     // Update providers
     ref.read(currentUserProvider.notifier).state = user;
-    ref.read(currentRoleProvider.notifier).state = appRoleFromUserRole(user.role);
+    ref.read(currentRoleProvider.notifier).state =
+        appRoleFromUserRole(user.role);
 
     state = AuthState.authenticated(user: user);
   }
@@ -190,7 +192,8 @@ class AuthStateNotifier extends Notifier<AuthState> {
 }
 
 /// Provider for auth state notifier.
-final authStateNotifierProvider = NotifierProvider<AuthStateNotifier, AuthState>(
+final authStateNotifierProvider =
+    NotifierProvider<AuthStateNotifier, AuthState>(
   AuthStateNotifier.new,
 );
 
@@ -200,7 +203,8 @@ sealed class AuthState {
 
   const factory AuthState.initial() = AuthStateInitial;
   const factory AuthState.unauthenticated() = AuthStateUnauthenticated;
-  const factory AuthState.authenticated({required User user}) = AuthStateAuthenticated;
+  const factory AuthState.authenticated({required User user}) =
+      AuthStateAuthenticated;
   const factory AuthState.loading() = AuthStateLoading;
 }
 

@@ -10,7 +10,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/domain/entities/route.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/widgets.dart';
-import '../../../../routes/presentation/providers/route_providers.dart';
+import '../../../../shared/routes/presentation/providers/route_providers.dart';
 
 /// A section displaying routes operated by a Sacco.
 ///
@@ -45,9 +45,8 @@ class SaccoRoutesSection extends ConsumerWidget {
       ),
       data: (routes) {
         // Filter routes by organization ID
-        final saccoRoutes = routes
-            .where((route) => route.organizationId == saccoId)
-            .toList();
+        final saccoRoutes =
+            routes.where((route) => route.organizationId == saccoId).toList();
 
         return _RoutesList(
           routes: saccoRoutes,
@@ -88,7 +87,8 @@ class _RoutesList extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.primaryBlue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),

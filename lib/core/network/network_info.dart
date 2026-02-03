@@ -12,7 +12,8 @@ final networkInfoProvider = Provider<NetworkInfo>((ref) {
 });
 
 /// Provider for current connectivity status.
-final connectivityStatusProvider = StreamProvider<List<ConnectivityResult>>((ref) {
+final connectivityStatusProvider =
+    StreamProvider<List<ConnectivityResult>>((ref) {
   final connectivity = Connectivity();
   return connectivity.onConnectivityChanged;
 });

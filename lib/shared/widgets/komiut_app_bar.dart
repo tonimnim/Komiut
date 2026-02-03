@@ -41,9 +41,11 @@ class KomiutAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: CircleAvatar(
                 radius: 18,
                 backgroundColor: AppColors.grey100,
-                backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
+                backgroundImage:
+                    imageUrl != null ? NetworkImage(imageUrl!) : null,
                 child: imageUrl == null
-                    ? const Icon(Icons.person, size: 20, color: AppColors.grey400)
+                    ? const Icon(Icons.person,
+                        size: 20, color: AppColors.grey400)
                     : null,
               ),
             ),

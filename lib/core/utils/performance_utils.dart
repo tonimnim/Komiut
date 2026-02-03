@@ -39,7 +39,7 @@ class Memoizer<K, V> {
   /// Gets a cached value or computes and caches it.
   V get(K key, V Function() compute) {
     if (_cache.containsKey(key)) {
-      final value = _cache.remove(key)!;
+      final value = _cache.remove(key) as V;
       _cache[key] = value; // Move to end (LRU)
       return value;
     }
@@ -52,7 +52,7 @@ class Memoizer<K, V> {
   /// Gets a cached value or computes it asynchronously.
   Future<V> getAsync(K key, Future<V> Function() compute) async {
     if (_cache.containsKey(key)) {
-      final value = _cache.remove(key)!;
+      final value = _cache.remove(key) as V;
       _cache[key] = value; // Move to end (LRU)
       return value;
     }
@@ -297,7 +297,7 @@ class LRUCache<K, V> {
     if (!_cache.containsKey(key)) return null;
 
     // Move to end (most recently used)
-    final value = _cache.remove(key)!;
+    final value = _cache.remove(key) as V;
     _cache[key] = value;
     return value;
   }

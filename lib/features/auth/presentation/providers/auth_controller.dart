@@ -98,7 +98,8 @@ enum AppRole {
       };
 
   /// Whether this role uses the driver interface.
-  bool get usesDriverInterface => this == AppRole.driver || this == AppRole.tout;
+  bool get usesDriverInterface =>
+      this == AppRole.driver || this == AppRole.tout;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -168,7 +169,8 @@ class AuthController extends AsyncNotifier<AuthState> {
           final email = await _storage.read(key: 'user_email');
           final fullName = await _storage.read(key: 'user_name');
           final phone = await _storage.read(key: 'user_phone');
-          final organizationId = await _storage.read(key: 'user_organization_id');
+          final organizationId =
+              await _storage.read(key: 'user_organization_id');
           final profileImage = await _storage.read(key: 'user_profile_image');
 
           // If we have minimum required stored data, use it
@@ -200,7 +202,8 @@ class AuthController extends AsyncNotifier<AuthState> {
 
           // Update stored role if it changed
           if (freshRole.name != roleStr) {
-            await _storage.write(key: AppConfig.userRoleKey, value: freshRole.name);
+            await _storage.write(
+                key: AppConfig.userRoleKey, value: freshRole.name);
           }
 
           return AuthAuthenticated(user: user, role: freshRole, token: token);
@@ -233,10 +236,12 @@ class AuthController extends AsyncNotifier<AuthState> {
       await _storage.write(key: 'user_phone', value: user.phone!);
     }
     if (user.organizationId != null) {
-      await _storage.write(key: 'user_organization_id', value: user.organizationId!);
+      await _storage.write(
+          key: 'user_organization_id', value: user.organizationId!);
     }
     if (user.profileImage != null) {
-      await _storage.write(key: 'user_profile_image', value: user.profileImage!);
+      await _storage.write(
+          key: 'user_profile_image', value: user.profileImage!);
     }
   }
 
@@ -295,16 +300,40 @@ class AuthController extends AsyncNotifier<AuthState> {
   }
 
   /// Login with email and password.
+  ///
+  /// Supports simulated auth for testing when [AppConfig.useSimulatedAuth] is true.
+  /// Test credentials:
+  /// - Passenger: passenger@test.com / password123
+  /// - Driver: driver@test.com / password123
   Future<void> login({
     required String email,
     required String password,
   }) async {
     state = const AsyncData(AuthLoading(message: 'Signing in...'));
 
+    // Check for simulated auth (dev/testing mode)
+    if (AppConfig.useSimulatedAuth) {
+      final simulatedResult = await _trySimulatedLogin(email, password);
+      if (simulatedResult != null) {
+        state = simulatedResult;
+        return;
+      }
+      // If credentials don't match test accounts, show error
+      state = const AsyncData(AuthError(
+        message: 'Invalid credentials. Use test accounts:\n'
+            '• Passenger: passenger@test.com\n'
+            '• Driver: driver@test.com\n'
+            'Password: password123',
+      ));
+      return;
+    }
+
+    // Real API login
     final result = await _apiClient.post<LoginResponseModel>(
       ApiEndpoints.login,
       data: LoginRequestModel(email: email, password: password).toJson(),
-      fromJson: (data) => LoginResponseModel.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          LoginResponseModel.fromJson(data as Map<String, dynamic>),
     );
 
     state = await result.fold(
@@ -314,9 +343,11 @@ class AuthController extends AsyncNotifier<AuthState> {
       )),
       (response) async {
         // Store tokens
-        await _storage.write(key: AppConfig.accessTokenKey, value: response.accessToken);
+        await _storage.write(
+            key: AppConfig.accessTokenKey, value: response.accessToken);
         if (response.refreshToken != null) {
-          await _storage.write(key: AppConfig.refreshTokenKey, value: response.refreshToken);
+          await _storage.write(
+              key: AppConfig.refreshTokenKey, value: response.refreshToken);
         }
 
         // Determine role from response
@@ -325,7 +356,8 @@ class AuthController extends AsyncNotifier<AuthState> {
 
         // Store role and user info for session restoration
         await _storage.write(key: AppConfig.userRoleKey, value: appRole.name);
-        await _storage.write(key: AppConfig.userIdKey, value: response.userId ?? '');
+        await _storage.write(
+            key: AppConfig.userIdKey, value: response.userId ?? '');
         await _storage.write(key: 'user_email', value: response.email ?? email);
         await _storage.write(key: 'user_name', value: response.fullName ?? '');
 
@@ -348,6 +380,64 @@ class AuthController extends AsyncNotifier<AuthState> {
     );
   }
 
+  /// Simulated login for testing without API.
+  Future<AsyncData<AuthState>?> _trySimulatedLogin(
+      String email, String password) async {
+    // Check passenger test account
+    if (email == AppConfig.testPassengerEmail &&
+        password == AppConfig.testPassengerPassword) {
+      return _createSimulatedAuth(
+        email: email,
+        name: 'Test Passenger',
+        role: UserRole.passenger,
+      );
+    }
+
+    // Check driver test account
+    if (email == AppConfig.testDriverEmail &&
+        password == AppConfig.testDriverPassword) {
+      return _createSimulatedAuth(
+        email: email,
+        name: 'Test Driver',
+        role: UserRole.driver,
+      );
+    }
+
+    return null; // No matching test account
+  }
+
+  /// Create simulated authenticated state.
+  Future<AsyncData<AuthState>> _createSimulatedAuth({
+    required String email,
+    required String name,
+    required UserRole role,
+  }) async {
+    final appRole = AppRole.fromUserRole(role);
+    const token = 'simulated_token_for_testing';
+    final userId = 'test_${role.name}_001';
+
+    // Store simulated session
+    await _storage.write(key: AppConfig.accessTokenKey, value: token);
+    await _storage.write(key: AppConfig.userRoleKey, value: appRole.name);
+    await _storage.write(key: AppConfig.userIdKey, value: userId);
+    await _storage.write(key: 'user_email', value: email);
+    await _storage.write(key: 'user_name', value: name);
+
+    final user = User(
+      id: userId,
+      email: email,
+      role: role,
+      status: UserStatus.active,
+      fullName: name,
+    );
+
+    return AsyncData(AuthAuthenticated(
+      user: user,
+      role: appRole,
+      token: token,
+    ));
+  }
+
   /// Register a new passenger account.
   /// Note: Drivers are added manually from backend, they only login.
   Future<void> register({
@@ -367,7 +457,8 @@ class AuthController extends AsyncNotifier<AuthState> {
         confirmPassword: password,
         userName: fullName,
       ).toJson(),
-      fromJson: (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          RegisterResponseModel.fromJson(data as Map<String, dynamic>),
     );
 
     final registerResult = await result.fold(
@@ -400,7 +491,8 @@ class AuthController extends AsyncNotifier<AuthState> {
     final result = await _apiClient.post<ResetPasswordResponseModel>(
       ApiEndpoints.resetPassword,
       data: ResetPasswordRequestModel(phoneNumber: phoneNumber).toJson(),
-      fromJson: (data) => ResetPasswordResponseModel.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          ResetPasswordResponseModel.fromJson(data as Map<String, dynamic>),
     );
 
     return result.fold(

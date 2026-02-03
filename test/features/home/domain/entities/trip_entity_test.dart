@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:komiut/features/home/domain/entities/trip_entity.dart';
+import 'package:komiut/features/shared/home/domain/entities/trip_entity.dart';
 
 void main() {
   group('TripEntity', () {

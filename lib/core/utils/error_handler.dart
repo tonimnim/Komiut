@@ -354,7 +354,7 @@ class ErrorHandler {
       SnackBar(
         content: Row(
           children: [
-            Icon(
+            const Icon(
               Icons.warning_amber_rounded,
               color: AppColors.textPrimary,
               size: 20,
@@ -363,7 +363,7 @@ class ErrorHandler {
             Expanded(
               child: Text(
                 message,
-                style: TextStyle(color: AppColors.textPrimary),
+                style: const TextStyle(color: AppColors.textPrimary),
               ),
             ),
           ],
@@ -424,7 +424,8 @@ extension ErrorHandlerX on Object {
   /// Convert any error to a Failure.
   Failure toFailure() {
     if (this is Failure) return this as Failure;
-    if (this is DioException) return ErrorHandler.fromDioError(this as DioException);
+    if (this is DioException)
+      return ErrorHandler.fromDioError(this as DioException);
     return UnknownFailure(toString());
   }
 }

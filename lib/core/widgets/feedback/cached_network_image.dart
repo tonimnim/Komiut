@@ -330,16 +330,18 @@ class _CachedNetworkImageState extends ConsumerState<CachedNetworkImage> {
     Widget content;
 
     if (_isLoading) {
-      content = widget.placeholder ?? _DefaultPlaceholder(
-        width: widget.width,
-        height: widget.height,
-      );
+      content = widget.placeholder ??
+          _DefaultPlaceholder(
+            width: widget.width,
+            height: widget.height,
+          );
     } else if (_hasError || _imageBytes == null) {
-      content = widget.errorWidget ?? _DefaultErrorWidget(
-        width: widget.width,
-        height: widget.height,
-        isOffline: _errorMessage == 'Offline',
-      );
+      content = widget.errorWidget ??
+          _DefaultErrorWidget(
+            width: widget.width,
+            height: widget.height,
+            isOffline: _errorMessage == 'Offline',
+          );
     } else {
       content = AnimatedOpacity(
         duration: widget.fadeInDuration,
@@ -350,10 +352,11 @@ class _CachedNetworkImageState extends ConsumerState<CachedNetworkImage> {
           height: widget.height,
           fit: widget.fit,
           errorBuilder: (context, error, stack) {
-            return widget.errorWidget ?? _DefaultErrorWidget(
-              width: widget.width,
-              height: widget.height,
-            );
+            return widget.errorWidget ??
+                _DefaultErrorWidget(
+                  width: widget.width,
+                  height: widget.height,
+                );
           },
         ),
       );
@@ -484,7 +487,8 @@ class CachedCircleAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
+    final bgColor =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
 
     return ClipOval(
       child: Container(

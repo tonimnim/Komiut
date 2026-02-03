@@ -175,7 +175,8 @@ class BookingModel {
 BookingStatus _parseBookingStatus(dynamic status) {
   if (status is int) {
     // API returns: 0=pending, 1=confirmed, 2=cancelled
-    return BookingStatus.values[status.clamp(0, BookingStatus.values.length - 1)];
+    return BookingStatus
+        .values[status.clamp(0, BookingStatus.values.length - 1)];
   }
   return bookingStatusFromString(status as String? ?? 'pending');
 }

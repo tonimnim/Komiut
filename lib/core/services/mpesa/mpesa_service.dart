@@ -95,8 +95,7 @@ class MpesaFailure extends Failure {
   final MpesaTransactionResultCode? resultCode;
 
   @override
-  List<Object> get props =>
-      [message, if (resultCode != null) resultCode!];
+  List<Object> get props => [message, if (resultCode != null) resultCode!];
 }
 
 /// Failure when STK Push initiation fails.

@@ -156,7 +156,8 @@ class ShimmerListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
           if (hasLeading) ...[
@@ -188,6 +189,7 @@ class ShimmerListTile extends StatelessWidget {
 /// Shimmer loading placeholder for card components.
 ///
 /// Provides a card-like container with shimmer content.
+/// Adapts content based on available height.
 class ShimmerCard extends StatelessWidget {
   /// Creates a ShimmerCard.
   const ShimmerCard({
@@ -218,12 +220,14 @@ class ShimmerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final effectivePadding = padding ?? const EdgeInsets.all(16);
+    final innerHeight = height - effectivePadding.vertical;
 
     return Container(
       height: height,
       width: width,
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: padding ?? const EdgeInsets.all(16),
+      padding: effectivePadding,
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -235,22 +239,86 @@ class ShimmerCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: _buildContent(innerHeight),
+    );
+  }
+
+  Widget _buildContent(double innerHeight) {
+    // Simple layout for small cards
+    if (innerHeight < 80) {
+      return const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const ShimmerBox(height: 18, width: 180),
-          const SizedBox(height: 12),
-          const ShimmerBox(height: 14, width: 140),
-          const Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const ShimmerBox(height: 14, width: 80),
-              ShimmerBox(height: 32, width: 80, borderRadius: 16),
-            ],
+          FractionallySizedBox(
+            widthFactor: 0.7,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 16),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.5,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
           ),
         ],
-      ),
+      );
+    }
+
+    // Standard layout for medium cards
+    if (innerHeight < 120) {
+      return const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          FractionallySizedBox(
+            widthFactor: 0.8,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 18),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.6,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.4,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
+          ),
+        ],
+      );
+    }
+
+    // Full layout for larger cards
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FractionallySizedBox(
+              widthFactor: 0.8,
+              alignment: Alignment.centerLeft,
+              child: const ShimmerBox(height: 18),
+            ),
+            const SizedBox(height: 12),
+            FractionallySizedBox(
+              widthFactor: 0.6,
+              alignment: Alignment.centerLeft,
+              child: const ShimmerBox(height: 14),
+            ),
+          ],
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(child: ShimmerBox(height: 14)),
+            SizedBox(width: 16),
+            ShimmerBox(height: 32, width: 70, borderRadius: 16),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -289,13 +357,13 @@ class ShimmerWalletCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ShimmerBoxLight(height: 14, width: 100),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           _ShimmerBoxLight(height: 32, width: 150),
-          const Spacer(),
+          Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -303,7 +371,7 @@ class ShimmerWalletCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _ShimmerBoxLight(height: 12, width: 60),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   _ShimmerBoxLight(height: 14, width: 100),
                 ],
               ),
@@ -422,10 +490,10 @@ class ShimmerTripCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Date and status row
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(height: 12, width: 80),
+              ShimmerBox(height: 12, width: 80),
               ShimmerBox(height: 24, width: 70, borderRadius: 12),
             ],
           ),
@@ -435,7 +503,7 @@ class ShimmerTripCard extends StatelessWidget {
             children: [
               Column(
                 children: [
-                  ShimmerCircle(size: 12),
+                  const ShimmerCircle(size: 12),
                   Container(
                     width: 2,
                     height: 24,
@@ -445,17 +513,17 @@ class ShimmerTripCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(1),
                     ),
                   ),
-                  ShimmerCircle(size: 12),
+                  const ShimmerCircle(size: 12),
                 ],
               ),
               const SizedBox(width: 12),
-              Expanded(
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const ShimmerBox(height: 14, width: 140),
-                    const SizedBox(height: 20),
-                    const ShimmerBox(height: 14, width: 160),
+                    ShimmerBox(height: 14, width: 140),
+                    SizedBox(height: 20),
+                    ShimmerBox(height: 14, width: 160),
                   ],
                 ),
               ),
@@ -463,11 +531,11 @@ class ShimmerTripCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           // Bottom row - price and details
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(height: 16, width: 60),
-              const ShimmerBox(height: 12, width: 80),
+              ShimmerBox(height: 16, width: 60),
+              ShimmerBox(height: 12, width: 80),
             ],
           ),
         ],
@@ -503,10 +571,9 @@ class ShimmerList extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: itemCount,
-      separatorBuilder: separatorBuilder ??
-          (context, index) => const Divider(height: 1),
-      itemBuilder: itemBuilder ??
-          (context, index) => const ShimmerListTile(),
+      separatorBuilder:
+          separatorBuilder ?? (context, index) => const Divider(height: 1),
+      itemBuilder: itemBuilder ?? (context, index) => const ShimmerListTile(),
     );
   }
 }
@@ -555,7 +622,7 @@ class ShimmerGrid extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
       ),
       itemCount: itemCount,
-      itemBuilder: (context, index) => ShimmerCard(
+      itemBuilder: (context, index) => const ShimmerCard(
         height: double.infinity,
         margin: EdgeInsets.zero,
       ),

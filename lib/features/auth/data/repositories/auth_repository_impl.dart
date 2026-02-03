@@ -21,7 +21,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthenticationException catch (e) {
       return Left(AuthenticationFailure(e.message));
     } catch (e) {
-      return Left(AuthenticationFailure('An unexpected error occurred'));
+      return const Left(AuthenticationFailure('An unexpected error occurred'));
     }
   }
 
@@ -37,7 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthenticationException catch (e) {
       return Left(AuthenticationFailure(e.message));
     } catch (e) {
-      return Left(AuthenticationFailure('An unexpected error occurred'));
+      return const Left(AuthenticationFailure('An unexpected error occurred'));
     }
   }
 
@@ -51,7 +51,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on AuthenticationException catch (e) {
       return Left(AuthenticationFailure(e.message));
     } catch (e) {
-      return Left(AuthenticationFailure('An unexpected error occurred'));
+      return const Left(AuthenticationFailure('An unexpected error occurred'));
     }
   }
 
@@ -61,7 +61,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await localDataSource.verify2FA(code);
       return Right(result);
     } catch (e) {
-      return Left(AuthenticationFailure('Verification failed'));
+      return const Left(AuthenticationFailure('Verification failed'));
     }
   }
 
@@ -71,7 +71,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = await localDataSource.getCurrentUser();
       return Right(user?.toEntity());
     } catch (e) {
-      return Left(AuthenticationFailure('Failed to get current user'));
+      return const Left(AuthenticationFailure('Failed to get current user'));
     }
   }
 
@@ -81,7 +81,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await localDataSource.logout();
       return const Right(null);
     } catch (e) {
-      return Left(AuthenticationFailure('Logout failed'));
+      return const Left(AuthenticationFailure('Logout failed'));
     }
   }
 }

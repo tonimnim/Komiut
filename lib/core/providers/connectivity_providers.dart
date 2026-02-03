@@ -181,8 +181,9 @@ final syncQueueProvider = StreamProvider<List<SyncAction>>((ref) {
 final pendingSyncCountProvider = Provider<int>((ref) {
   final asyncQueue = ref.watch(syncQueueProvider);
   return asyncQueue.whenData((queue) {
-    return queue.where((a) => a.status == SyncStatus.pending).length;
-  }).value ?? ref.read(syncQueueServiceProvider).pendingCount;
+        return queue.where((a) => a.status == SyncStatus.pending).length;
+      }).value ??
+      ref.read(syncQueueServiceProvider).pendingCount;
 });
 
 /// Provider for whether there are pending sync actions.

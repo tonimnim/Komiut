@@ -100,6 +100,9 @@ class ApiEndpoints {
   /// Assign route to vehicle.
   static const String assignRoute = '/api/Vehicles/assign-route';
 
+  /// Assign route to vehicle (alias).
+  static const String vehicleAssignRoute = '/api/Vehicles/assign-route';
+
   // ─────────────────────────────────────────────────────────────────────────
   // Trips
   // ─────────────────────────────────────────────────────────────────────────
@@ -203,8 +206,7 @@ class ApiEndpoints {
   // ─────────────────────────────────────────────────────────────────────────
 
   /// Get trips for a specific driver.
-  static String tripsByDriver(String driverId) =>
-      '/api/Trips/driver/$driverId';
+  static String tripsByDriver(String driverId) => '/api/Trips/driver/$driverId';
 
   /// Get current driver's trips.
   static const String tripsMyDriver = '/api/Trips/driver/my';

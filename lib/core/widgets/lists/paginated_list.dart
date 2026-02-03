@@ -210,8 +210,8 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
   Widget _buildList() {
     // Calculate total item count including header/footer/loading
-    int itemCount = widget.items.length;
-    int headerOffset = widget.headerWidget != null ? 1 : 0;
+    final int itemCount = widget.items.length;
+    final int headerOffset = widget.headerWidget != null ? 1 : 0;
     int footerOffset = 0;
 
     if (widget.footerWidget != null) footerOffset++;
@@ -225,9 +225,10 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     if (widget.separatorBuilder != null) {
       return ListView.separated(
         controller: _scrollController,
-        physics: widget.physics ?? const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
+        physics: widget.physics ??
+            const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
         padding: widget.padding,
         shrinkWrap: widget.shrinkWrap,
         reverse: widget.reverse,
@@ -248,9 +249,10 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
     if (widget.itemExtent != null) {
       return ListView.builder(
         controller: _scrollController,
-        physics: widget.physics ?? const BouncingScrollPhysics(
-          parent: AlwaysScrollableScrollPhysics(),
-        ),
+        physics: widget.physics ??
+            const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
         padding: widget.padding,
         shrinkWrap: widget.shrinkWrap,
         reverse: widget.reverse,
@@ -264,9 +266,10 @@ class _PaginatedListViewState<T> extends State<PaginatedListView<T>> {
 
     return ListView.builder(
       controller: _scrollController,
-      physics: widget.physics ?? const BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
-      ),
+      physics: widget.physics ??
+          const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
       padding: widget.padding,
       shrinkWrap: widget.shrinkWrap,
       reverse: widget.reverse,
@@ -480,14 +483,16 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
 
     final grid = GridView.builder(
       controller: _scrollController,
-      physics: widget.physics ?? const BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
-      ),
+      physics: widget.physics ??
+          const BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
       padding: widget.padding,
       shrinkWrap: widget.shrinkWrap,
       cacheExtent: widget.cacheExtent,
       gridDelegate: widget.gridDelegate,
-      itemCount: widget.items.length + (widget.hasMore && widget.isLoading ? 1 : 0),
+      itemCount:
+          widget.items.length + (widget.hasMore && widget.isLoading ? 1 : 0),
       itemBuilder: (context, index) {
         if (index >= widget.items.length) {
           return const Center(

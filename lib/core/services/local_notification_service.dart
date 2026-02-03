@@ -86,7 +86,7 @@ class LocalNotificationService implements NotificationService {
     );
 
     // Combined initialization settings
-    final initSettings = InitializationSettings(
+    const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
@@ -95,7 +95,8 @@ class LocalNotificationService implements NotificationService {
     await _plugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: _onNotificationResponse,
-      onDidReceiveBackgroundNotificationResponse: _onBackgroundNotificationResponse,
+      onDidReceiveBackgroundNotificationResponse:
+          _onBackgroundNotificationResponse,
     );
 
     // Create Android notification channels
@@ -109,9 +110,8 @@ class LocalNotificationService implements NotificationService {
 
   /// Creates notification channels for Android.
   Future<void> _createNotificationChannels() async {
-    final androidPlugin =
-        _plugin.resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+    final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
 
     if (androidPlugin == null) return;
 
@@ -156,7 +156,8 @@ class LocalNotificationService implements NotificationService {
     debugPrint('LocalNotificationService: Notification tapped: ${response.id}');
     if (response.payload != null) {
       try {
-        final payload = NotificationPayload.fromPayloadString(response.payload!);
+        final payload =
+            NotificationPayload.fromPayloadString(response.payload!);
         onNotificationTap(payload);
       } catch (e) {
         debugPrint('LocalNotificationService: Error parsing payload: $e');
@@ -169,21 +170,20 @@ class LocalNotificationService implements NotificationService {
   static void _onBackgroundNotificationResponse(NotificationResponse response) {
     // Handle background notification tap
     // This runs in an isolate, so we can only do limited operations
-    debugPrint('LocalNotificationService: Background notification tapped: ${response.id}');
+    debugPrint(
+        'LocalNotificationService: Background notification tapped: ${response.id}');
   }
 
   @override
   Future<bool> areNotificationsEnabled() async {
     if (Platform.isAndroid) {
-      final androidPlugin =
-          _plugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
       return await androidPlugin?.areNotificationsEnabled() ?? false;
     } else if (Platform.isIOS) {
       // For iOS, check current notification settings
-      final iosPlugin =
-          _plugin.resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>();
+      final iosPlugin = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
       final settings = await iosPlugin?.checkPermissions();
       return settings?.isEnabled ?? false;
     }
@@ -193,15 +193,13 @@ class LocalNotificationService implements NotificationService {
   @override
   Future<bool> requestPermission() async {
     if (Platform.isAndroid) {
-      final androidPlugin =
-          _plugin.resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>();
+      final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
       final granted = await androidPlugin?.requestNotificationsPermission();
       return granted ?? false;
     } else if (Platform.isIOS) {
-      final iosPlugin =
-          _plugin.resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>();
+      final iosPlugin = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
       final granted = await iosPlugin?.requestPermissions(
         alert: true,
         badge: true,
@@ -272,7 +270,8 @@ class LocalNotificationService implements NotificationService {
 
     // Don't schedule if the time has passed
     if (scheduledTime.isBefore(DateTime.now())) {
-      debugPrint('LocalNotificationService: Cannot schedule notification in the past');
+      debugPrint(
+          'LocalNotificationService: Cannot schedule notification in the past');
       return;
     }
 
@@ -313,7 +312,8 @@ class LocalNotificationService implements NotificationService {
           UILocalNotificationDateInterpretation.absoluteTime,
     );
 
-    debugPrint('LocalNotificationService: Scheduled notification for $scheduledTime: $title');
+    debugPrint(
+        'LocalNotificationService: Scheduled notification for $scheduledTime: $title');
   }
 
   @override
@@ -338,7 +338,8 @@ class LocalNotificationService implements NotificationService {
   void onNotificationTap(NotificationPayload? payload) {
     if (payload == null) return;
 
-    debugPrint('LocalNotificationService: Handling notification tap: ${payload.type}');
+    debugPrint(
+        'LocalNotificationService: Handling notification tap: ${payload.type}');
     onNotificationTapped?.call(payload);
   }
 

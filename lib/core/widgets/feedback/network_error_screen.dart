@@ -236,7 +236,7 @@ class _ConnectionTips extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.tips_and_updates_outlined,
                 size: 18,
                 color: AppColors.info,
@@ -335,8 +335,8 @@ class NetworkErrorBanner extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
           colors: [AppColors.primaryBlue, AppColors.primaryGreen],

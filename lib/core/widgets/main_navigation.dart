@@ -1,10 +1,10 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
-import '../../features/activity/presentation/screens/activity_screen.dart';
-import '../../features/payment/presentation/screens/payment_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
+import '../../features/shared/home/presentation/screens/home_screen.dart';
+import '../../features/shared/activity/presentation/screens/activity_screen.dart';
+import '../../features/shared/payment/presentation/screens/payment_screen.dart';
+import '../../features/shared/settings/presentation/screens/settings_screen.dart';
 import '../theme/app_colors.dart';
 
 final navigationIndexProvider = StateProvider<int>((ref) => 0);
@@ -56,7 +56,8 @@ class MainNavigation extends ConsumerWidget {
                       icon: Icons.home_outlined,
                       activeIcon: Icons.home,
                       label: 'Home',
-                      onTap: () => ref.read(navigationIndexProvider.notifier).state = 0,
+                      onTap: () =>
+                          ref.read(navigationIndexProvider.notifier).state = 0,
                     ),
                     _NavItem(
                       index: 1,
@@ -64,7 +65,8 @@ class MainNavigation extends ConsumerWidget {
                       icon: Icons.route_outlined,
                       activeIcon: Icons.route,
                       label: 'Routes',
-                      onTap: () => ref.read(navigationIndexProvider.notifier).state = 1,
+                      onTap: () =>
+                          ref.read(navigationIndexProvider.notifier).state = 1,
                     ),
                     _NavItem(
                       index: 2,
@@ -72,7 +74,8 @@ class MainNavigation extends ConsumerWidget {
                       icon: Icons.account_balance_wallet_outlined,
                       activeIcon: Icons.account_balance_wallet,
                       label: 'Payments',
-                      onTap: () => ref.read(navigationIndexProvider.notifier).state = 2,
+                      onTap: () =>
+                          ref.read(navigationIndexProvider.notifier).state = 2,
                     ),
                     _NavItem(
                       index: 3,
@@ -80,7 +83,8 @@ class MainNavigation extends ConsumerWidget {
                       icon: Icons.settings_outlined,
                       activeIcon: Icons.settings,
                       label: 'Settings',
-                      onTap: () => ref.read(navigationIndexProvider.notifier).state = 3,
+                      onTap: () =>
+                          ref.read(navigationIndexProvider.notifier).state = 3,
                     ),
                   ],
                 ),

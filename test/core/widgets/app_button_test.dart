@@ -6,6 +6,7 @@
 /// - Loading states
 /// - Icon positions
 /// - Tap callbacks
+library;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:komiut/core/widgets/buttons/app_button.dart';
@@ -50,10 +51,10 @@ void main() {
     });
 
     testWidgets('does not call onPressed when disabled', (tester) async {
-      var pressed = false;
+      const pressed = false;
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: AppButton(
               label: 'Disabled',

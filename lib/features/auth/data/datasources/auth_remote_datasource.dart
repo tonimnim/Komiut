@@ -67,7 +67,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return apiClient.post<LoginResponseModel>(
       ApiEndpoints.login,
       data: request.toJson(),
-      fromJson: (data) => LoginResponseModel.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          LoginResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
@@ -90,7 +91,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return apiClient.post<RegisterResponseModel>(
       ApiEndpoints.register,
       data: request.toJson(),
-      fromJson: (data) => RegisterResponseModel.fromJson(data as Map<String, dynamic>),
+      fromJson: (data) =>
+          RegisterResponseModel.fromJson(data as Map<String, dynamic>),
     );
   }
 
@@ -112,7 +114,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<Either<Failure, User>> getUserById(String userId) async {
     return apiClient.get<User>(
       ApiEndpoints.userById(userId),
-      fromJson: (data) => UserModel.fromJson(data as Map<String, dynamic>).toEntity(),
+      fromJson: (data) =>
+          UserModel.fromJson(data as Map<String, dynamic>).toEntity(),
     );
   }
 
@@ -122,7 +125,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     // For now, return the users endpoint as placeholder
     return apiClient.get<User>(
       '${ApiEndpoints.users}/me',
-      fromJson: (data) => UserModel.fromJson(data as Map<String, dynamic>).toEntity(),
+      fromJson: (data) =>
+          UserModel.fromJson(data as Map<String, dynamic>).toEntity(),
     );
   }
 }

@@ -31,7 +31,8 @@ class RouteFareModel {
     return RouteFareModel(
       id: json['id'] as String,
       routeId: json['routeId'] as String,
-      fromStopId: json['fromPointId'] as String? ?? json['fromStopId'] as String,
+      fromStopId:
+          json['fromPointId'] as String? ?? json['fromStopId'] as String,
       toStopId: json['toPointId'] as String? ?? json['toStopId'] as String,
       amount: (json['amount'] as num).toDouble(),
       currency: currencyFromString(json['currency'] as String? ?? 'KES'),

@@ -319,7 +319,8 @@ class _SharedAxisTransition extends StatelessWidget {
           begin: const Offset(0.3, 0.0),
           end: Offset.zero,
         ).animate(
-          CurvedAnimation(parent: animation, curve: AnimationCurves.fastOutSlowIn),
+          CurvedAnimation(
+              parent: animation, curve: AnimationCurves.fastOutSlowIn),
         );
 
         final slideOut = Tween<Offset>(
@@ -343,7 +344,8 @@ class _SharedAxisTransition extends StatelessWidget {
           begin: const Offset(0.0, 0.3),
           end: Offset.zero,
         ).animate(
-          CurvedAnimation(parent: animation, curve: AnimationCurves.fastOutSlowIn),
+          CurvedAnimation(
+              parent: animation, curve: AnimationCurves.fastOutSlowIn),
         );
 
         final slideOut = Tween<Offset>(
@@ -364,7 +366,8 @@ class _SharedAxisTransition extends StatelessWidget {
 
       case SharedAxisTransitionType.scaled:
         final scaleIn = Tween<double>(begin: 0.8, end: 1.0).animate(
-          CurvedAnimation(parent: animation, curve: AnimationCurves.fastOutSlowIn),
+          CurvedAnimation(
+              parent: animation, curve: AnimationCurves.fastOutSlowIn),
         );
 
         final scaleOut = Tween<double>(begin: 1.0, end: 1.1).animate(

@@ -86,7 +86,8 @@ class AppTabItem extends StatelessWidget {
                 if (count != null && count! > 0) ...[
                   const SizedBox(width: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: AppColors.primaryBlue,
                       borderRadius: BorderRadius.circular(10),

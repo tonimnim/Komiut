@@ -364,7 +364,8 @@ class OptimizedCircleImage extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: border,
-        color: backgroundColor ?? (isDark ? Colors.grey[800] : Colors.grey[200]),
+        color:
+            backgroundColor ?? (isDark ? Colors.grey[800] : Colors.grey[200]),
       ),
       child: ClipOval(
         child: OptimizedImage(
@@ -471,8 +472,7 @@ class _OptimizedImageListState extends State<OptimizedImageList> {
       final metrics = notification.metrics;
       if (metrics.maxScrollExtent > 0 && widget.imageUrls.isNotEmpty) {
         final progress = metrics.pixels / metrics.maxScrollExtent;
-        final estimatedIndex =
-            (progress * widget.imageUrls.length).floor();
+        final estimatedIndex = (progress * widget.imageUrls.length).floor();
         if (estimatedIndex != _firstVisibleIndex) {
           _firstVisibleIndex = estimatedIndex;
           _preloadImages();
@@ -484,8 +484,8 @@ class _OptimizedImageListState extends State<OptimizedImageList> {
 
   void _preloadImages() {
     final startIndex = _firstVisibleIndex;
-    final endIndex = (startIndex + widget.preloadCount)
-        .clamp(0, widget.imageUrls.length);
+    final endIndex =
+        (startIndex + widget.preloadCount).clamp(0, widget.imageUrls.length);
 
     for (var i = startIndex; i < endIndex; i++) {
       precacheImage(NetworkImage(widget.imageUrls[i]), context);

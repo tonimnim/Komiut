@@ -33,7 +33,8 @@ class AppSectionHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding:
+          padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

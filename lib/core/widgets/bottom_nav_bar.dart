@@ -19,14 +19,18 @@ class BottomNavBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        boxShadow: isDark ? null : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-        border: isDark ? Border(top: BorderSide(color: Colors.grey[800]!, width: 0.5)) : null,
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                ),
+              ],
+        border: isDark
+            ? Border(top: BorderSide(color: Colors.grey[800]!, width: 0.5))
+            : null,
       ),
       child: SafeArea(
         child: Padding(
@@ -88,7 +92,9 @@ class BottomNavBar extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primaryBlue.withOpacity(0.1) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primaryBlue.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

@@ -6,8 +6,8 @@
 /// - Signup flow
 /// - Logout
 /// - Error handling
+library;
 import 'package:dartz/dartz.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:komiut/core/errors/failures.dart';
 import 'package:komiut/features/auth/domain/entities/user_entity.dart';
@@ -114,7 +114,7 @@ void main() {
 
     test('copyWith creates new state with updated values', () {
       const state = AuthState();
-      final user = UserEntity(
+      const user = UserEntity(
         id: 1,
         email: 'test@test.com',
         fullName: 'Test User',
@@ -135,13 +135,13 @@ void main() {
     });
 
     test('copyWith preserves existing values when not specified', () {
-      final user = UserEntity(
+      const user = UserEntity(
         id: 1,
         email: 'test@test.com',
         fullName: 'Test User',
         phone: '+254712345678',
       );
-      final state = AuthState(user: user, isInitialized: true);
+      const state = AuthState(user: user, isInitialized: true);
 
       final newState = state.copyWith(isLoading: true);
 
@@ -256,7 +256,7 @@ void main() {
     test('refreshUser updates user state', () async {
       // Set a user in the repository
       mockRepository.setCurrentUser(
-        UserEntity(
+        const UserEntity(
           id: 1,
           email: 'updated@test.com',
           fullName: 'Updated User',
@@ -274,7 +274,7 @@ void main() {
     test('initializes with existing user', () async {
       final mockRepository = MockAuthRepository();
       mockRepository.setCurrentUser(
-        UserEntity(
+        const UserEntity(
           id: 1,
           email: 'existing@test.com',
           fullName: 'Existing User',

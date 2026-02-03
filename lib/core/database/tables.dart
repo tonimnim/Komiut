@@ -13,7 +13,8 @@ class Users extends Table {
 
 class Wallets extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer().references(Users, #id, onDelete: KeyAction.cascade)();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade)();
   RealColumn get balance => real().withDefault(const Constant(0.0))();
   IntColumn get points => integer().withDefault(const Constant(0))();
   TextColumn get currency => text().withDefault(const Constant('KES'))();
@@ -23,7 +24,8 @@ class Wallets extends Table {
 
 class Trips extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer().references(Users, #id, onDelete: KeyAction.cascade)();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade)();
   TextColumn get routeName => text()();
   TextColumn get fromLocation => text()();
   TextColumn get toLocation => text()();
@@ -35,7 +37,8 @@ class Trips extends Table {
 
 class Payments extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer().references(Users, #id, onDelete: KeyAction.cascade)();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade)();
   RealColumn get amount => real()();
   TextColumn get type => text()(); // 'top-up', 'trip', 'refund'
   TextColumn get status => text()(); // 'completed', 'failed', 'pending'
@@ -47,7 +50,8 @@ class Payments extends Table {
 
 class AuthTokens extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer().references(Users, #id, onDelete: KeyAction.cascade).unique()();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade).unique()();
   TextColumn get accessToken => text()();
   TextColumn get refreshToken => text().nullable()();
   DateTimeColumn get expiresAt => dateTime()();
@@ -71,8 +75,10 @@ class BusRoutes extends Table {
 
 class FavoriteRoutes extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get userId => integer().references(Users, #id, onDelete: KeyAction.cascade)();
-  IntColumn get routeId => integer().references(BusRoutes, #id, onDelete: KeyAction.cascade)();
+  IntColumn get userId =>
+      integer().references(Users, #id, onDelete: KeyAction.cascade)();
+  IntColumn get routeId =>
+      integer().references(BusRoutes, #id, onDelete: KeyAction.cascade)();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
   @override

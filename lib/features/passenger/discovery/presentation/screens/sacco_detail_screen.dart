@@ -269,4 +269,3 @@ class _DescriptionSection extends StatelessWidget {
     );
   }
 }
-

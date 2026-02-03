@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/routes/route_names.dart';
@@ -23,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkAuth() async {
     await Future.delayed(const Duration(seconds: 2));
-    
+
     if (!mounted) return;
 
     final authRepository = getIt<AuthBloc>().authRepository;
@@ -67,9 +66,9 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               'KOMIUT',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 4,
-              ),
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                  ),
             ),
             const SizedBox(height: 48),
             const CircularProgressIndicator(),
@@ -77,8 +76,8 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               'Loading...',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey,
-              ),
+                    color: Colors.grey,
+                  ),
             ),
           ],
         ),

@@ -1,6 +1,5 @@
 import 'package:komiut/core/network/api_client.dart';
 import 'package:komiut/core/config/api_endpoints.dart';
-import 'package:komiut/shared/auth/data/models/user_model.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>> login(String email, String password);
@@ -24,8 +23,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     final data = response.data;
-    final result = data is Map && data.containsKey('data') ? data['data'] : data;
-    
+    final result =
+        data is Map && data.containsKey('data') ? data['data'] : data;
+
     if (result is List) {
       return result.first as Map<String, dynamic>;
     }
@@ -40,8 +40,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     final responseData = response.data;
-    final result = responseData is Map && responseData.containsKey('data') ? responseData['data'] : responseData;
-    
+    final result = responseData is Map && responseData.containsKey('data')
+        ? responseData['data']
+        : responseData;
+
     if (result is List) {
       return result.first as Map<String, dynamic>;
     }
@@ -58,8 +60,9 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     );
 
     final data = response.data;
-    final result = data is Map && data.containsKey('data') ? data['data'] : data;
-    
+    final result =
+        data is Map && data.containsKey('data') ? data['data'] : data;
+
     if (result is List) {
       return result.first as Map<String, dynamic>;
     }

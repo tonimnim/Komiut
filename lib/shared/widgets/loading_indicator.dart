@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:komiut/core/theme/app_colors.dart';
-
 class LoadingIndicator extends StatelessWidget {
   final double size;
   final Color? color;

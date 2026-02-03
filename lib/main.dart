@@ -6,17 +6,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:komiut/core/config/app_config.dart';
-import 'package:komiut/core/routes/app_router.dart';
+import 'package:komiut/core/navigation/app_router.dart';
 import 'package:komiut/core/theme/app_theme.dart';
 import 'package:komiut/di/injection_container.dart';
 import 'package:komiut/core/theme/theme_bloc.dart';
 import 'package:komiut/core/theme/theme_provider.dart';
 import 'package:komiut/core/constants/app_constants.dart';
-import 'package:komiut/features/queue/presentation/providers/notification_providers.dart';
+import 'package:komiut/features/shared/queue/presentation/providers/notification_providers.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Keep splash screen visible while app initializes (unless skipping auth)
   if (!AppConfig.skipAuth) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -63,17 +63,13 @@ class KomiutApp extends ConsumerWidget {
       statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
     ));
 
-    return BlocBuilder<ThemeBloc, ThemeState>(
-      builder: (context, state) {
-        return MaterialApp.router(
-          title: AppConfig.appName,
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: state.themeMode, 
-          routerConfig: router,
-        );
-      },
+    return MaterialApp.router(
+      title: AppConfig.appName,
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeMode,
+      routerConfig: router,
     );
   }
 }
