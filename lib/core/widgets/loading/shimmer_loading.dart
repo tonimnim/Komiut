@@ -189,6 +189,7 @@ class ShimmerListTile extends StatelessWidget {
 /// Shimmer loading placeholder for card components.
 ///
 /// Provides a card-like container with shimmer content.
+/// Adapts content based on available height.
 class ShimmerCard extends StatelessWidget {
   /// Creates a ShimmerCard.
   const ShimmerCard({
@@ -219,12 +220,14 @@ class ShimmerCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final effectivePadding = padding ?? const EdgeInsets.all(16);
+    final innerHeight = height - effectivePadding.vertical;
 
     return Container(
       height: height,
       width: width,
       margin: margin ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: padding ?? const EdgeInsets.all(16),
+      padding: effectivePadding,
       decoration: BoxDecoration(
         color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(borderRadius),
@@ -236,22 +239,86 @@ class ShimmerCard extends StatelessWidget {
           ),
         ],
       ),
-      child: const Column(
+      child: _buildContent(innerHeight),
+    );
+  }
+
+  Widget _buildContent(double innerHeight) {
+    // Simple layout for small cards
+    if (innerHeight < 80) {
+      return const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ShimmerBox(height: 18, width: 180),
-          SizedBox(height: 12),
-          ShimmerBox(height: 14, width: 140),
-          Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              ShimmerBox(height: 14, width: 80),
-              ShimmerBox(height: 32, width: 80, borderRadius: 16),
-            ],
+          FractionallySizedBox(
+            widthFactor: 0.7,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 16),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.5,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
           ),
         ],
-      ),
+      );
+    }
+
+    // Standard layout for medium cards
+    if (innerHeight < 120) {
+      return const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          FractionallySizedBox(
+            widthFactor: 0.8,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 18),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.6,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
+          ),
+          FractionallySizedBox(
+            widthFactor: 0.4,
+            alignment: Alignment.centerLeft,
+            child: ShimmerBox(height: 14),
+          ),
+        ],
+      );
+    }
+
+    // Full layout for larger cards
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FractionallySizedBox(
+              widthFactor: 0.8,
+              alignment: Alignment.centerLeft,
+              child: const ShimmerBox(height: 18),
+            ),
+            const SizedBox(height: 12),
+            FractionallySizedBox(
+              widthFactor: 0.6,
+              alignment: Alignment.centerLeft,
+              child: const ShimmerBox(height: 14),
+            ),
+          ],
+        ),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(child: ShimmerBox(height: 14)),
+            SizedBox(width: 16),
+            ShimmerBox(height: 32, width: 70, borderRadius: 16),
+          ],
+        ),
+      ],
     );
   }
 }

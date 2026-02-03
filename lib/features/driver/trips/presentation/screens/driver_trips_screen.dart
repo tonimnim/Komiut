@@ -16,19 +16,32 @@ import '../../../../../core/widgets/cards/app_card.dart';
 import '../../../../../core/widgets/cards/stat_card.dart';
 import '../../../../../core/widgets/feedback/app_error.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
-import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
 import '../../domain/entities/driver_trip.dart';
 import '../providers/trips_providers.dart';
 
-/// Driver trips screen widget.
-class DriverTripsScreen extends ConsumerStatefulWidget {
+/// Driver trips screen widget (standalone).
+class DriverTripsScreen extends StatelessWidget {
   const DriverTripsScreen({super.key});
 
   @override
-  ConsumerState<DriverTripsScreen> createState() => _DriverTripsScreenState();
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: DriverTripsContent(),
+    );
+  }
 }
 
-class _DriverTripsScreenState extends ConsumerState<DriverTripsScreen>
+/// Driver trips content widget (without navigation shell).
+///
+/// Used by [DriverMainNavigation] in IndexedStack.
+class DriverTripsContent extends ConsumerStatefulWidget {
+  const DriverTripsContent({super.key});
+
+  @override
+  ConsumerState<DriverTripsContent> createState() => _DriverTripsContentState();
+}
+
+class _DriverTripsContentState extends ConsumerState<DriverTripsContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -46,31 +59,64 @@ class _DriverTripsScreenState extends ConsumerState<DriverTripsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Trips'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(RouteConstants.driverHome),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list),
-            onPressed: () => _showFilterDialog(context),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Active'),
-            Tab(text: 'History'),
-          ],
-        ),
-      ),
-      body: Column(
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return SafeArea(
+      bottom: false,
+      child: Column(
         children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'My Trips',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.filter_list,
+                    color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                  ),
+                  onPressed: () => _showFilterDialog(context),
+                ),
+              ],
+            ),
+          ),
+
           // Statistics Section
           const _StatisticsSection(),
+
+          // Tab bar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: AppColors.primaryBlue,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              labelColor: Colors.white,
+              unselectedLabelColor: isDark ? Colors.grey[400] : AppColors.textSecondary,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              tabs: const [
+                Tab(text: 'Active'),
+                Tab(text: 'History'),
+              ],
+            ),
+          ),
 
           // Tab Content
           Expanded(
@@ -84,8 +130,6 @@ class _DriverTripsScreenState extends ConsumerState<DriverTripsScreen>
           ),
         ],
       ),
-      floatingActionButton: _StartTripFAB(),
-      bottomNavigationBar: const DriverBottomNav(currentIndex: 2),
     );
   }
 

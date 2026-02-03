@@ -8,26 +8,37 @@ library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/cards/app_card.dart';
 import '../../../../../core/widgets/cards/stat_card.dart';
 import '../../../../../core/widgets/feedback/app_error.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
-import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
 import '../providers/earnings_providers.dart';
 
-/// Earnings screen widget.
-class EarningsScreen extends ConsumerStatefulWidget {
+/// Earnings screen widget (standalone).
+class EarningsScreen extends StatelessWidget {
   const EarningsScreen({super.key});
 
   @override
-  ConsumerState<EarningsScreen> createState() => _EarningsScreenState();
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: EarningsContent(),
+    );
+  }
 }
 
-class _EarningsScreenState extends ConsumerState<EarningsScreen>
+/// Earnings content widget (without navigation shell).
+///
+/// Used by [DriverMainNavigation] in IndexedStack.
+class EarningsContent extends ConsumerStatefulWidget {
+  const EarningsContent({super.key});
+
+  @override
+  ConsumerState<EarningsContent> createState() => _EarningsContentState();
+}
+
+class _EarningsContentState extends ConsumerState<EarningsContent>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
@@ -45,35 +56,72 @@ class _EarningsScreenState extends ConsumerState<EarningsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Earnings'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go(RouteConstants.driverHome),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.calendar_month),
-            onPressed: () => _showDateRangePicker(context),
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return SafeArea(
+      bottom: false,
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Earnings',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.calendar_month,
+                    color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                  ),
+                  onPressed: () => _showDateRangePicker(context),
+                ),
+              ],
+            ),
+          ),
+          // Tab bar
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicator: BoxDecoration(
+                color: AppColors.primaryBlue,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              labelColor: Colors.white,
+              unselectedLabelColor: isDark ? Colors.grey[400] : AppColors.textSecondary,
+              indicatorSize: TabBarIndicatorSize.tab,
+              dividerColor: Colors.transparent,
+              tabs: const [
+                Tab(text: 'Overview'),
+                Tab(text: 'History'),
+              ],
+            ),
+          ),
+          // Tab content
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _OverviewTab(),
+                _HistoryTab(),
+              ],
+            ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: 'Overview'),
-            Tab(text: 'History'),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _OverviewTab(),
-          _HistoryTab(),
-        ],
-      ),
-      bottomNavigationBar: const DriverBottomNav(currentIndex: 3),
     );
   }
 
