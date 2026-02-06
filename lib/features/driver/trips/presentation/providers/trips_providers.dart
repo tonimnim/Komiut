@@ -240,7 +240,7 @@ final startTripProvider =
   final profile = await ref.watch(driverProfileProvider.future);
 
   if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+    throw Exception('No vehicle assigned to captain');
   }
 
   // Set loading state

@@ -25,17 +25,19 @@ class AuthRegisterRequested extends AuthEvent {
   final String email;
   final String phoneNumber;
   final String password;
-  final String userName;
+  final String firstName;
+  final String lastName;
 
   AuthRegisterRequested({
     required this.email,
     required this.phoneNumber,
     required this.password,
-    required this.userName,
+    required this.firstName,
+    required this.lastName,
   });
 
   @override
-  List<Object?> get props => [email, phoneNumber, password, userName];
+  List<Object?> get props => [email, phoneNumber, password, firstName, lastName];
 }
 
 class AuthResetPasswordRequested extends AuthEvent {
@@ -139,7 +141,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         email: event.email,
         phoneNumber: event.phoneNumber,
         password: event.password,
-        userName: event.userName,
+        firstName: event.firstName,
+        lastName: event.lastName,
       );
       final user = await authRepository.getCurrentUser();
       if (user != null) {

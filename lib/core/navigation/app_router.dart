@@ -36,7 +36,6 @@ import '../../features/shared/settings/presentation/screens/saved_saccos_screen.
 import '../../features/shared/settings/presentation/screens/payment_methods_screen.dart';
 import '../../features/shared/notifications/presentation/screens/notification_screen.dart';
 import '../../features/shared/scan/presentation/screens/scan_screen.dart';
-import '../../features/driver/driver.dart';
 import '../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
 import '../../features/driver/earnings/presentation/screens/earnings_screen.dart';
 import '../../features/driver/profile/presentation/screens/driver_profile_screen.dart';
@@ -46,11 +45,9 @@ import '../../features/driver/notifications/presentation/screens/driver_notifica
 import '../../features/shared/shared.dart';
 import '../../features/passenger/discovery/presentation/screens/saccos_screen.dart';
 import '../../features/passenger/discovery/presentation/screens/sacco_detail_screen.dart';
-import '../../features/shared/queue/presentation/screens/queue_screen.dart';
 import '../../features/passenger/trips/presentation/screens/active_trip_screen.dart';
 import '../../features/shared/loyalty/presentation/screens/loyalty_screen.dart';
 import '../../features/passenger/tickets/tickets.dart';
-import '../config/app_config.dart';
 import '../constants/route_constants.dart';
 
 /// Provider for the app router.
@@ -61,16 +58,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 /// Creates and configures the application router.
 GoRouter createAppRouter(Ref ref) {
   return GoRouter(
-    // Skip auth: go directly to home, otherwise start at splash
-    initialLocation:
-        AppConfig.skipAuth ? RouteConstants.home : RouteConstants.splash,
+    initialLocation: RouteConstants.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      // DEV MODE: Skip all auth checks - no redirects at all
-      if (AppConfig.skipAuth) {
-        return null;
-      }
-
       final authState = ref.read(authControllerProvider).valueOrNull;
       final isAuthenticated = authState is AuthAuthenticated;
       final currentPath = state.matchedLocation;
@@ -137,8 +127,7 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteConstants.twoFactor,
         name: 'twoFactor',
         builder: (context, state) {
-          final showHint = state.uri.queryParameters['showHint'] == 'true';
-          return TwoFactorScreen(showDemoHint: showHint);
+          return const TwoFactorScreen();
         },
       ),
 
@@ -150,9 +139,6 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteConstants.home,
         name: 'home',
         redirect: (context, state) {
-          // DEV MODE: Skip auth check
-          if (AppConfig.skipAuth) return null;
-
           final authState = ref.read(authControllerProvider).valueOrNull;
           if (authState is AuthAuthenticated) {
             return authState.role.homeRoute;

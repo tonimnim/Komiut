@@ -133,11 +133,15 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<bool> verify2FA(String code) async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    // For demo, accept '123456'
-    return code == '123456';
+    // TODO: Integrate with real backend 2FA verification.
+    // This should call the remote datasource or API endpoint
+    // (e.g., /api/MobileAppAuth/send-2fa) to verify the code.
+    // The local datasource is not the right place for 2FA verification
+    // since it requires server-side validation.
+    throw UnimplementedError(
+      '2FA verification requires backend integration. '
+      'Use the remote datasource with the appropriate API endpoint.',
+    );
   }
 
   @override

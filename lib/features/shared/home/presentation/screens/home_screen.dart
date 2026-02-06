@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/main_navigation.dart';
-import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../auth/presentation/providers/auth_controller.dart';
 import '../../../notifications/presentation/providers/notification_provider.dart';
 import '../providers/home_providers.dart';
 import '../widgets/wallet_card.dart';
@@ -37,10 +37,11 @@ class HomeContent extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
+    final user = ref.watch(currentUserProvider);
     final walletAsync = ref.watch(walletProvider);
     final tripsAsync = ref.watch(recentTripsProvider);
-    final userName = authState.user?.fullName.split(' ').first ?? 'User';
+    final rawName = user?.fullName?.split(' ').first;
+    final userName = (rawName != null && rawName.isNotEmpty) ? rawName : (user?.email?.split('@').first ?? 'User');
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -74,18 +75,18 @@ class HomeContent extends ConsumerWidget {
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
-                            image: authState.user?.profileImage != null &&
-                                    File(authState.user!.profileImage!)
+                            image: user?.profileImage != null &&
+                                    File(user!.profileImage!)
                                         .existsSync()
                                 ? DecorationImage(
                                     image: FileImage(
-                                        File(authState.user!.profileImage!)),
+                                        File(user.profileImage!)),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
-                          child: authState.user?.profileImage == null ||
-                                  !File(authState.user!.profileImage!)
+                          child: user?.profileImage == null ||
+                                  !File(user!.profileImage!)
                                       .existsSync()
                               ? Icon(
                                   Icons.person_outline,
@@ -120,24 +121,7 @@ class HomeContent extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          context.push('/scan');
-                        },
-                        child: Icon(
-                          Icons.qr_code_scanner,
-                          color: isDark
-                              ? Colors.grey[400]
-                              : AppColors.textSecondary,
-                          size: 26,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      _NotificationBell(isDark: isDark),
-                    ],
-                  ),
+                  _NotificationBell(isDark: isDark),
                 ],
               ),
               const SizedBox(height: 24),

@@ -119,12 +119,8 @@ class RecentTripsSection extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32),
       child: Center(
         child: Column(
           children: [
@@ -142,13 +138,6 @@ class RecentTripsSection extends ConsumerWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Your recent trips will appear here',
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : AppColors.textSecondary,
               ),
             ),
           ],

@@ -5,6 +5,8 @@
 /// Optimized for performance with minimal rebuilds.
 library;
 
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -300,35 +302,13 @@ class AuthController extends AsyncNotifier<AuthState> {
   }
 
   /// Login with email and password.
-  ///
-  /// Supports simulated auth for testing when [AppConfig.useSimulatedAuth] is true.
-  /// Test credentials:
-  /// - Passenger: passenger@test.com / password123
-  /// - Driver: driver@test.com / password123
   Future<void> login({
     required String email,
     required String password,
   }) async {
     state = const AsyncData(AuthLoading(message: 'Signing in...'));
 
-    // Check for simulated auth (dev/testing mode)
-    if (AppConfig.useSimulatedAuth) {
-      final simulatedResult = await _trySimulatedLogin(email, password);
-      if (simulatedResult != null) {
-        state = simulatedResult;
-        return;
-      }
-      // If credentials don't match test accounts, show error
-      state = const AsyncData(AuthError(
-        message: 'Invalid credentials. Use test accounts:\n'
-            '• Passenger: passenger@test.com\n'
-            '• Driver: driver@test.com\n'
-            'Password: password123',
-      ));
-      return;
-    }
-
-    // Real API login
+    // API login
     final result = await _apiClient.post<LoginResponseModel>(
       ApiEndpoints.login,
       data: LoginRequestModel(email: email, password: password).toJson(),
@@ -350,24 +330,41 @@ class AuthController extends AsyncNotifier<AuthState> {
               key: AppConfig.refreshTokenKey, value: response.refreshToken);
         }
 
-        // Determine role from response
-        final userRole = response.role ?? UserRole.passenger;
+        // Extract user info from JWT (no extra API call needed)
+        final claims = _extractJwtClaims(response.accessToken);
+
+        // Determine role: JWT claim > response field > default
+        final roleStr = claims.role?.toLowerCase();
+        final userRole = response.role ??
+            (roleStr != null ? userRoleFromString(roleStr) : UserRole.passenger);
         final appRole = AppRole.fromUserRole(userRole);
+
+        // Get userId and email from JWT if not in response
+        final userId = response.userId ?? claims.userId ?? '';
+        final userEmail = response.email ?? claims.email ?? email;
+
+        // Get stored name (set during registration) or fall back to email
+        final storedName = await _storage.read(key: 'user_name');
+        final displayName = response.fullName ??
+            (storedName != null && storedName.isNotEmpty
+                ? storedName
+                : userEmail.split('@').first);
 
         // Store role and user info for session restoration
         await _storage.write(key: AppConfig.userRoleKey, value: appRole.name);
-        await _storage.write(
-            key: AppConfig.userIdKey, value: response.userId ?? '');
-        await _storage.write(key: 'user_email', value: response.email ?? email);
-        await _storage.write(key: 'user_name', value: response.fullName ?? '');
+        await _storage.write(key: AppConfig.userIdKey, value: userId);
+        await _storage.write(key: 'user_email', value: userEmail);
+        if (storedName == null || storedName.isEmpty) {
+          await _storage.write(key: 'user_name', value: displayName);
+        }
 
         // Create user object
         final user = User(
-          id: response.userId ?? '',
-          email: response.email ?? email,
+          id: userId,
+          email: userEmail,
           role: userRole,
           status: UserStatus.active,
-          fullName: response.fullName,
+          fullName: displayName,
           organizationId: response.organizationId,
         );
 
@@ -380,64 +377,6 @@ class AuthController extends AsyncNotifier<AuthState> {
     );
   }
 
-  /// Simulated login for testing without API.
-  Future<AsyncData<AuthState>?> _trySimulatedLogin(
-      String email, String password) async {
-    // Check passenger test account
-    if (email == AppConfig.testPassengerEmail &&
-        password == AppConfig.testPassengerPassword) {
-      return _createSimulatedAuth(
-        email: email,
-        name: 'Test Passenger',
-        role: UserRole.passenger,
-      );
-    }
-
-    // Check driver test account
-    if (email == AppConfig.testDriverEmail &&
-        password == AppConfig.testDriverPassword) {
-      return _createSimulatedAuth(
-        email: email,
-        name: 'Test Driver',
-        role: UserRole.driver,
-      );
-    }
-
-    return null; // No matching test account
-  }
-
-  /// Create simulated authenticated state.
-  Future<AsyncData<AuthState>> _createSimulatedAuth({
-    required String email,
-    required String name,
-    required UserRole role,
-  }) async {
-    final appRole = AppRole.fromUserRole(role);
-    const token = 'simulated_token_for_testing';
-    final userId = 'test_${role.name}_001';
-
-    // Store simulated session
-    await _storage.write(key: AppConfig.accessTokenKey, value: token);
-    await _storage.write(key: AppConfig.userRoleKey, value: appRole.name);
-    await _storage.write(key: AppConfig.userIdKey, value: userId);
-    await _storage.write(key: 'user_email', value: email);
-    await _storage.write(key: 'user_name', value: name);
-
-    final user = User(
-      id: userId,
-      email: email,
-      role: role,
-      status: UserStatus.active,
-      fullName: name,
-    );
-
-    return AsyncData(AuthAuthenticated(
-      user: user,
-      role: appRole,
-      token: token,
-    ));
-  }
-
   /// Register a new passenger account.
   /// Note: Drivers are added manually from backend, they only login.
   Future<void> register({
@@ -448,14 +387,22 @@ class AuthController extends AsyncNotifier<AuthState> {
   }) async {
     state = const AsyncData(AuthLoading(message: 'Creating account...'));
 
+    // Split fullName into firstName and lastName for the backend
+    final nameParts = fullName.trim().split(RegExp(r'\s+'));
+    final firstName = nameParts.first;
+    final lastName = nameParts.length > 1
+        ? nameParts.sublist(1).join(' ')
+        : '';
+
     final result = await _apiClient.post<RegisterResponseModel>(
       ApiEndpoints.register,
       data: RegisterRequestModel(
         email: email,
         phoneNumber: phoneNumber,
         password: password,
-        confirmPassword: password,
-        userName: fullName,
+        confirmedPassword: password,
+        firstName: firstName,
+        lastName: lastName,
       ).toJson(),
       fromJson: (data) =>
           RegisterResponseModel.fromJson(data as Map<String, dynamic>),
@@ -468,6 +415,8 @@ class AuthController extends AsyncNotifier<AuthState> {
       )),
       (response) async {
         if (response.success) {
+          // Store name before auto-login so it's available immediately
+          await _storage.write(key: 'user_name', value: fullName.trim());
           // Auto-login after successful registration
           await login(email: email, password: password);
           return state; // Return current state after login
@@ -527,6 +476,39 @@ class AuthController extends AsyncNotifier<AuthState> {
     await _storage.delete(key: 'user_phone');
     await _storage.delete(key: 'user_organization_id');
     await _storage.delete(key: 'user_profile_image');
+  }
+
+  /// Decode JWT payload to extract user claims (no extra API call).
+  Map<String, dynamic> _decodeJwt(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return {};
+      // Base64 payload needs padding
+      final payload = parts[1];
+      final normalized = base64Url.normalize(payload);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+      return json.decode(decoded) as Map<String, dynamic>;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  /// Extract user info from JWT claims.
+  /// Claims use full XML schema URIs as keys.
+  ({String? userId, String? email, String? role}) _extractJwtClaims(
+      String token) {
+    final claims = _decodeJwt(token);
+    return (
+      userId: claims[
+              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier']
+          as String?,
+      email: claims[
+              'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress']
+          as String?,
+      role: claims[
+              'http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+          as String?,
+    );
   }
 
   /// Get user-friendly error message.

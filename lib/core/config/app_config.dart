@@ -20,6 +20,10 @@ class AppConfig {
   /// Base URL for API requests.
   static String get apiBaseUrl => EnvConfig.baseUrl;
 
+  /// Domain ID for white-label backend identification.
+  /// Sent as `_domain` header with every API request.
+  static const String domainId = '75fcf243-e029-4721-abae-08de656ef6a0';
+
   /// Default API request timeout in milliseconds.
   static const int apiTimeoutMs = 30000;
 
@@ -103,19 +107,7 @@ class AppConfig {
   /// DEV MODE: Use simulated auth with hardcoded test credentials.
   /// When true, login will work with test accounts below (no API needed).
   /// ⚠️ PRODUCTION: Must be false before deployment!
-  static const bool useSimulatedAuth = true;
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Test Credentials (for simulated auth only)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  /// Test passenger account
-  static const String testPassengerEmail = 'passenger@test.com';
-  static const String testPassengerPassword = 'password123';
-
-  /// Test driver account
-  static const String testDriverEmail = 'driver@test.com';
-  static const String testDriverPassword = 'password123';
+  static const bool useSimulatedAuth = false;
 
   /// Whether to enable loyalty points feature.
   static const bool enableLoyalty = true;
@@ -141,5 +133,5 @@ class AppConfig {
 
   /// Whether to enable mock data for development/testing.
   /// ⚠️ PRODUCTION: Must be false to use real API!
-  static bool get enableMockData => true; // Dev mode: No backend available yet
+  static bool get enableMockData => false;
 }

@@ -73,21 +73,25 @@ class _ActivityContentState extends ConsumerState<ActivityContent>
             child: Container(
               height: 44,
               decoration: BoxDecoration(
-                color: isDark ? Colors.grey[850] : Colors.grey[100],
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.06)
+                    : Colors.grey[100],
                 borderRadius: BorderRadius.circular(10),
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: AppColors.primaryBlue,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.12)
+                      : AppColors.primaryBlue,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicatorPadding: const EdgeInsets.all(4),
                 dividerColor: Colors.transparent,
-                labelColor: Colors.white,
+                labelColor: isDark ? Colors.white : Colors.white,
                 unselectedLabelColor:
-                    isDark ? Colors.grey[400] : AppColors.textSecondary,
+                    isDark ? Colors.grey[500] : AppColors.textSecondary,
                 labelStyle: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,

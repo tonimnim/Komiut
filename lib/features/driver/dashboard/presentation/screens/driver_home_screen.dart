@@ -56,7 +56,7 @@ class DriverHomeContent extends ConsumerWidget {
             children: [
               // ── Header ──────────────────────────────────────────────
               _DriverHeader(),
-              SizedBox(height: 32),
+              SizedBox(height: 24),
 
               // ── State-Driven Content ────────────────────────────────
               DriverActivityContent(),
@@ -102,7 +102,7 @@ class _DriverHeader extends ConsumerWidget {
   }
 }
 
-/// Profile avatar that navigates to profile on tap.
+/// Profile avatar that opens drawer on tap.
 class _ProfileAvatar extends ConsumerWidget {
   const _ProfileAvatar();
 
@@ -117,7 +117,7 @@ class _ProfileAvatar extends ConsumerWidget {
         profileImage != null && File(profileImage).existsSync();
 
     return GestureDetector(
-      onTap: () => context.push(RouteConstants.sharedProfile),
+      onTap: () => driverScaffoldKey.currentState?.openDrawer(),
       child: Container(
         width: 48,
         height: 48,
@@ -154,7 +154,7 @@ class _GreetingAndStatus extends ConsumerWidget {
     // Only rebuild when user name changes
     final userName = ref.watch(
       authStateProvider.select(
-        (state) => state.user?.fullName.split(' ').first ?? 'Driver',
+        (state) => state.user?.fullName.split(' ').first ?? 'Captain',
       ),
     );
 

@@ -82,35 +82,17 @@ AppRole appRoleFromUserRole(UserRole role) {
 }
 
 /// Provider for the current app role.
-/// Returns passenger role when skipAuth is enabled (dev mode).
 final currentRoleProvider = StateProvider<AppRole?>((ref) {
-  // DEV MODE: Default to passenger role
-  if (AppConfig.skipAuth) return AppRole.passenger;
   return null;
 });
 
 /// Provider for the current user.
-/// Returns a mock user when skipAuth is enabled (dev mode).
 final currentUserProvider = StateProvider<User?>((ref) {
-  // DEV MODE: Return mock user
-  if (AppConfig.skipAuth) {
-    return const User(
-      id: 'dev-user-123',
-      email: 'dev@komiut.com',
-      role: UserRole.passenger,
-      status: UserStatus.active,
-      fullName: 'Dev User',
-      phone: '+254700000000',
-    );
-  }
   return null;
 });
 
 /// Provider for checking if user is authenticated.
-/// Returns true if skipAuth is enabled (dev mode) or user is logged in.
 final isAuthenticatedProvider = Provider<bool>((ref) {
-  // DEV MODE: Always authenticated when skipping auth
-  if (AppConfig.skipAuth) return true;
   return ref.watch(currentUserProvider) != null;
 });
 

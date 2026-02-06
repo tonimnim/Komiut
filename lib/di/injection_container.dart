@@ -5,11 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:komiut/core/network/api_client.dart';
 import 'package:komiut/core/network/network_info.dart';
-import 'package:komiut/core/config/app_config.dart';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:komiut/shared/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:komiut/shared/auth/data/datasources/auth_mock_datasource.dart';
 import 'package:komiut/shared/auth/data/datasources/auth_local_datasource.dart';
 import 'package:komiut/shared/auth/data/repositories/auth_repository_impl.dart';
 import 'package:komiut/shared/auth/domain/repositories/auth_repository.dart';
@@ -40,15 +37,9 @@ Future<void> initializeDependencies() async {
   );
 
   // Auth
-  if (AppConfig.enableMockData) {
-    getIt.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthMockDataSource(),
-    );
-  } else {
-    getIt.registerLazySingleton<AuthRemoteDataSource>(
-      () => AuthRemoteDataSourceImpl(getIt()),
-    );
-  }
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(getIt()),
+  );
   getIt.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(getIt(), getIt()),
   );

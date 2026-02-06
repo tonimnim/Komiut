@@ -133,7 +133,7 @@ class _DriverStatusCardContent extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'Driver Status',
+              'Captain Status',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.white70,

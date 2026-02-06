@@ -83,7 +83,7 @@ final earningsSummaryProvider = FutureProvider<EarningsSummary>((ref) async {
   final profile = await ref.watch(driverProfileProvider.future);
 
   if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+    throw Exception('No vehicle assigned to captain');
   }
 
   final repository = ref.watch(earningsRepositoryProvider);
@@ -106,7 +106,7 @@ final earningsHistoryProvider =
   final profile = await ref.watch(driverProfileProvider.future);
 
   if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+    throw Exception('No vehicle assigned to captain');
   }
 
   final period = ref.watch(selectedEarningsPeriodProvider);

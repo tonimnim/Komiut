@@ -204,7 +204,7 @@ class _ProfileHeader extends StatelessWidget {
 
           // Name
           Text(
-            user?.fullName ?? 'Driver',
+            user?.fullName ?? 'Captain',
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,

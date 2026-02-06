@@ -67,15 +67,11 @@ class _OtpScreenState extends State<OtpScreen> {
   void _onOtpChanged(BuildContext context, int index, String value) {
     if (value.isNotEmpty && index < 5) {
       _focusNodes[index + 1].requestFocus();
+    } else if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
     }
     if (_otp.length == 6) {
       _verifyOtp(context);
-    }
-  }
-
-  void _onBackspace(int index) {
-    if (_controllers[index].text.isEmpty && index > 0) {
-      _focusNodes[index - 1].requestFocus();
     }
   }
 
