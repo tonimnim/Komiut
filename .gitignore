@@ -68,7 +68,15 @@ doctor.txt
 login_test.json
 .env
 
-# Claude Code local settings
+# AI assistant settings & planning docs
 .claude/
+CLAUDE.md
+.cursorrules
+.aider*
+.github/copilot-*
+.copilot/
+PHASE_1_AGENT_INSTRUCTIONS.md
+PHASE_3_PR.md
+REFACTORING_PLAN.md
 
 .metadata
