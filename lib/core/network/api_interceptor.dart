@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../config/app_config.dart';
 import '../config/app_constants.dart';
 import 'api_endpoints.dart';
 
@@ -14,6 +15,9 @@ class ApiInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    // Add domain header for white-label backend identification
+    options.headers['_domain'] = AppConstants.domainId;
+
     final noAuthPaths = [
       ApiEndpoints.login,
       ApiEndpoints.verifyOtp,
@@ -49,11 +53,20 @@ class ApiInterceptor extends Interceptor {
           final token = await _storage.read(key: AppConstants.keyAccessToken);
           err.requestOptions.headers['Authorization'] = 'Bearer $token';
 
-          final dio = Dio();
-          final response = await dio.fetch(err.requestOptions);
+          final retryDio = Dio(BaseOptions(
+            baseUrl: AppConfig.apiBaseUrl,
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              '_domain': AppConstants.domainId,
+            },
+          ));
+          final response = await retryDio.fetch(err.requestOptions);
           handler.resolve(response);
           return;
-        } catch (e) {}
+        } catch (_) {
+          // Retry failed, continue with original error
+        }
       }
     }
 
@@ -66,8 +79,15 @@ class ApiInterceptor extends Interceptor {
           await _storage.read(key: AppConstants.keyRefreshToken);
       if (refreshToken == null) return false;
 
-      final dio = Dio();
-      final response = await dio.post(
+      final refreshDio = Dio(BaseOptions(
+        baseUrl: AppConfig.apiBaseUrl,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          '_domain': AppConstants.domainId,
+        },
+      ));
+      final response = await refreshDio.post(
         ApiEndpoints.refreshToken,
         options: Options(
           headers: {'Authorization': 'Bearer $refreshToken'},
@@ -86,7 +106,9 @@ class ApiInterceptor extends Interceptor {
         );
         return true;
       }
-    } catch (e) {}
+    } catch (_) {
+      // Token refresh failed
+    }
     return false;
   }
 }

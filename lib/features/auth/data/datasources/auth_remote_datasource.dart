@@ -33,8 +33,9 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String phoneNumber,
     required String password,
-    required String confirmPassword,
-    required String userName,
+    required String confirmedPassword,
+    required String firstName,
+    required String lastName,
   });
 
   /// Request password reset.
@@ -77,15 +78,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String email,
     required String phoneNumber,
     required String password,
-    required String confirmPassword,
-    required String userName,
+    required String confirmedPassword,
+    required String firstName,
+    required String lastName,
   }) async {
     final request = RegisterRequestModel(
       email: email,
       phoneNumber: phoneNumber,
       password: password,
-      confirmPassword: confirmPassword,
-      userName: userName,
+      confirmedPassword: confirmedPassword,
+      firstName: firstName,
+      lastName: lastName,
     );
 
     return apiClient.post<RegisterResponseModel>(

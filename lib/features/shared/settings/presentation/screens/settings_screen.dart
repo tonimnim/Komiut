@@ -61,17 +61,13 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                   );
                 }
               },
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Row(
                   children: [
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
                         color: AppColors.primaryBlue.withValues(alpha: 0.1),
                         shape: BoxShape.circle,
@@ -88,34 +84,18 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                           ? const Icon(
                               Icons.person,
                               color: AppColors.primaryBlue,
-                              size: 30,
+                              size: 28,
                             )
                           : null,
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user?.fullName ?? 'User',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: theme.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            user?.email ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isDark
-                                  ? Colors.grey[400]
-                                  : AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
+                      child: Text(
+                        user?.email ?? '',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                     ),
                     Icon(
@@ -126,6 +106,7 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                 ),
               ),
             ),
+            Divider(color: isDark ? Colors.grey[800] : AppColors.divider),
             const SizedBox(height: 24),
             Text(
               'Preferences',
@@ -135,65 +116,55 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                 color: isDark ? Colors.grey[400] : AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  _buildSwitchTile(
-                    context: context,
-                    icon: Icons.queue_outlined,
-                    title: 'Queue Notifications',
-                    subtitle: 'Vehicle position & departure alerts',
-                    value: notificationSettings.queueNotificationsEnabled,
-                    onChanged: (value) {
-                      ref
-                          .read(notificationSettingsProvider.notifier)
-                          .setQueueNotificationsEnabled(value);
-                    },
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildSwitchTile(
-                    context: context,
-                    icon: Icons.directions_bus_outlined,
-                    title: 'Trip Notifications',
-                    subtitle: 'Trip start & destination alerts',
-                    value: notificationSettings.tripNotificationsEnabled,
-                    onChanged: (value) {
-                      ref
-                          .read(notificationSettingsProvider.notifier)
-                          .setTripNotificationsEnabled(value);
-                    },
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildSwitchTile(
-                    context: context,
-                    icon: Icons.dark_mode_outlined,
-                    title: 'Dark Mode',
-                    value: isDark,
-                    onChanged: (value) {
-                      ref.read(themeProvider.notifier).toggleTheme();
-                    },
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildTile(
-                    context: context,
-                    icon: Icons.tune,
-                    title: 'More Preferences',
-                    onTap: () =>
-                        context.push(RouteConstants.settingsPreferences),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 8),
+            _buildSwitchTile(
+              context: context,
+              icon: Icons.queue_outlined,
+              title: 'Queue Notifications',
+              subtitle: 'Vehicle position & departure alerts',
+              value: notificationSettings.queueNotificationsEnabled,
+              onChanged: (value) {
+                ref
+                    .read(notificationSettingsProvider.notifier)
+                    .setQueueNotificationsEnabled(value);
+              },
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildSwitchTile(
+              context: context,
+              icon: Icons.directions_bus_outlined,
+              title: 'Trip Notifications',
+              subtitle: 'Trip start & destination alerts',
+              value: notificationSettings.tripNotificationsEnabled,
+              onChanged: (value) {
+                ref
+                    .read(notificationSettingsProvider.notifier)
+                    .setTripNotificationsEnabled(value);
+              },
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildSwitchTile(
+              context: context,
+              icon: Icons.dark_mode_outlined,
+              title: 'Dark Mode',
+              value: isDark,
+              onChanged: (value) {
+                ref.read(themeProvider.notifier).toggleTheme();
+              },
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildTile(
+              context: context,
+              icon: Icons.tune,
+              title: 'More Preferences',
+              onTap: () =>
+                  context.push(RouteConstants.settingsPreferences),
             ),
             const SizedBox(height: 24),
             Text(
@@ -204,49 +175,39 @@ class _SettingsContentState extends ConsumerState<SettingsContent> {
                 color: isDark ? Colors.grey[400] : AppColors.textSecondary,
               ),
             ),
-            const SizedBox(height: 12),
-            Container(
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  _buildTile(
-                    context: context,
-                    icon: Icons.help_outline,
-                    title: 'Help & Support',
-                    onTap: () => context.push(RouteConstants.settingsHelp),
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildTile(
-                    context: context,
-                    icon: Icons.info_outline,
-                    title: 'About',
-                    onTap: () => context.push(RouteConstants.settingsAbout),
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildTile(
-                    context: context,
-                    icon: Icons.privacy_tip_outlined,
-                    title: 'Privacy Policy',
-                    onTap: () => context.push(RouteConstants.settingsPrivacy),
-                  ),
-                  Divider(
-                      height: 1,
-                      color: isDark ? Colors.grey[800] : AppColors.divider),
-                  _buildTile(
-                    context: context,
-                    icon: Icons.description_outlined,
-                    title: 'Terms of Service',
-                    onTap: () => context.push(RouteConstants.settingsTerms),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 8),
+            _buildTile(
+              context: context,
+              icon: Icons.help_outline,
+              title: 'Help & Support',
+              onTap: () => context.push(RouteConstants.settingsHelp),
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildTile(
+              context: context,
+              icon: Icons.info_outline,
+              title: 'About',
+              onTap: () => context.push(RouteConstants.settingsAbout),
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildTile(
+              context: context,
+              icon: Icons.privacy_tip_outlined,
+              title: 'Privacy Policy',
+              onTap: () => context.push(RouteConstants.settingsPrivacy),
+            ),
+            Divider(
+                height: 1,
+                color: isDark ? Colors.grey[800] : AppColors.divider),
+            _buildTile(
+              context: context,
+              icon: Icons.description_outlined,
+              title: 'Terms of Service',
+              onTap: () => context.push(RouteConstants.settingsTerms),
             ),
             const SizedBox(height: 24),
             SizedBox(

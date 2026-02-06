@@ -10,11 +10,8 @@ import '../../../../core/widgets/custom_button.dart';
 import '../providers/auth_providers.dart';
 
 class TwoFactorScreen extends ConsumerStatefulWidget {
-  final bool showDemoHint;
-
   const TwoFactorScreen({
     super.key,
-    this.showDemoHint = false,
   });
 
   @override
@@ -164,40 +161,6 @@ class _TwoFactorScreenState extends ConsumerState<TwoFactorScreen> {
                           foregroundColor: AppColors.primaryBlue,
                         ),
                         const SizedBox(height: 24),
-
-                        // Demo code hint - only show for registration
-                        if (widget.showDemoHint)
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.2),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.3),
-                                width: 1,
-                              ),
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.info_outline,
-                                  size: 18,
-                                  color: Colors.white,
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    'Demo code: ${AppConstants.mockOtp}',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (widget.showDemoHint) const SizedBox(height: 24),
 
                         // Resend code
                         Row(

@@ -90,12 +90,10 @@ class MockAuthRepository implements AuthRepository {
     return const Right(true);
   }
 
-  @override
   Future<Either<Failure, String>> refreshToken() async {
     return const Right('new_token');
   }
 
-  @override
   Future<Either<Failure, bool>> isLoggedIn() async {
     return Right(_currentUser != null);
   }

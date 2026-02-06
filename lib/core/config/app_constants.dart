@@ -20,6 +20,9 @@ class AppConstants {
   static const String keyUserData = 'user_data';
   static const String keyThemeMode = 'theme_mode';
 
+  /// Domain ID for white-label backend identification.
+  static const String domainId = '75fcf243-e029-4721-abae-08de656ef6a0';
+
   static const int otpResendSeconds = 60;
   static const int queuePollIntervalSeconds = 10;
   static const int locationUpdateIntervalSeconds = 5;

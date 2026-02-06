@@ -11,18 +11,12 @@ import 'package:komiut/core/theme/app_theme.dart';
 import 'package:komiut/di/injection_container.dart';
 import 'package:komiut/core/theme/theme_bloc.dart';
 import 'package:komiut/core/theme/theme_provider.dart';
-import 'package:komiut/core/constants/app_constants.dart';
 import 'package:komiut/features/shared/queue/presentation/providers/notification_providers.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  // Keep splash screen visible while app initializes (unless skipping auth)
-  if (!AppConfig.skipAuth) {
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  } else {
-    FlutterNativeSplash.remove();
-  }
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await dotenv.load(fileName: '.env');
   await initializeDependencies();
