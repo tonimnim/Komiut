@@ -37,6 +37,12 @@ import '../../features/shared/settings/presentation/screens/payment_methods_scre
 import '../../features/shared/notifications/presentation/screens/notification_screen.dart';
 import '../../features/shared/scan/presentation/screens/scan_screen.dart';
 import '../../features/driver/driver.dart';
+import '../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
+import '../../features/driver/earnings/presentation/screens/earnings_screen.dart';
+import '../../features/driver/profile/presentation/screens/driver_profile_screen.dart';
+import '../../features/driver/queue/presentation/screens/queue_screen.dart' as driver_queue;
+import '../../features/driver/trips/presentation/screens/driver_trips_screen.dart';
+import '../../features/driver/notifications/presentation/screens/driver_notification_screen.dart';
 import '../../features/shared/shared.dart';
 import '../../features/passenger/discovery/presentation/screens/saccos_screen.dart';
 import '../../features/passenger/discovery/presentation/screens/sacco_detail_screen.dart';
@@ -303,7 +309,7 @@ GoRouter createAppRouter(Ref ref) {
       GoRoute(
         path: RouteConstants.driverQueue,
         name: 'driverQueue',
-        builder: (context, state) => const QueueScreen(),
+        builder: (context, state) => const driver_queue.QueueScreen(),
       ),
       GoRoute(
         path: RouteConstants.driverTrips,
@@ -323,7 +329,16 @@ GoRouter createAppRouter(Ref ref) {
       GoRoute(
         path: RouteConstants.sharedProfile,
         name: 'sharedProfile',
-        builder: (context, state) => const ProfileScreen(),
+        builder: (context, state) {
+          // Use driver profile for drivers, shared profile for passengers
+          final container = ProviderScope.containerOf(context);
+          final isDriver = container.read(isDriverOrToutProvider);
+
+          if (isDriver) {
+            return const DriverProfileScreen();
+          }
+          return const ProfileScreen();
+        },
       ),
       GoRoute(
         path: RouteConstants.sharedSettings,
@@ -333,7 +348,14 @@ GoRouter createAppRouter(Ref ref) {
       GoRoute(
         path: RouteConstants.sharedNotifications,
         name: 'sharedNotifications',
-        builder: (context, state) => const NotificationScreen(),
+        builder: (context, state) {
+          final container = ProviderScope.containerOf(context);
+          final isDriver = container.read(isDriverOrToutProvider);
+          if (isDriver) {
+            return const DriverNotificationScreen();
+          }
+          return const NotificationScreen();
+        },
       ),
 
       // ─────────────────────────────────────────────────────────────────────

@@ -300,12 +300,35 @@ class AuthController extends AsyncNotifier<AuthState> {
   }
 
   /// Login with email and password.
+  ///
+  /// Supports simulated auth for testing when [AppConfig.useSimulatedAuth] is true.
+  /// Test credentials:
+  /// - Passenger: passenger@test.com / password123
+  /// - Driver: driver@test.com / password123
   Future<void> login({
     required String email,
     required String password,
   }) async {
     state = const AsyncData(AuthLoading(message: 'Signing in...'));
 
+    // Check for simulated auth (dev/testing mode)
+    if (AppConfig.useSimulatedAuth) {
+      final simulatedResult = await _trySimulatedLogin(email, password);
+      if (simulatedResult != null) {
+        state = simulatedResult;
+        return;
+      }
+      // If credentials don't match test accounts, show error
+      state = const AsyncData(AuthError(
+        message: 'Invalid credentials. Use test accounts:\n'
+            '• Passenger: passenger@test.com\n'
+            '• Driver: driver@test.com\n'
+            'Password: password123',
+      ));
+      return;
+    }
+
+    // Real API login
     final result = await _apiClient.post<LoginResponseModel>(
       ApiEndpoints.login,
       data: LoginRequestModel(email: email, password: password).toJson(),
@@ -355,6 +378,64 @@ class AuthController extends AsyncNotifier<AuthState> {
         ));
       },
     );
+  }
+
+  /// Simulated login for testing without API.
+  Future<AsyncData<AuthState>?> _trySimulatedLogin(
+      String email, String password) async {
+    // Check passenger test account
+    if (email == AppConfig.testPassengerEmail &&
+        password == AppConfig.testPassengerPassword) {
+      return _createSimulatedAuth(
+        email: email,
+        name: 'Test Passenger',
+        role: UserRole.passenger,
+      );
+    }
+
+    // Check driver test account
+    if (email == AppConfig.testDriverEmail &&
+        password == AppConfig.testDriverPassword) {
+      return _createSimulatedAuth(
+        email: email,
+        name: 'Test Driver',
+        role: UserRole.driver,
+      );
+    }
+
+    return null; // No matching test account
+  }
+
+  /// Create simulated authenticated state.
+  Future<AsyncData<AuthState>> _createSimulatedAuth({
+    required String email,
+    required String name,
+    required UserRole role,
+  }) async {
+    final appRole = AppRole.fromUserRole(role);
+    const token = 'simulated_token_for_testing';
+    final userId = 'test_${role.name}_001';
+
+    // Store simulated session
+    await _storage.write(key: AppConfig.accessTokenKey, value: token);
+    await _storage.write(key: AppConfig.userRoleKey, value: appRole.name);
+    await _storage.write(key: AppConfig.userIdKey, value: userId);
+    await _storage.write(key: 'user_email', value: email);
+    await _storage.write(key: 'user_name', value: name);
+
+    final user = User(
+      id: userId,
+      email: email,
+      role: role,
+      status: UserStatus.active,
+      fullName: name,
+    );
+
+    return AsyncData(AuthAuthenticated(
+      user: user,
+      role: appRole,
+      token: token,
+    ));
   }
 
   /// Register a new passenger account.

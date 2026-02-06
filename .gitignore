@@ -68,4 +68,7 @@ doctor.txt
 login_test.json
 .env
 
+# Claude Code local settings
+.claude/
+
 .metadata

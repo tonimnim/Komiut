@@ -1,45 +1,10 @@
 /// Driver home screen.
 ///
-/// Main dashboard for drivers showing:
-/// - Current trip status
-/// - Queue position
-/// - Today's earnings summary
-/// - Quick actions
-///
-/// ## TODO(Musa): Implement driver home screen
-///
-/// ### High Priority
-/// - [ ] Create `DriverHomeProvider` in `providers/driver_home_provider.dart`
-/// - [ ] Fetch driver profile using `ApiEndpoints.personnelMy`
-/// - [ ] Display current trip status (scheduled, in progress, etc.)
-/// - [ ] Show queue position using `ApiEndpoints.queueMyPosition`
-/// - [ ] Display today's earnings summary
-///
-/// ### Medium Priority
-/// - [ ] Add quick action buttons (start trip, join queue, etc.)
-/// - [ ] Implement real-time updates for trip status (WebSocket/polling)
-/// - [ ] Add notification badge to app bar
-/// - [ ] Show assigned vehicle information
-///
-/// ### Low Priority
-/// - [ ] Add pull-to-refresh functionality
-/// - [ ] Implement offline mode with cached data
-/// - [ ] Add analytics tracking for driver actions
-///
-/// ### API Endpoints to use:
-/// - `ApiEndpoints.personnelMy` - Get driver profile
-/// - `ApiEndpoints.vehicleMyDriver` - Get assigned vehicle
-/// - `ApiEndpoints.queueMyPosition` - Get queue position
-/// - `ApiEndpoints.tripsMyDriver` - Get driver's trips
-/// - `ApiEndpoints.driverEarnings` - Get earnings summary
-///
-/// ### Shared widgets to use:
-/// - `StatCard` for earnings/trips stats
-/// - `AppCard` for sections
-/// - `AppButton` for actions
-/// - `AppLoading` / `ShimmerLoading` for loading states
-/// - `AppError` for error states
+/// Clean, state-driven dashboard that shows what the driver needs to know
+/// and what actions they can take right now.
 library;
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,381 +12,286 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/widgets/navigation/driver_bottom_nav.dart';
+import '../../../../../core/widgets/navigation/driver_main_navigation.dart';
+import '../../../../auth/presentation/providers/auth_providers.dart';
+import '../../../../shared/notifications/presentation/providers/notification_provider.dart';
+import '../../../earnings/presentation/providers/earnings_providers.dart';
+import '../../../queue/presentation/providers/queue_providers.dart';
+import '../../../trips/presentation/providers/trips_providers.dart';
+import '../providers/dashboard_providers.dart';
+import '../widgets/driver_activity_content.dart';
 
-/// Driver home screen widget.
-///
-/// Entry point for the driver interface. Shows dashboard with:
-/// - Trip status card
-/// - Queue position card
-/// - Today's earnings
-/// - Quick actions
-class DriverHomeScreen extends ConsumerStatefulWidget {
+/// Driver home screen entry point.
+class DriverHomeScreen extends StatelessWidget {
   const DriverHomeScreen({super.key});
 
   @override
-  ConsumerState<DriverHomeScreen> createState() => _DriverHomeScreenState();
+  Widget build(BuildContext context) {
+    return const DriverMainNavigation();
+  }
 }
 
-class _DriverHomeScreenState extends ConsumerState<DriverHomeScreen> {
+/// Driver home content (used in IndexedStack).
+class DriverHomeContent extends ConsumerWidget {
+  const DriverHomeContent({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Driver Dashboard'),
-        actions: [
-          // TODO(Musa): Add notification badge
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            onPressed: () {
-              context.push(RouteConstants.sharedNotifications);
-            },
-          ),
-          // TODO(Musa): Add profile menu
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            onPressed: () {
-              context.push(RouteConstants.sharedProfile);
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SafeArea(
+      bottom: false,
+      child: RefreshIndicator(
         onRefresh: () async {
-          // TODO(Musa): Implement refresh - invalidate providers
+          ref.invalidate(driverProfileProvider);
+          ref.invalidate(driverQueuePositionProvider);
+          ref.invalidate(activeTripProvider);
+          ref.invalidate(earningsSummaryProvider);
         },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(16),
+        child: const SingleChildScrollView(
+          physics: BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ─────────────────────────────────────────────────────────────────
-              // Welcome Section
-              // ─────────────────────────────────────────────────────────────────
-              _buildWelcomeSection(context),
-              const SizedBox(height: 24),
+              // ── Header ──────────────────────────────────────────────
+              _DriverHeader(),
+              SizedBox(height: 32),
 
-              // ─────────────────────────────────────────────────────────────────
-              // Current Trip Status
-              // TODO(Musa): Replace with actual trip data from provider
-              // ─────────────────────────────────────────────────────────────────
-              _buildSectionHeader('Current Trip'),
-              const SizedBox(height: 12),
-              _buildTripStatusCard(context),
-              const SizedBox(height: 24),
-
-              // ─────────────────────────────────────────────────────────────────
-              // Queue Position
-              // TODO(Musa): Replace with actual queue data
-              // ─────────────────────────────────────────────────────────────────
-              _buildSectionHeader('Queue Status'),
-              const SizedBox(height: 12),
-              _buildQueueCard(context),
-              const SizedBox(height: 24),
-
-              // ─────────────────────────────────────────────────────────────────
-              // Today's Summary
-              // TODO(Musa): Replace with actual earnings data
-              // ─────────────────────────────────────────────────────────────────
-              _buildSectionHeader("Today's Summary"),
-              const SizedBox(height: 12),
-              _buildTodaySummary(context),
-              const SizedBox(height: 24),
-
-              // ─────────────────────────────────────────────────────────────────
-              // Quick Actions
-              // ─────────────────────────────────────────────────────────────────
-              _buildSectionHeader('Quick Actions'),
-              const SizedBox(height: 12),
-              _buildQuickActions(context),
+              // ── State-Driven Content ────────────────────────────────
+              DriverActivityContent(),
             ],
           ),
         ),
       ),
-      bottomNavigationBar: const DriverBottomNav(currentIndex: 0),
     );
   }
+}
 
-  Widget _buildWelcomeSection(BuildContext context) {
-    // TODO(Musa): Get actual driver name from provider
+// ─────────────────────────────────────────────────────────────────────────────
+// Header Components
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Driver header with avatar, greeting, status, and action icons.
+///
+/// Extracted as a separate widget to minimize rebuilds when only
+/// specific parts of the header change.
+class _DriverHeader extends ConsumerWidget {
+  const _DriverHeader();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Profile + Greeting + Status
+        Expanded(
+          child: Row(
+            children: [
+              _ProfileAvatar(),
+              SizedBox(width: 12),
+              Expanded(child: _GreetingAndStatus()),
+            ],
+          ),
+        ),
+
+        // Action Icons
+        _HeaderActions(),
+      ],
+    );
+  }
+}
+
+/// Profile avatar that navigates to profile on tap.
+class _ProfileAvatar extends ConsumerWidget {
+  const _ProfileAvatar();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final profileImage = ref.watch(
+      authStateProvider.select((state) => state.user?.profileImage),
+    );
+
+    final hasValidImage =
+        profileImage != null && File(profileImage).existsSync();
+
+    return GestureDetector(
+      onTap: () => context.push(RouteConstants.sharedProfile),
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+          image: hasValidImage
+              ? DecorationImage(
+                  image: FileImage(File(profileImage)),
+                  fit: BoxFit.cover,
+                )
+              : null,
+        ),
+        child: hasValidImage
+            ? null
+            : Icon(
+                Icons.person_outline,
+                color: theme.colorScheme.primary,
+              ),
+      ),
+    );
+  }
+}
+
+/// Driver name and online status indicator.
+class _GreetingAndStatus extends ConsumerWidget {
+  const _GreetingAndStatus();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Only rebuild when user name changes
+    final userName = ref.watch(
+      authStateProvider.select(
+        (state) => state.user?.fullName.split(' ').first ?? 'Driver',
+      ),
+    );
+
+    // Only rebuild when online status changes
+    final isOnline = ref.watch(
+      driverProfileProvider.select(
+        (async) => async.whenOrNull(data: (p) => p.isOnline) ?? false,
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Welcome back!',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+          userName,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: theme.colorScheme.onSurface,
+          ),
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
-        Text(
-          // TODO(Musa): Show actual vehicle registration
-          'Vehicle: KAA 123X',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Colors.grey,
-              ),
-        ),
+        const SizedBox(height: 2),
+        _OnlineStatusIndicator(isOnline: isOnline, isDark: isDark),
       ],
     );
   }
+}
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-      ),
-    );
-  }
+/// Online/offline status indicator.
+class _OnlineStatusIndicator extends StatelessWidget {
+  const _OnlineStatusIndicator({
+    required this.isOnline,
+    required this.isDark,
+  });
 
-  Widget _buildTripStatusCard(BuildContext context) {
-    // TODO(Musa): Implement with actual trip data
-    // Use TripStatus enum for status display
-    // Show different UI based on trip state:
-    // - No active trip: Show "Start Trip" button
-    // - Trip in progress: Show trip details with "End Trip" button
-    // - Trip scheduled: Show countdown to start
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Row(
-              children: [
-                Icon(
-                  Icons.directions_bus,
-                  size: 40,
-                  color: Colors.grey,
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'No Active Trip',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Join queue or start a new trip',
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // TODO(Musa): Navigate to trip start flow
-                  // Check if in queue first, then start trip
-                },
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('Start Trip'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryGreen,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  final bool isOnline;
+  final bool isDark;
 
-  Widget _buildQueueCard(BuildContext context) {
-    // TODO(Musa): Implement with actual queue data
-    // Show:
-    // - Current position number
-    // - Route name
-    // - Estimated wait time
-    // - Join/Leave queue button
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            // Queue position indicator
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: AppColors.primaryBlue.withAlpha(26),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Center(
-                child: Text(
-                  '--',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryBlue,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Not in Queue',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Join a route queue to get assigned',
-                    style: TextStyle(color: Colors.grey, fontSize: 12),
-                  ),
-                ],
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                context.go(RouteConstants.driverQueue);
-              },
-              child: const Text('Join'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = isOnline ? AppColors.statusOnline : AppColors.statusOffline;
+    final statusText = isOnline ? 'Online' : 'Offline';
 
-  Widget _buildTodaySummary(BuildContext context) {
-    // TODO(Musa): Implement with actual earnings data
-    // Use StatCard widgets for each metric
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.account_balance_wallet,
-            label: 'Earnings',
-            value: 'KSh --',
-            color: AppColors.primaryGreen,
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: statusColor,
+            shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.directions_bus,
-            label: 'Trips',
-            value: '--',
-            color: AppColors.primaryBlue,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildStatCard(
-            context,
-            icon: Icons.people,
-            label: 'Passengers',
-            value: '--',
-            color: AppColors.secondaryOrange,
+        const SizedBox(width: 6),
+        Text(
+          statusText,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: isDark ? Colors.grey[400] : AppColors.textSecondary,
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildStatCard(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
+/// Settings and notification action icons.
+class _HeaderActions extends StatelessWidget {
+  const _HeaderActions();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return _NotificationButton(isDark: isDark);
+  }
+}
+
+/// Notification button with badge.
+class _NotificationButton extends ConsumerWidget {
+  const _NotificationButton({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadCountProvider);
+
+    return GestureDetector(
+      onTap: () => context.push(RouteConstants.sharedNotifications),
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.05)
+              : Colors.black.withValues(alpha: 0.03),
+          shape: BoxShape.circle,
+        ),
+        child: Stack(
+          alignment: Alignment.center,
           children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            Icon(
+              Icons.notifications_outlined,
+              color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+              size: 22,
             ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 12,
+            if (unreadCount > 0)
+              const Positioned(
+                right: 8,
+                top: 8,
+                child: _NotificationBadge(),
               ),
-            ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildQuickActions(BuildContext context) {
-    // TODO(Musa): Enable/disable based on current state
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
-      children: [
-        _buildActionChip(
-          icon: Icons.qr_code_scanner,
-          label: 'Scan Ticket',
-          onTap: () {
-            // TODO(Musa): Navigate to ticket scanner
-          },
-        ),
-        _buildActionChip(
-          icon: Icons.history,
-          label: 'Trip History',
-          onTap: () {
-            context.go(RouteConstants.driverTrips);
-          },
-        ),
-        _buildActionChip(
-          icon: Icons.attach_money,
-          label: 'Earnings',
-          onTap: () {
-            context.go(RouteConstants.driverEarnings);
-          },
-        ),
-        _buildActionChip(
-          icon: Icons.settings,
-          label: 'Settings',
-          onTap: () {
-            context.push(RouteConstants.sharedSettings);
-          },
-        ),
-      ],
-    );
-  }
+/// Notification badge indicator.
+class _NotificationBadge extends StatelessWidget {
+  const _NotificationBadge();
 
-  Widget _buildActionChip({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return ActionChip(
-      avatar: Icon(icon, size: 18),
-      label: Text(label),
-      onPressed: onTap,
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: const BoxDecoration(
+        color: AppColors.error,
+        shape: BoxShape.circle,
+      ),
     );
   }
 }

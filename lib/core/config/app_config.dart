@@ -98,7 +98,24 @@ class AppConfig {
   /// DEV MODE: Skip authentication and go directly to home screen.
   /// Set to true to preview UI without logging in.
   /// ⚠️ PRODUCTION: Must be false before deployment!
-  static const bool skipAuth = true; // Dev mode: No backend APIs available yet
+  static const bool skipAuth = false;
+
+  /// DEV MODE: Use simulated auth with hardcoded test credentials.
+  /// When true, login will work with test accounts below (no API needed).
+  /// ⚠️ PRODUCTION: Must be false before deployment!
+  static const bool useSimulatedAuth = true;
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Test Credentials (for simulated auth only)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Test passenger account
+  static const String testPassengerEmail = 'passenger@test.com';
+  static const String testPassengerPassword = 'password123';
+
+  /// Test driver account
+  static const String testDriverEmail = 'driver@test.com';
+  static const String testDriverPassword = 'password123';
 
   /// Whether to enable loyalty points feature.
   static const bool enableLoyalty = true;

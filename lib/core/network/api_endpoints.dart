@@ -100,6 +100,9 @@ class ApiEndpoints {
   /// Assign route to vehicle.
   static const String assignRoute = '/api/Vehicles/assign-route';
 
+  /// Assign route to vehicle (alias).
+  static const String vehicleAssignRoute = '/api/Vehicles/assign-route';
+
   // ─────────────────────────────────────────────────────────────────────────
   // Trips
   // ─────────────────────────────────────────────────────────────────────────
