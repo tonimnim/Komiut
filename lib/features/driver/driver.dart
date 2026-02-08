@@ -1,16 +1,37 @@
 /// Driver feature barrel file.
 ///
 /// Exports all driver-related features for the Komiut app.
+/// This module contains driver-specific functionality including:
+/// - Dashboard (home screen, profile, stats)
+/// - Earnings (income tracking, payouts, transactions)
+/// - Queue (stage queue management)
+/// - Trips (active and historical trips)
 library;
 
-// Dashboard/Home
-export 'dashboard/presentation/screens/driver_home_screen.dart';
-
-// Queue management
-export 'queue/presentation/screens/queue_screen.dart' show QueueScreen;
-
-// Trips
-export 'trips/presentation/screens/driver_trips_screen.dart';
+// Dashboard
+export 'dashboard/domain/entities/entities.dart';
+export 'dashboard/data/models/models.dart';
+export 'dashboard/data/datasources/datasources.dart';
+export 'dashboard/data/repositories/repositories.dart';
+export 'dashboard/presentation/providers/providers.dart';
 
 // Earnings
-export 'earnings/presentation/screens/earnings_screen.dart';
+export 'earnings/domain/entities/entities.dart';
+export 'earnings/data/models/models.dart';
+export 'earnings/data/datasources/datasources.dart';
+export 'earnings/data/repositories/repositories.dart';
+export 'earnings/presentation/providers/providers.dart';
+
+// Queue
+export 'queue/domain/entities/entities.dart';
+export 'queue/data/models/models.dart';
+export 'queue/data/datasources/datasources.dart';
+export 'queue/data/repositories/repositories.dart';
+export 'queue/presentation/providers/providers.dart';
+
+// Trips
+export 'trips/domain/entities/entities.dart';
+export 'trips/data/models/models.dart';
+export 'trips/data/datasources/datasources.dart';
+export 'trips/data/repositories/repositories.dart';
+export 'trips/presentation/providers/providers.dart';
