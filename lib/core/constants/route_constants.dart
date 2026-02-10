@@ -100,6 +100,7 @@ class RouteConstants {
   // ─────────────────────────────────────────────────────────────────────────
 
   static const String driverHome = '/driver/home';
+  static const String driverBookings = '/driver/bookings';
   static const String driverQueue = '/driver/queue';
   static const String driverTrips = '/driver/trips';
   static const String driverTripDetail = '/driver/trips/:id';

@@ -38,7 +38,8 @@ class PaymentMethodsScreen extends ConsumerWidget {
       ),
       body: methodsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(context, ref, error.toString()),
+        error: (error, _) => _buildErrorState(
+            context, ref, error.toString().replaceAll('Exception: ', '')),
         data: (methods) => methods.isEmpty
             ? _buildEmptyState(context, isDark)
             : _buildMethodsList(context, ref, methods),
@@ -106,7 +107,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
               color: AppColors.error,
@@ -546,7 +547,7 @@ class PaymentMethodsScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       method.maskedNumber,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),

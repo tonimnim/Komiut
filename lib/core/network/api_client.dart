@@ -9,6 +9,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/app_config.dart';
+import '../config/env_config.dart';
 import '../errors/failures.dart';
 import 'api_interceptors.dart';
 import 'api_response.dart';
@@ -43,6 +44,7 @@ class ApiClient {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           '_domain': AppConfig.domainId,
+          if (EnvConfig.tenantId.isNotEmpty) '_tenant': EnvConfig.tenantId,
         },
       ),
     );

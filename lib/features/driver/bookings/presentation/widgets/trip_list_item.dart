@@ -42,7 +42,7 @@ class TripListItem extends StatelessWidget {
             // Route name row
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.route,
                   color: AppColors.primary,
                   size: 20,
@@ -65,7 +65,7 @@ class TripListItem extends StatelessWidget {
             Row(
               children: [
                 // Seats info
-                Icon(
+                const Icon(
                   Icons.event_seat,
                   color: AppColors.textSecondary,
                   size: 16,
@@ -80,7 +80,7 @@ class TripListItem extends StatelessWidget {
                 const SizedBox(width: 16),
 
                 // Time info
-                Icon(
+                const Icon(
                   Icons.access_time,
                   color: AppColors.textSecondary,
                   size: 16,

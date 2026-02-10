@@ -93,7 +93,7 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
             final model = LoyaltyPointsApiModel.fromJson(data);
             return Right(model.toEntity());
           }
-          return Left(ServerFailure('Invalid response format'));
+          return const Left(ServerFailure('Invalid response format'));
         } catch (e) {
           return Left(ServerFailure('Failed to parse loyalty points: $e'));
         }

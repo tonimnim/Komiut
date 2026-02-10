@@ -1,12 +1,8 @@
-/// Booking providers for driver's active trip.
-///
-/// Provides bookings for the driver's current active trip.
-library;
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/domain/entities/booking.dart';
-import '../../../../passenger/trips/data/datasources/bookings_remote_datasource.dart';
+import '../../domain/entities/booking.dart';
+import '../../data/repositories/booking_repository_impl.dart';
+
 import '../../../trips/presentation/providers/trips_providers.dart';
 
 /// Provider for bookings on the driver's active trip.
@@ -22,8 +18,8 @@ final activeTripBookingsProvider =
     return [];
   }
 
-  final dataSource = ref.watch(bookingsRemoteDataSourceProvider);
-  final result = await dataSource.getBookings(tripId: activeTrip.id);
+  final repository = ref.watch(bookingRepositoryProvider);
+  final result = await repository.getBookingsForTrip(activeTrip.id);
 
   return result.fold(
     (failure) => throw Exception(failure.message),
@@ -32,15 +28,21 @@ final activeTripBookingsProvider =
 });
 
 /// Provider for confirmed bookings count on active trip.
+///
+/// Returns 0 if loading or error.
 final confirmedBookingsCountProvider = Provider<int>((ref) {
   final bookingsAsync = ref.watch(activeTripBookingsProvider);
   return bookingsAsync.whenOrNull(
-        data: (bookings) => bookings.where((b) => b.isConfirmed).length,
+        data: (bookings) => bookings
+            .where((b) => b.isPaid)
+            .length, // Using isPaid as proxy for confirmed/paid or check status
       ) ??
       0;
 });
 
 /// Provider for total bookings count on active trip.
+///
+/// Returns 0 if loading or error.
 final totalBookingsCountProvider = Provider<int>((ref) {
   final bookingsAsync = ref.watch(activeTripBookingsProvider);
   return bookingsAsync.whenOrNull(data: (bookings) => bookings.length) ?? 0;

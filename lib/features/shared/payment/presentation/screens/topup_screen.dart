@@ -195,7 +195,7 @@ class _TopupScreenState extends ConsumerState<TopupScreen> {
                         ],
                       ),
                     ),
-                    Icon(
+                    const Icon(
                       Icons.check_circle,
                       color: AppColors.primaryGreen,
                       size: 24,

@@ -128,7 +128,7 @@ class _CompactFareDisplay extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
+        const Icon(
           Icons.receipt_long,
           size: 16,
           color: AppColors.primaryBlue,
@@ -165,7 +165,7 @@ class _CompactFareDisplay extends StatelessWidget {
             ),
             child: Text(
               'x$passengerCount',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w500,
                 color: AppColors.primaryBlue,
@@ -255,7 +255,7 @@ class _DetailedFareDisplay extends StatelessWidget {
                   color: AppColors.primaryBlue.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.calculate,
                   size: 20,
                   color: AppColors.primaryBlue,
@@ -337,7 +337,7 @@ class _DetailedFareDisplay extends StatelessWidget {
               ),
               Text(
                 '${route.currency} ${totalFare.toStringAsFixed(0)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,
@@ -511,7 +511,7 @@ class InlineFarePreview extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
+          const Icon(
             Icons.attach_money,
             size: 16,
             color: AppColors.primaryGreen,
@@ -519,7 +519,7 @@ class InlineFarePreview extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             route.formatFare(totalFare),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: AppColors.primaryGreen,

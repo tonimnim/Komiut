@@ -70,7 +70,7 @@ class TripListSheet extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       'Your Trips',
                       style: AppTextStyles.heading3,
                     ),

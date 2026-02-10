@@ -27,15 +27,14 @@ class EnvConfig {
   /// Base URLs for each environment.
   static const Map<Environment, String> _baseUrls = {
     Environment.dev: 'https://v2.komiut.com',
-    Environment.staging:
-        'https://89faa99f-4645-443f-77d5-08de64e4c1a8.komiut.com',
+    Environment.staging: 'https://v2.komiut.com',
     Environment.prod: 'https://v2.komiut.com',
   };
 
   /// Tenant IDs for each environment.
   /// Used for multi-tenant API authentication.
   static const Map<Environment, String> _tenantIds = {
-    Environment.dev: '',
+    Environment.dev: '@157943731372240',
     Environment.staging: '@157943731372240',
     Environment.prod: '',
   };

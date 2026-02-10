@@ -80,3 +80,17 @@ PHASE_3_PR.md
 REFACTORING_PLAN.md
 
 .metadata
+
+# Android build artifacts & local config
+android/.gradle/
+android/build/
+android/local.properties
+android/gradlew
+android/gradlew.bat
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/src/main/java/
+
+# Log & temp files
+build_log.txt
+diff_output.txt
+swagger.json

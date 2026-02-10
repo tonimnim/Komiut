@@ -39,7 +39,8 @@ import '../../features/shared/scan/presentation/screens/scan_screen.dart';
 import '../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
 import '../../features/driver/earnings/presentation/screens/earnings_screen.dart';
 import '../../features/driver/profile/presentation/screens/driver_profile_screen.dart';
-import '../../features/driver/queue/presentation/screens/queue_screen.dart' as driver_queue;
+import '../../features/driver/queue/presentation/screens/queue_screen.dart'
+    as driver_queue;
 import '../../features/driver/trips/presentation/screens/driver_trips_screen.dart';
 import '../../features/driver/notifications/presentation/screens/driver_notification_screen.dart';
 import '../../features/shared/shared.dart';
@@ -48,6 +49,7 @@ import '../../features/passenger/discovery/presentation/screens/sacco_detail_scr
 import '../../features/passenger/trips/presentation/screens/active_trip_screen.dart';
 import '../../features/shared/loyalty/presentation/screens/loyalty_screen.dart';
 import '../../features/passenger/tickets/tickets.dart';
+import '../config/app_config.dart';
 import '../constants/route_constants.dart';
 
 /// Provider for the app router.
@@ -58,9 +60,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 /// Creates and configures the application router.
 GoRouter createAppRouter(Ref ref) {
   return GoRouter(
-    initialLocation: RouteConstants.splash,
+    // Skip auth: go directly to home, otherwise start at splash
+    initialLocation:
+        AppConfig.skipAuth ? RouteConstants.home : RouteConstants.splash,
     debugLogDiagnostics: true,
     redirect: (context, state) {
+      // DEV MODE: Skip all auth checks - no redirects at all
+      if (AppConfig.skipAuth) {
+        return null;
+      }
+
       final authState = ref.read(authControllerProvider).valueOrNull;
       final isAuthenticated = authState is AuthAuthenticated;
       final currentPath = state.matchedLocation;
@@ -139,6 +148,9 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteConstants.home,
         name: 'home',
         redirect: (context, state) {
+          // DEV MODE: Skip auth check
+          if (AppConfig.skipAuth) return null;
+
           final authState = ref.read(authControllerProvider).valueOrNull;
           if (authState is AuthAuthenticated) {
             return authState.role.homeRoute;

@@ -41,7 +41,9 @@ class HomeContent extends ConsumerWidget {
     final walletAsync = ref.watch(walletProvider);
     final tripsAsync = ref.watch(recentTripsProvider);
     final rawName = user?.fullName?.split(' ').first;
-    final userName = (rawName != null && rawName.isNotEmpty) ? rawName : (user?.email?.split('@').first ?? 'User');
+    final userName = (rawName != null && rawName.isNotEmpty)
+        ? rawName
+        : (user?.email.split('@').first ?? 'User');
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -76,18 +78,15 @@ class HomeContent extends ConsumerWidget {
                             color: theme.colorScheme.primary.withOpacity(0.1),
                             shape: BoxShape.circle,
                             image: user?.profileImage != null &&
-                                    File(user!.profileImage!)
-                                        .existsSync()
+                                    File(user!.profileImage!).existsSync()
                                 ? DecorationImage(
-                                    image: FileImage(
-                                        File(user.profileImage!)),
+                                    image: FileImage(File(user.profileImage!)),
                                     fit: BoxFit.cover,
                                   )
                                 : null,
                           ),
                           child: user?.profileImage == null ||
-                                  !File(user!.profileImage!)
-                                      .existsSync()
+                                  !File(user!.profileImage!).existsSync()
                               ? Icon(
                                   Icons.person_outline,
                                   color: theme.colorScheme.primary,

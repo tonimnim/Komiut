@@ -7,8 +7,9 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../queue/domain/entities/queue_position.dart';
-import '../../../queue/presentation/providers/queue_providers.dart';
 import '../../../trips/domain/entities/driver_trip.dart';
+
+import '../../../queue/presentation/providers/queue_providers.dart';
 import '../../../trips/presentation/providers/trips_providers.dart';
 import 'dashboard_providers.dart';
 
@@ -184,20 +185,24 @@ final driverStateEnumProvider = Provider<DriverState>((ref) {
 
 /// Provider for whether the driver is currently loading.
 final isDriverLoadingProvider = Provider<bool>((ref) {
-  return ref.watch(driverStateProvider.select((s) => s.state == DriverState.loading));
+  return ref
+      .watch(driverStateProvider.select((s) => s.state == DriverState.loading));
 });
 
 /// Provider for whether the driver is idle.
 final isDriverIdleProvider = Provider<bool>((ref) {
-  return ref.watch(driverStateProvider.select((s) => s.state == DriverState.idle));
+  return ref
+      .watch(driverStateProvider.select((s) => s.state == DriverState.idle));
 });
 
 /// Provider for whether the driver is in queue.
 final isDriverInQueueProvider = Provider<bool>((ref) {
-  return ref.watch(driverStateProvider.select((s) => s.state == DriverState.inQueue));
+  return ref
+      .watch(driverStateProvider.select((s) => s.state == DriverState.inQueue));
 });
 
 /// Provider for whether the driver is on a trip.
 final isDriverOnTripProvider = Provider<bool>((ref) {
-  return ref.watch(driverStateProvider.select((s) => s.state == DriverState.onTrip));
+  return ref
+      .watch(driverStateProvider.select((s) => s.state == DriverState.onTrip));
 });

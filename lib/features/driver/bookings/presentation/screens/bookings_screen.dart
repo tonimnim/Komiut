@@ -12,6 +12,7 @@ import '../widgets/passenger_booking_card.dart';
 import '../../../../../shared/widgets/komiut_map.dart';
 import '../../../../../core/widgets/error_widget.dart';
 import '../../../../../core/widgets/empty_state_widget.dart';
+import '../../../../../core/widgets/loading/shimmer_loading.dart';
 
 class BookingsScreen extends ConsumerStatefulWidget {
   const BookingsScreen({super.key});
@@ -35,7 +36,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       _setDefaultLocation();
       return;
@@ -145,8 +146,10 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
             return Container(
               decoration: BoxDecoration(
                 color: theme.scaffoldBackgroundColor,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                boxShadow: [
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
+                boxShadow: const [
                   BoxShadow(
                     color: AppColors.shadow12,
                     blurRadius: 16,
@@ -196,40 +199,18 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   }
 
   Widget _buildScrollableError(ScrollController controller, String message) {
-    final theme = Theme.of(context);
     return SingleChildScrollView(
       controller: controller,
-      child: Column(
-        children: [
-          _buildHandleBar(),
-          const SizedBox(height: 60),
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.error.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.error_outline,
-              size: 40,
-              color: AppColors.error,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Failed to load bookings',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextButton(
-            onPressed: _onRefresh,
-            child: const Text('Try Again'),
-          ),
-          const SizedBox(height: 60),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            _buildHandleBar(),
+            const SizedBox(height: 40),
+            CustomErrorWidget(message: message, onRetry: _onRefresh),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
@@ -240,41 +221,35 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
       child: Column(
         children: [
           _buildHandleBar(),
-          const SizedBox(height: 40),
-          const CircularProgressIndicator(color: AppColors.primary),
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: ShimmerList(
+              itemCount: 6,
+              itemBuilder: (context, index) => const ShimmerListTile(
+                hasLeading: true,
+                hasSubtitle: true,
+                hasTrailing: true,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
         ],
       ),
     );
   }
 
   Widget _buildScrollableNoTrip(ScrollController controller) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return SingleChildScrollView(
       controller: controller,
       child: Column(
         children: [
           _buildHandleBar(),
           const SizedBox(height: 40),
-          Icon(
-            Icons.directions_bus_outlined,
-            size: 40,
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'No active trip',
-            style: theme.textTheme.bodyLarge?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Join a queue to start a trip',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
+          const EmptyStateWidget(
+            icon: Icons.directions_bus_outlined,
+            title: 'No active trip',
+            message: 'Join a queue to start a trip',
           ),
           const SizedBox(height: 40),
         ],
@@ -330,7 +305,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -344,8 +319,10 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.pillGreenBg,
                   borderRadius: BorderRadius.circular(12),
@@ -363,8 +340,11 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
           const SizedBox(height: 8),
           Row(
             children: [
-              Icon(Icons.people_outline,
-                  size: 16, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.people_outline,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 6),
               Text(
                 '${trip.passengerCount ?? 0}/${trip.maxCapacity ?? _defaultCapacity} passengers',
@@ -373,8 +353,11 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                 ),
               ),
               const SizedBox(width: 16),
-              Icon(Icons.access_time,
-                  size: 16, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Icons.access_time,
+                size: 16,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               const SizedBox(width: 6),
               Text(
                 _formatTime(trip.startTime),
@@ -397,7 +380,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
       return Padding(
         padding: const EdgeInsets.all(24),
         child: CustomErrorWidget(
-          message: 'Failed to load passengers',
+          message: bookingsAsync.error.toString().replaceAll('Exception: ', ''),
           onRetry: () => ref.refresh(activeTripBookingsProvider),
         ),
       );
@@ -406,8 +389,9 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     if (bookingsAsync.isLoading) {
       return const Padding(
         padding: EdgeInsets.all(24),
-        child:
-            Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        child: Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
@@ -429,7 +413,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -448,10 +432,12 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
             ],
           ),
         ),
-        ...bookings.map((booking) => Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: PassengerBookingCard(booking: booking),
-            )),
+        ...bookings.map(
+          (booking) => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: PassengerBookingCard(booking: booking),
+          ),
+        ),
         const SizedBox(height: 16),
       ],
     );

@@ -297,22 +297,22 @@ class _StatusBadge extends StatelessWidget {
   _StatusConfig _getStatusConfig() {
     switch (status) {
       case QueueVehicleStatus.boarding:
-        return _StatusConfig(
+        return const _StatusConfig(
           label: 'Boarding Now',
           color: AppColors.success,
         );
       case QueueVehicleStatus.waiting:
-        return _StatusConfig(
+        return const _StatusConfig(
           label: 'Waiting',
           color: AppColors.warning,
         );
       case QueueVehicleStatus.departing:
-        return _StatusConfig(
+        return const _StatusConfig(
           label: 'Departing Soon',
           color: AppColors.info,
         );
       case QueueVehicleStatus.departed:
-        return _StatusConfig(
+        return const _StatusConfig(
           label: 'Departed',
           color: AppColors.textSecondary,
         );
@@ -417,7 +417,7 @@ class _PendingIndicatorState extends State<_PendingIndicator>
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       width: 12,
       height: 12,
       child: CircularProgressIndicator(

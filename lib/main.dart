@@ -16,7 +16,12 @@ import 'package:komiut/features/shared/queue/presentation/providers/notification
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  // Keep splash screen visible while app initializes (unless skipping auth)
+  if (!AppConfig.skipAuth) {
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  } else {
+    FlutterNativeSplash.remove();
+  }
 
   await dotenv.load(fileName: '.env');
   await initializeDependencies();

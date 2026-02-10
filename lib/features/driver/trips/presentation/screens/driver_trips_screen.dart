@@ -11,6 +11,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
 import '../../domain/entities/driver_trip.dart';
 import '../providers/trips_providers.dart';
+import '../../../../../core/widgets/error_widget.dart';
 
 /// Driver trips screen widget (standalone).
 class DriverTripsScreen extends StatelessWidget {
@@ -68,18 +69,20 @@ class _DriverTripsContentState extends ConsumerState<DriverTripsContent> {
               onRefresh: () async => refreshTrips(ref),
               child: tripsAsync.when(
                 loading: () => _HistoryLoading(isDark: isDark),
-                error: (error, _) => _ErrorView(
-                  message: 'Failed to load trips',
+                error: (error, _) => CustomErrorWidget(
+                  message:
+                      error.toString().replaceAll('Exception: ', ''),
                   onRetry: () => ref.invalidate(tripsHistoryProvider),
-                  isDark: isDark,
                 ),
                 data: (trips) {
                   if (trips.isEmpty) {
-                    final selectedFilter = ref.watch(selectedTripFilterProvider);
+                    final selectedFilter =
+                        ref.watch(selectedTripFilterProvider);
                     return _EmptyStateView(
                       icon: Icons.directions_bus_outlined,
                       title: 'No trips found',
-                      subtitle: 'No ${selectedFilter.label.toLowerCase()} trips yet',
+                      subtitle:
+                          'No ${selectedFilter.label.toLowerCase()} trips yet',
                       isDark: isDark,
                     );
                   }
@@ -295,8 +298,8 @@ class _HistoryLoading extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
       itemCount: 5,
-      itemBuilder: (context, index) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
+      itemBuilder: (context, index) => const Padding(
+        padding: EdgeInsets.only(bottom: 12),
         child: ShimmerCard(
           height: 90,
           margin: EdgeInsets.zero,
@@ -377,65 +380,3 @@ class _EmptyStateView extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────────────────────
 // Error State
 // ─────────────────────────────────────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({
-    required this.message,
-    required this.onRetry,
-    required this.isDark,
-  });
-
-  final String message;
-  final VoidCallback onRetry;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.error.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.error_outline,
-                size: 40,
-                color: AppColors.error,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              message,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: theme.colorScheme.onSurface,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: onRetry,
-              child: const Text(
-                'Try Again',
-                style: TextStyle(
-                  color: AppColors.primaryBlue,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

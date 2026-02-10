@@ -50,10 +50,16 @@ class NotificationModel extends NotificationEntity {
       case 'trip':
         return NotificationType.trip;
       case 'payment':
+      case 'earnings':
         return NotificationType.payment;
       case 'promo':
       case 'promotion':
         return NotificationType.promo;
+      case 'queue':
+        return NotificationType.queue;
+      case 'assignment':
+      case 'trip_assignment':
+        return NotificationType.assignment;
       case 'system':
       default:
         return NotificationType.system;

@@ -121,7 +121,7 @@ class _SeatSelectorHeader extends StatelessWidget {
               color: AppColors.primaryBlue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.event_seat,
               color: AppColors.primaryBlue,
               size: 24,
@@ -194,11 +194,11 @@ class _SeatLegend extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _LegendItem(
+          const _LegendItem(
             color: AppColors.primaryGreen,
             label: 'Available',
           ),
-          _LegendItem(
+          const _LegendItem(
             color: AppColors.primaryBlue,
             label: 'Selected',
           ),
@@ -531,7 +531,7 @@ class _SeatWidget extends StatelessWidget {
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.check,
                     size: 8,
                     color: AppColors.primaryBlue,
@@ -609,7 +609,7 @@ class _SelectionSummary extends StatelessWidget {
                         ),
                         child: Text(
                           'Seat $seatNumber',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                             color: AppColors.primaryBlue,
@@ -624,7 +624,7 @@ class _SelectionSummary extends StatelessWidget {
           if (remaining > 0)
             Text(
               '$remaining more',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
                 color: AppColors.warning,

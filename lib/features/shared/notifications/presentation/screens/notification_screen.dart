@@ -5,6 +5,7 @@ import '../../../../../core/theme/app_colors.dart';
 import '../../domain/entities/notification_entity.dart';
 import '../providers/notification_provider.dart';
 import '../widgets/notification_tile.dart';
+import '../../../../../core/widgets/feedback/app_error.dart';
 
 class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
@@ -164,8 +165,6 @@ class _NotificationPageView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notificationsAsync = ref.watch(notificationsProvider);
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return notificationsAsync.when(
       data: (allNotifications) {
@@ -201,37 +200,13 @@ class _NotificationPageView extends ConsumerWidget {
         ),
       ),
       error: (error, _) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: AppColors.error.withOpacity(0.7),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'Failed to load notifications',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDark ? Colors.grey[400] : AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: () {
-                ref.read(notificationsProvider.notifier).refresh();
-              },
-              child: const Text(
-                'Try Again',
-                style: TextStyle(
-                  color: AppColors.primaryBlue,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
+        child: AppErrorWidget(
+          title: 'Failed to load notifications',
+          message: error.toString().replaceAll('Exception: ', ''),
+          type: ErrorType.server,
+          onRetry: () {
+            ref.read(notificationsProvider.notifier).refresh();
+          },
         ),
       ),
     );

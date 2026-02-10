@@ -122,7 +122,7 @@ class _VehicleSelectorHeader extends StatelessWidget {
               color: AppColors.primaryBlue.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
+            child: const Icon(
               Icons.directions_bus,
               color: AppColors.primaryBlue,
               size: 24,
@@ -157,7 +157,7 @@ class _VehicleSelectorHeader extends StatelessWidget {
             ),
           ),
           if (selectedVehicle != null)
-            Icon(
+            const Icon(
               Icons.check_circle,
               color: AppColors.primaryGreen,
               size: 24,
@@ -356,7 +356,7 @@ class VehicleCard extends StatelessWidget {
 
                 // Selection indicator
                 if (isSelected)
-                  Icon(
+                  const Icon(
                     Icons.check_circle,
                     color: AppColors.primaryBlue,
                     size: 24,
@@ -435,7 +435,7 @@ class VehicleCard extends StatelessWidget {
             // Disabled message
             if (isDisabled) ...[
               const SizedBox(height: 8),
-              Text(
+              const Text(
                 'Not enough seats available',
                 style: TextStyle(
                   fontSize: 12,
@@ -526,7 +526,7 @@ class _RecommendedBadge extends StatelessWidget {
         color: AppColors.primaryGreen.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
+      child: const Text(
         'Recommended',
         style: TextStyle(
           fontSize: 10,
@@ -639,7 +639,7 @@ class _NoAvailableSeatsState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.event_seat,
             size: 64,
             color: AppColors.warning,
@@ -688,7 +688,7 @@ class _ErrorState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
               color: AppColors.error,

@@ -36,7 +36,8 @@ class SavedSaccosScreen extends ConsumerWidget {
       ),
       body: saccosAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(context, ref, error.toString()),
+        error: (error, _) => _buildErrorState(
+            context, ref, error.toString().replaceAll('Exception: ', '')),
         data: (saccos) => saccos.isEmpty
             ? _buildEmptyState(context, isDark)
             : _buildSaccosList(context, ref, saccos),
@@ -98,7 +99,7 @@ class SavedSaccosScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
               color: AppColors.error,

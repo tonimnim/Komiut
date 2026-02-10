@@ -80,7 +80,7 @@ class NextStopIndicator extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Arriving at destination',
                   style: TextStyle(
                     fontSize: 16,
@@ -154,7 +154,7 @@ class NextStopIndicator extends StatelessWidget {
                       color: AppColors.success.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -162,7 +162,7 @@ class NextStopIndicator extends StatelessWidget {
                           size: 12,
                           color: AppColors.success,
                         ),
-                        const SizedBox(width: 4),
+                        SizedBox(width: 4),
                         Text(
                           'Your Stop',
                           style: TextStyle(
@@ -270,7 +270,7 @@ class NextStopIndicator extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.location_on,
                       size: 14,
                       color: AppColors.primaryBlue,
@@ -661,7 +661,7 @@ class _UpcomingStopTile extends StatelessWidget {
                 color: AppColors.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Text(
+              child: const Text(
                 'Destination',
                 style: TextStyle(
                   fontSize: 10,

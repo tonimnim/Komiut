@@ -1,29 +1,17 @@
-/// Driver main navigation with IndexedStack.
-///
-/// Uses IndexedStack to keep all screens in memory and avoid rebuilds
-/// when switching tabs. Includes profile drawer accessible from header.
-library;
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../theme/app_colors.dart';
+import '../drawers/profile_drawer.dart';
 import '../../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
 import '../../../features/driver/earnings/presentation/screens/earnings_screen.dart';
 import '../../../features/driver/trips/presentation/screens/driver_trips_screen.dart';
-import '../../theme/app_colors.dart';
-import '../drawers/profile_drawer.dart';
+import '../../../features/driver/bookings/presentation/screens/bookings_screen.dart';
 
-/// Provider for driver navigation tab index.
+import 'driver_navigation_keys.dart';
+
 final driverNavigationIndexProvider = StateProvider<int>((ref) => 0);
 
-/// Global key to control the scaffold (for opening drawer).
-final driverScaffoldKey = GlobalKey<ScaffoldState>();
-
-/// Main navigation wrapper for driver screens.
-///
-/// Uses IndexedStack to preserve state across tab switches.
-/// This prevents unnecessary rebuilds and data refetching.
 class DriverMainNavigation extends ConsumerWidget {
   const DriverMainNavigation({super.key});
 
@@ -40,6 +28,7 @@ class DriverMainNavigation extends ConsumerWidget {
         index: currentIndex,
         children: const [
           DriverHomeContent(),
+          BookingsScreen(),
           DriverTripsContent(),
           EarningsContent(),
         ],
@@ -72,26 +61,39 @@ class DriverMainNavigation extends ConsumerWidget {
                       icon: Icons.home_outlined,
                       activeIcon: Icons.home,
                       label: 'Home',
-                      onTap: () =>
-                          ref.read(driverNavigationIndexProvider.notifier).state = 0,
+                      onTap: () => ref
+                          .read(driverNavigationIndexProvider.notifier)
+                          .state = 0,
                     ),
                     _DriverNavItem(
                       index: 1,
                       currentIndex: currentIndex,
-                      icon: Icons.directions_bus_outlined,
-                      activeIcon: Icons.directions_bus,
-                      label: 'Trips',
-                      onTap: () =>
-                          ref.read(driverNavigationIndexProvider.notifier).state = 1,
+                      icon: Icons.map_outlined,
+                      activeIcon: Icons.map,
+                      label: 'Bookings',
+                      onTap: () => ref
+                          .read(driverNavigationIndexProvider.notifier)
+                          .state = 1,
                     ),
                     _DriverNavItem(
                       index: 2,
                       currentIndex: currentIndex,
+                      icon: Icons.directions_bus_outlined,
+                      activeIcon: Icons.directions_bus,
+                      label: 'Trips',
+                      onTap: () => ref
+                          .read(driverNavigationIndexProvider.notifier)
+                          .state = 2,
+                    ),
+                    _DriverNavItem(
+                      index: 3,
+                      currentIndex: currentIndex,
                       icon: Icons.account_balance_wallet_outlined,
                       activeIcon: Icons.account_balance_wallet,
                       label: 'Earnings',
-                      onTap: () =>
-                          ref.read(driverNavigationIndexProvider.notifier).state = 2,
+                      onTap: () => ref
+                          .read(driverNavigationIndexProvider.notifier)
+                          .state = 3,
                     ),
                   ],
                 ),

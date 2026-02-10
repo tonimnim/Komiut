@@ -71,7 +71,9 @@ final driverStatsProvider = FutureProvider<DriverStats>((ref) async {
 /// Use this instead of [driverProfileProvider] when you only need the name
 /// to avoid unnecessary rebuilds.
 final driverNameProvider = Provider<AsyncValue<String>>((ref) {
-  return ref.watch(driverProfileProvider).whenData((profile) => profile.fullName);
+  return ref
+      .watch(driverProfileProvider)
+      .whenData((profile) => profile.fullName);
 });
 
 /// Provider for the driver's vehicle ID.
@@ -79,13 +81,16 @@ final driverNameProvider = Provider<AsyncValue<String>>((ref) {
 /// Returns null if no vehicle is assigned.
 /// Other features use this to fetch vehicle-specific data.
 final driverVehicleIdProvider = Provider<AsyncValue<String?>>((ref) {
-  return ref.watch(driverProfileProvider).whenData((profile) => profile.vehicleId);
+  return ref
+      .watch(driverProfileProvider)
+      .whenData((profile) => profile.vehicleId);
 });
 
 /// Provider for whether the driver has a vehicle assigned.
 final driverHasVehicleProvider = Provider<bool>((ref) {
   final profileAsync = ref.watch(driverProfileProvider);
-  return profileAsync.whenOrNull(data: (profile) => profile.hasVehicle) ?? false;
+  return profileAsync.whenOrNull(data: (profile) => profile.hasVehicle) ??
+      false;
 });
 
 /// Provider for whether the driver can accept trips.
@@ -93,12 +98,15 @@ final driverHasVehicleProvider = Provider<bool>((ref) {
 /// Returns true only if the driver is verified, has a vehicle, and belongs to a sacco.
 final driverCanAcceptTripsProvider = Provider<bool>((ref) {
   final profileAsync = ref.watch(driverProfileProvider);
-  return profileAsync.whenOrNull(data: (profile) => profile.canAcceptTrips) ?? false;
+  return profileAsync.whenOrNull(data: (profile) => profile.canAcceptTrips) ??
+      false;
 });
 
 /// Provider for the driver's rating.
 final driverRatingProvider = Provider<AsyncValue<String>>((ref) {
-  return ref.watch(driverProfileProvider).whenData((profile) => profile.displayRating);
+  return ref
+      .watch(driverProfileProvider)
+      .whenData((profile) => profile.displayRating);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

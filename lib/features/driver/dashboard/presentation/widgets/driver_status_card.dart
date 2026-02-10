@@ -29,6 +29,20 @@ class DriverStatusCard extends ConsumerWidget {
       data: (profile) => _DriverStatusCardContent(
         isOnline: profile.isOnline,
         vehicleId: profile.vehicleId,
+        onStatusToggle: (value) async {
+          try {
+            await ref.read(updateOnlineStatusProvider(value).future);
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Failed to update status: $e'),
+                  backgroundColor: AppColors.error,
+                ),
+              );
+            }
+          }
+        },
       ),
     );
   }
@@ -39,11 +53,13 @@ class _DriverStatusCardContent extends StatelessWidget {
     required this.isOnline,
     this.vehicleId,
     this.isLoading = false,
+    this.onStatusToggle,
   });
 
   final bool isOnline;
   final String? vehicleId;
   final bool isLoading;
+  final ValueChanged<bool>? onStatusToggle;
 
   @override
   Widget build(BuildContext context) {
@@ -195,9 +211,7 @@ class _DriverStatusCardContent extends StatelessWidget {
 
   Widget _buildStatusToggle() {
     return GestureDetector(
-      onTap: () {
-        // TODO: Toggle online status
-      },
+      onTap: () => onStatusToggle?.call(!isOnline),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
+import '../../../payments/presentation/providers/payments_providers.dart';
 
 /// Idle state - Shows wallet, stats, and go online button.
 class IdleStateContent extends ConsumerWidget {
@@ -118,7 +119,8 @@ class _DriverWalletCard extends StatelessWidget {
               GestureDetector(
                 onTap: onToggleOnline,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
@@ -127,7 +129,9 @@ class _DriverWalletCard extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        isOnline ? Icons.wifi : Icons.power_settings_new_rounded,
+                        isOnline
+                            ? Icons.wifi
+                            : Icons.power_settings_new_rounded,
                         size: 16,
                         color: Colors.white.withValues(alpha: 0.9),
                       ),
@@ -166,109 +170,135 @@ class _DriverWalletCard extends StatelessWidget {
 // LIVE TRANSACTIONS LIST
 // ═══════════════════════════════════════════════════════════════════════════════
 
-class _LiveTransactionsList extends StatelessWidget {
+class _LiveTransactionsList extends ConsumerWidget {
   const _LiveTransactionsList({required this.isDark});
 
   final bool isDark;
 
-  // Mock M-Pesa transactions (name, receipt, vehicle, amount, time)
-  static const _transactions = [
-    ('John Kamau', 'SHK7Y2X9LP', 'KDB 123A', 'KES 120', '2 min ago'),
-    ('Mary Wanjiku', 'RKL3M8N4QT', 'KDB 123A', 'KES 80', '5 min ago'),
-    ('Peter Ochieng', 'QWE5R7T1YU', 'KDB 123A', 'KES 150', '8 min ago'),
-    ('Grace Muthoni', 'PLK8W3V6NM', 'KDB 123A', 'KES 100', '12 min ago'),
-    ('James Kipruto', 'TYH2J9F4XC', 'KDB 123A', 'KES 80', '15 min ago'),
-    ('Faith Akinyi', 'BNM6K1R8QZ', 'KDB 123A', 'KES 120', '18 min ago'),
-    ('David Mwangi', 'VCX4L7P2SD', 'KDB 123A', 'KES 150', '22 min ago'),
-    ('Susan Njeri', 'ZAQ9W5E3RT', 'KDB 123A', 'KES 80', '25 min ago'),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final paymentsAsync = ref.watch(recentPaymentsProvider);
     final theme = Theme.of(context);
 
-    return Column(
-      children: _transactions.map((tx) {
-        return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: isDark
-                ? null
-                : [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.receipt_long_rounded,
-                  color: AppColors.primaryGreen,
-                  size: 20,
+    return paymentsAsync.when(
+      data: (payments) {
+        if (payments.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                'No recent transactions',
+                style: TextStyle(
+                  color: isDark ? Colors.grey[600] : Colors.grey[500],
                 ),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      tx.$1,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${tx.$2} • ${tx.$3}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.grey[500] : AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
+            ),
+          );
+        }
+
+        return Column(
+          children: payments.map((tx) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: isDark
+                    ? null
+                    : [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Row(
                 children: [
-                  Text(
-                    tx.$4,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.receipt_long_rounded,
                       color: AppColors.primaryGreen,
+                      size: 20,
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    tx.$5,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: isDark ? Colors.grey[500] : AppColors.textSecondary,
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          tx.payerName ?? 'Unknown Payer',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${tx.referenceId ?? 'No Ref'} • ${tx.vehicleRegistration ?? ''}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? Colors.grey[500]
+                                : AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        tx.displayAmount,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primaryGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        tx.timeAgo,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark
+                              ? Colors.grey[500]
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          }).toList(),
         );
-      }).toList(),
+      },
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stack) => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: Text(
+            'Failed to load transactions',
+            style: TextStyle(color: AppColors.error),
+          ),
+        ),
+      ),
     );
   }
 }

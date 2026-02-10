@@ -751,13 +751,13 @@ class _RealtimeQueueScreenState extends ConsumerState<RealtimeQueueScreen> {
                             Container(
                               width: 6,
                               height: 6,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: AppColors.success,
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Text(
+                            const Text(
                               'Live',
                               style: TextStyle(
                                 fontSize: 12,

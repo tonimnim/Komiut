@@ -223,7 +223,7 @@ class _RefreshButton extends StatelessWidget {
             color: isDark ? Colors.grey[800] : Colors.grey[100],
           ),
           child: isRefreshing
-              ? SizedBox(
+              ? const SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(

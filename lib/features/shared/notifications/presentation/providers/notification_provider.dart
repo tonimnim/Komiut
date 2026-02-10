@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/notification_entity.dart';
+import '../../domain/repositories/notification_repository.dart';
+import '../../data/notification_providers.dart';
 
 enum NotificationFilter { all, unread }
 
@@ -9,7 +11,8 @@ final notificationFilterProvider = StateProvider<NotificationFilter>((ref) {
 
 final notificationsProvider = StateNotifierProvider<NotificationNotifier,
     AsyncValue<List<NotificationEntity>>>((ref) {
-  return NotificationNotifier();
+  final repository = ref.watch(notificationRepositoryProvider);
+  return NotificationNotifier(repository);
 });
 
 final unreadCountProvider = Provider<int>((ref) {
@@ -23,110 +26,61 @@ final unreadCountProvider = Provider<int>((ref) {
 
 class NotificationNotifier
     extends StateNotifier<AsyncValue<List<NotificationEntity>>> {
-  NotificationNotifier() : super(const AsyncValue.loading()) {
+  final NotificationRepository _repository;
+
+  NotificationNotifier(this._repository) : super(const AsyncValue.loading()) {
     _loadNotifications();
   }
 
   Future<void> _loadNotifications() async {
     state = const AsyncValue.loading();
+    final result = await _repository.getNotifications();
 
-    // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    final mockNotifications = _generateMockNotifications();
-    state = AsyncValue.data(mockNotifications);
+    state = result.fold(
+      (failure) => AsyncValue.error(failure, StackTrace.current),
+      (notifications) => AsyncValue.data(notifications),
+    );
   }
 
-  List<NotificationEntity> _generateMockNotifications() {
-    final now = DateTime.now();
-    return [
-      NotificationEntity(
-        id: '1',
-        title: 'Trip Completed',
-        message:
-            'Your trip from Nairobi CBD to Westlands has been completed. Fare: KES 120',
-        type: NotificationType.trip,
-        createdAt: now.subtract(const Duration(minutes: 30)),
-        isRead: false,
-      ),
-      NotificationEntity(
-        id: '2',
-        title: 'Payment Successful',
-        message: 'Your wallet has been topped up with KES 500 via M-Pesa.',
-        type: NotificationType.payment,
-        createdAt: now.subtract(const Duration(hours: 2)),
-        isRead: false,
-      ),
-      NotificationEntity(
-        id: '3',
-        title: 'Weekend Offer!',
-        message: 'Get 20% off on all trips this weekend. Use code WEEKEND20.',
-        type: NotificationType.promo,
-        createdAt: now.subtract(const Duration(hours: 5)),
-        isRead: false,
-      ),
-      NotificationEntity(
-        id: '4',
-        title: 'Trip Completed',
-        message:
-            'Your trip from Westlands to Karen has been completed. Fare: KES 350',
-        type: NotificationType.trip,
-        createdAt: now.subtract(const Duration(days: 1)),
-        isRead: true,
-      ),
-      NotificationEntity(
-        id: '5',
-        title: 'Points Earned',
-        message: 'You earned 50 points from your last trip. Keep riding!',
-        type: NotificationType.system,
-        createdAt: now.subtract(const Duration(days: 1, hours: 2)),
-        isRead: true,
-      ),
-      NotificationEntity(
-        id: '6',
-        title: 'Payment Successful',
-        message: 'Your wallet has been topped up with KES 1,000 via Card.',
-        type: NotificationType.payment,
-        createdAt: now.subtract(const Duration(days: 2)),
-        isRead: true,
-      ),
-      NotificationEntity(
-        id: '7',
-        title: 'New Route Available',
-        message: 'We now have a direct route from CBD to JKIA. Try it today!',
-        type: NotificationType.system,
-        createdAt: now.subtract(const Duration(days: 3)),
-        isRead: true,
-      ),
-      NotificationEntity(
-        id: '8',
-        title: 'Trip Failed',
-        message: 'Your trip payment failed. Please check your wallet balance.',
-        type: NotificationType.trip,
-        createdAt: now.subtract(const Duration(days: 3)),
-        isRead: true,
-      ),
-    ];
-  }
-
-  void markAsRead(String id) {
-    state.whenData((notifications) {
-      final updated = notifications.map((n) {
+  Future<void> markAsRead(String id) async {
+    // Optimistic update
+    final currentState = state.value;
+    if (currentState != null) {
+      final updated = currentState.map((n) {
         if (n.id == id) {
           return n.copyWith(isRead: true);
         }
         return n;
       }).toList();
       state = AsyncValue.data(updated);
-    });
+    }
+
+    final result = await _repository.markAsRead(id);
+    result.fold(
+      (failure) {
+        // Revert on failure if needed, or just reload
+        _loadNotifications();
+      },
+      (_) => null,
+    );
   }
 
-  void markAllAsRead() {
-    state.whenData((notifications) {
+  Future<void> markAllAsRead() async {
+    // Optimistic update
+    final currentState = state.value;
+    if (currentState != null) {
       final updated =
-          notifications.map((n) => n.copyWith(isRead: true)).toList();
+          currentState.map((n) => n.copyWith(isRead: true)).toList();
       state = AsyncValue.data(updated);
-    });
+    }
+
+    final result = await _repository.markAllAsRead();
+    result.fold(
+      (failure) {
+        _loadNotifications();
+      },
+      (_) => null,
+    );
   }
 
   Future<void> refresh() async {

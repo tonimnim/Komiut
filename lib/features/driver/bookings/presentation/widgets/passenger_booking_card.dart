@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../../core/domain/entities/booking.dart';
+import '../../domain/entities/booking.dart';
 import '../../../../../core/domain/enums/enums.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/theme/app_text_styles.dart';
@@ -27,10 +27,16 @@ class PassengerBookingCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: theme.dividerTheme.color ?? Colors.grey[700]!,
-          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           children: [
@@ -48,8 +54,9 @@ class PassengerBookingCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          booking.passengerName ?? 'Passenger',
-                          style: AppTextStyles.body1.copyWith(
+                          booking.passengerName,
+                          style: TextStyle(
+                            fontSize: 15,
                             fontWeight: FontWeight.w600,
                             color: theme.colorScheme.onSurface,
                           ),
@@ -84,8 +91,10 @@ class PassengerBookingCard extends StatelessWidget {
                   if (booking.passengerPhone != null)
                     Text(
                       booking.passengerPhone!,
-                      style: AppTextStyles.body3.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color:
+                            isDark ? Colors.grey[500] : AppColors.textSecondary,
                       ),
                     ),
 
@@ -94,7 +103,7 @@ class PassengerBookingCard extends StatelessWidget {
                   // Pickup → Dropoff
                   Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.circle,
                         size: 8,
                         color: AppColors.primaryGreen,
@@ -102,9 +111,12 @@ class PassengerBookingCard extends StatelessWidget {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          '${booking.pickupStopName ?? 'Pickup'} → ${booking.dropoffStopName ?? 'Dropoff'}',
-                          style: AppTextStyles.caption.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
+                          '${booking.pickupStopName} → ${booking.dropoffStopName}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? Colors.grey[500]
+                                : AppColors.textSecondary,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -126,7 +138,7 @@ class PassengerBookingCard extends StatelessWidget {
   }
 
   Widget _buildAvatar(bool isDark) {
-    final initials = _getInitials(booking.passengerName ?? 'P');
+    final initials = _getInitials(booking.passengerName);
     return Container(
       width: 44,
       height: 44,

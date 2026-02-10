@@ -22,7 +22,7 @@ class HomeLocalDataSourceImpl implements HomeLocalDataSource {
       await Future.delayed(const Duration(milliseconds: 300));
       final wallet = await _database.getWalletByUserId(userId);
       if (wallet == null) {
-        throw CacheException('Wallet not found');
+        throw const CacheException('Wallet not found');
       }
       return WalletModel.fromDatabase(wallet);
     } catch (e) {

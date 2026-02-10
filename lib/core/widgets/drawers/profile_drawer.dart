@@ -84,7 +84,9 @@ class ProfileDrawer extends ConsumerWidget {
 
                   const SizedBox(height: 8),
                   Divider(
-                    color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06),
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.06),
                   ),
                   const SizedBox(height: 8),
 
@@ -189,7 +191,9 @@ class ProfileDrawer extends ConsumerWidget {
                           email,
                           style: TextStyle(
                             fontSize: 13,
-                            color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : AppColors.textSecondary,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -206,7 +210,7 @@ class ProfileDrawer extends ConsumerWidget {
                     if (vehicleNumber != null)
                       Text(
                         vehicleNumber,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryBlue,
@@ -367,9 +371,9 @@ class _LogoutButton extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: const Row(
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 14),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.logout_rounded, color: AppColors.error, size: 20),
