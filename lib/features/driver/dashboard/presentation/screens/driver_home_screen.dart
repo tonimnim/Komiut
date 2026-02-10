@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../../core/constants/route_constants.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../../../core/widgets/navigation/driver_main_navigation.dart';
+import '../../../../../core/widgets/navigation/driver_navigation_keys.dart';
 import '../../../../auth/presentation/providers/auth_providers.dart';
 import '../../../../shared/notifications/presentation/providers/notification_provider.dart';
 import '../../../earnings/presentation/providers/earnings_providers.dart';
@@ -56,7 +57,7 @@ class DriverHomeContent extends ConsumerWidget {
             children: [
               // ── Header ──────────────────────────────────────────────
               _DriverHeader(),
-              SizedBox(height: 32),
+              SizedBox(height: 24),
 
               // ── State-Driven Content ────────────────────────────────
               DriverActivityContent(),
@@ -102,7 +103,7 @@ class _DriverHeader extends ConsumerWidget {
   }
 }
 
-/// Profile avatar that navigates to profile on tap.
+/// Profile avatar that opens drawer on tap.
 class _ProfileAvatar extends ConsumerWidget {
   const _ProfileAvatar();
 
@@ -117,7 +118,7 @@ class _ProfileAvatar extends ConsumerWidget {
         profileImage != null && File(profileImage).existsSync();
 
     return GestureDetector(
-      onTap: () => context.push(RouteConstants.sharedProfile),
+      onTap: () => driverScaffoldKey.currentState?.openDrawer(),
       child: Container(
         width: 48,
         height: 48,
@@ -154,7 +155,7 @@ class _GreetingAndStatus extends ConsumerWidget {
     // Only rebuild when user name changes
     final userName = ref.watch(
       authStateProvider.select(
-        (state) => state.user?.fullName.split(' ').first ?? 'Driver',
+        (state) => state.user?.fullName.split(' ').first ?? 'Captain',
       ),
     );
 

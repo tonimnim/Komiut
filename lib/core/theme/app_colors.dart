@@ -80,6 +80,8 @@ class AppColors {
 
   static const Color pillBlueBg = Color(0xFFEFF6FF); // Light blue for pills
   static const Color pillGreenBg = Color(0xFFECFDF5); // Light green for status
+  static const Color pillRedBg = Color(0xFFFEF2F2); // Light red for errors
+  static const Color pillGrayBg = Color(0xFFF3F4F6); // Light gray for neutral
 
   static const Color cardBgLight = Color(0xFFF9FAFB);
   static const Color cardBgSecondary = Color(0xFFF3F4F6);

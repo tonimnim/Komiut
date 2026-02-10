@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../core/theme/app_colors.dart';
 import '../../../trips/domain/entities/driver_trip.dart';
+import '../../../trips/presentation/widgets/driver_trip_map.dart';
 import 'shared_action_buttons.dart';
 
 /// On trip state - trip progress with route visualization.
@@ -22,6 +23,10 @@ class OnTripContent extends StatelessWidget {
 
     return Column(
       children: [
+        // Live map showing driver position
+        DriverTripMap(trip: trip, height: 220),
+        const SizedBox(height: 20),
+
         // Trip in progress card
         Container(
           width: double.infinity,
@@ -125,16 +130,13 @@ class _TripRouteProgress extends StatelessWidget {
     return Row(
       children: [
         // Start point
-        _RoutePoint(label: 'Start', isCompleted: true),
+        const _RoutePoint(label: 'Start', isCompleted: true),
         Expanded(
           child: Container(
             height: 3,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.white,
-                  Colors.white.withValues(alpha: 0.3),
-                ],
+                colors: [Colors.white, Colors.white.withValues(alpha: 0.3)],
               ),
             ),
           ),
@@ -166,17 +168,14 @@ class _TripRouteProgress extends StatelessWidget {
           ),
         ),
         // End point
-        _RoutePoint(label: 'End', isCompleted: false),
+        const _RoutePoint(label: 'End', isCompleted: false),
       ],
     );
   }
 }
 
 class _RoutePoint extends StatelessWidget {
-  const _RoutePoint({
-    required this.label,
-    required this.isCompleted,
-  });
+  const _RoutePoint({required this.label, required this.isCompleted});
 
   final String label;
   final bool isCompleted;
@@ -189,7 +188,9 @@ class _RoutePoint extends StatelessWidget {
           width: 12,
           height: 12,
           decoration: BoxDecoration(
-            color: isCompleted ? Colors.white : Colors.white.withValues(alpha: 0.3),
+            color: isCompleted
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.3),
             shape: BoxShape.circle,
           ),
         ),
@@ -261,7 +262,8 @@ class _NextStopSection extends StatelessWidget {
                       '2 pickups expected',
                       style: TextStyle(
                         fontSize: 13,
-                        color: isDark ? Colors.grey[400] : AppColors.textSecondary,
+                        color:
+                            isDark ? Colors.grey[400] : AppColors.textSecondary,
                       ),
                     ),
                   ],

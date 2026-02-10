@@ -290,7 +290,7 @@ class ShimmerCard extends StatelessWidget {
     }
 
     // Full layout for larger cards
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -300,17 +300,17 @@ class ShimmerCard extends StatelessWidget {
             FractionallySizedBox(
               widthFactor: 0.8,
               alignment: Alignment.centerLeft,
-              child: const ShimmerBox(height: 18),
+              child: ShimmerBox(height: 18),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             FractionallySizedBox(
               widthFactor: 0.6,
               alignment: Alignment.centerLeft,
-              child: const ShimmerBox(height: 14),
+              child: ShimmerBox(height: 14),
             ),
           ],
         ),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Flexible(child: ShimmerBox(height: 14)),

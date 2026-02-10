@@ -16,6 +16,8 @@ class CreateBookingRequest {
     required this.dropoffStopId,
     this.seatNumber,
     this.passengerCount = 1,
+    this.passengerId,
+    this.amount,
   });
 
   /// ID of the trip to book.
@@ -36,14 +38,21 @@ class CreateBookingRequest {
   /// Number of passengers (default 1).
   final int passengerCount;
 
+  /// ID of the passenger making the booking.
+  final String? passengerId;
+
+  /// Fare amount for the booking.
+  final double? amount;
+
   /// Converts the request to JSON for API submission.
+  /// Uses API's CreateBookingCommand field names.
   Map<String, dynamic> toJson() => {
+        if (passengerId != null) 'passengerId': passengerId,
         'tripId': tripId,
-        'vehicleId': vehicleId,
-        'pickupStopId': pickupStopId,
-        'dropoffStopId': dropoffStopId,
-        if (seatNumber != null) 'seatNumber': seatNumber,
-        'passengerCount': passengerCount,
+        'seatNumber': seatNumber ?? 0,
+        'pickupPointId': pickupStopId,
+        'dropoffPointId': dropoffStopId,
+        'amount': amount ?? 0.0,
       };
 
   /// Creates a copy with modified fields.
@@ -62,6 +71,8 @@ class CreateBookingRequest {
       dropoffStopId: dropoffStopId ?? this.dropoffStopId,
       seatNumber: seatNumber ?? this.seatNumber,
       passengerCount: passengerCount ?? this.passengerCount,
+      passengerId: passengerId,
+      amount: amount,
     );
   }
 

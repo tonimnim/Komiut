@@ -391,12 +391,12 @@ class _ErrorBanner extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline, color: AppColors.error, size: 20),
+          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 13,
                 color: AppColors.error,
               ),
@@ -404,7 +404,7 @@ class _ErrorBanner extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onDismiss,
-            child: Icon(Icons.close, color: AppColors.error, size: 18),
+            child: const Icon(Icons.close, color: AppColors.error, size: 18),
           ),
         ],
       ),
@@ -648,7 +648,7 @@ class _PaymentStep extends StatelessWidget {
               color: AppColors.primaryBlue.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.payment,
               size: 64,
               color: AppColors.primaryBlue,
@@ -783,7 +783,7 @@ class _ConfirmationStep extends StatelessWidget {
               color: AppColors.primaryGreen.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.check_circle,
               size: 80,
               color: AppColors.primaryGreen,
@@ -850,7 +850,7 @@ class _ConfirmationStep extends StatelessWidget {
             onPressed: () {
               // View ticket/booking details
             },
-            child: Text(
+            child: const Text(
               'View Ticket',
               style: TextStyle(
                 fontSize: 14,

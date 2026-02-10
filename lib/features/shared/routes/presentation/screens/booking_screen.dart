@@ -76,7 +76,7 @@ class BookingScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.directions_bus,
                     color: AppColors.primaryBlue,
                     size: 24,
@@ -552,7 +552,7 @@ class _BookingBottomBar extends ConsumerWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Earn $pointsEarned points with this trip',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: AppColors.primaryGreen,

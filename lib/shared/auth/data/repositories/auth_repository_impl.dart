@@ -30,17 +30,19 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String phoneNumber,
     required String password,
-    required String userName,
+    required String firstName,
+    required String lastName,
   }) async {
     if (!await networkInfo.isConnected) {
       throw Exception('No internet connection');
     }
     final data = await remoteDataSource.registration({
-      'email': email,
-      'phoneNumber': phoneNumber,
+      'email': {'value': email},
+      'phoneNumber': {'value': phoneNumber},
       'password': password,
-      'confirmPassword': password,
-      'userName': userName,
+      'confirmedPassword': password,
+      'firstName': firstName,
+      'lastName': lastName,
     });
     await _saveLoginData(data);
   }

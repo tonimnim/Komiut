@@ -24,6 +24,9 @@ class ApiEndpoints {
   /// Password reset endpoint.
   static const String resetPassword = '/api/MobileAppAuth/reset-password';
 
+  /// Complete reset password endpoint.
+  static const String completeResetPassword = '/api/MobileAppAuth/complete-reset-password';
+
   /// Token refresh endpoint.
   static const String refreshToken = '/api/MobileAppAuth/refresh-token';
 
@@ -172,6 +175,9 @@ class ApiEndpoints {
   // Wallets
   // ─────────────────────────────────────────────────────────────────────────
 
+  /// Wallets base endpoint.
+  static const String wallets = '/api/Wallets';
+
   /// Get current user's wallet.
   static const String walletMy = '/api/Wallets/my';
 
@@ -266,17 +272,31 @@ class ApiEndpoints {
       '/api/Queues/vehicle/$vehicleId';
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Loyalty
+  // Notifications
   // ─────────────────────────────────────────────────────────────────────────
 
-  /// Get current user's loyalty points.
-  static const String loyaltyMy = '/api/Loyalty/my';
+  /// Notifications base endpoint.
+  static const String notifications = '/api/Notifications';
 
-  /// Get loyalty points history.
-  static const String loyaltyHistory = '/api/Loyalty/history';
+  /// Get notification by ID.
+  static String notificationById(String id) => '/api/Notifications/$id';
 
-  /// Redeem loyalty points.
-  static const String loyaltyRedeem = '/api/Loyalty/redeem';
+  // ─────────────────────────────────────────────────────────────────────────
+  // Loyalty Points
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Get loyalty points (single GET endpoint per Swagger).
+  static const String loyaltyPoints = '/api/LoyaltyPoints';
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Passengers
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Passengers base endpoint.
+  static const String passengers = '/api/Passengers';
+
+  /// Get passenger by ID.
+  static String passengerById(String id) => '/api/Passengers/$id';
 
   // ─────────────────────────────────────────────────────────────────────────
   // Tickets

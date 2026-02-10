@@ -49,9 +49,6 @@ final selectedTripFilterProvider = StateProvider<TripFilter>(
   (ref) => TripFilter.all,
 );
 
-/// Provider for current page number in trip history.
-final tripsPageProvider = StateProvider<int>((ref) => 1);
-
 /// Provider for tracking trip operation loading state.
 final tripOperationLoadingProvider = StateProvider<bool>((ref) => false);
 
@@ -81,32 +78,81 @@ final activeTripProvider = FutureProvider<DriverTrip?>((ref) async {
   );
 });
 
-/// Provider for the driver's trip history.
-///
-/// Fetches trips based on the selected filter and pagination.
-/// Depends on [driverProfileProvider] to get the vehicleId.
-final tripsHistoryProvider = FutureProvider<List<DriverTrip>>((ref) async {
-  final profile = await ref.watch(driverProfileProvider.future);
-
-  if (!profile.hasVehicle) {
-    return [];
+/// Notifier that accumulates trip history pages.
+class TripsHistoryNotifier
+    extends StateNotifier<AsyncValue<List<DriverTrip>>> {
+  TripsHistoryNotifier(this._ref) : super(const AsyncValue.loading()) {
+    _load();
   }
 
-  final filter = ref.watch(selectedTripFilterProvider);
-  final page = ref.watch(tripsPageProvider);
+  final Ref _ref;
+  int _currentPage = 1;
+  bool _hasMore = true;
 
-  final repository = ref.watch(tripsRepositoryProvider);
-  final result = await repository.getTrips(
-    vehicleId: profile.vehicleId!,
-    status: filter.toStatus,
-    pageNumber: page,
-    pageSize: 20,
-  );
+  bool get hasMore => _hasMore;
 
-  return result.fold(
-    (failure) => throw Exception(failure.message),
-    (trips) => trips,
-  );
+  Future<void> _load() async {
+    state = const AsyncValue.loading();
+    _currentPage = 1;
+    _hasMore = true;
+    await _fetchPage(1, replace: true);
+  }
+
+  Future<void> loadMore() async {
+    if (!_hasMore) return;
+    await _fetchPage(_currentPage + 1, replace: false);
+  }
+
+  Future<void> refresh() async {
+    await _load();
+  }
+
+  Future<void> _fetchPage(int page, {required bool replace}) async {
+    try {
+      final profile = await _ref.read(driverProfileProvider.future);
+      if (!profile.hasVehicle) {
+        if (replace) state = const AsyncValue.data([]);
+        return;
+      }
+
+      final filter = _ref.read(selectedTripFilterProvider);
+      final repository = _ref.read(tripsRepositoryProvider);
+      final result = await repository.getTrips(
+        vehicleId: profile.vehicleId!,
+        status: filter.toStatus,
+        pageNumber: page,
+        pageSize: 20,
+      );
+
+      result.fold(
+        (failure) {
+          if (replace) {
+            state = AsyncValue.error(
+                Exception(failure.message), StackTrace.current);
+          }
+        },
+        (newItems) {
+          _currentPage = page;
+          _hasMore = newItems.length >= 20;
+          final existing =
+              replace ? <DriverTrip>[] : (state.value ?? []);
+          state = AsyncValue.data([...existing, ...newItems]);
+        },
+      );
+    } catch (e, st) {
+      if (replace) {
+        state = AsyncValue.error(e, st);
+      }
+    }
+  }
+}
+
+/// Provider for the driver's trip history with pagination accumulation.
+final tripsHistoryProvider = StateNotifierProvider<TripsHistoryNotifier,
+    AsyncValue<List<DriverTrip>>>((ref) {
+  // Re-create when filter changes
+  ref.watch(selectedTripFilterProvider);
+  return TripsHistoryNotifier(ref);
 });
 
 /// Provider for a specific trip by ID.
@@ -163,8 +209,7 @@ final activeTripStatusProvider = Provider<DriverTripStatus?>((ref) {
 
 /// Provider for whether there are more pages to load.
 final hasMoreTripsProvider = Provider<bool>((ref) {
-  final tripsAsync = ref.watch(tripsHistoryProvider);
-  return tripsAsync.whenOrNull(data: (trips) => trips.length >= 20) ?? false;
+  return ref.watch(tripsHistoryProvider.notifier).hasMore;
 });
 
 /// Provider for total trips count in current list.
@@ -240,7 +285,7 @@ final startTripProvider =
   final profile = await ref.watch(driverProfileProvider.future);
 
   if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+    throw Exception('No vehicle assigned to captain');
   }
 
   // Set loading state
@@ -379,15 +424,11 @@ final updateTripStatusProvider =
 /// Call this on pull-to-refresh or when returning to the trips screen.
 void refreshTrips(WidgetRef ref) {
   ref.invalidate(activeTripProvider);
-  ref.invalidate(tripsHistoryProvider);
   ref.invalidate(todayCompletedTripsProvider);
-  ref.read(tripsPageProvider.notifier).state = 1;
+  ref.read(tripsHistoryProvider.notifier).refresh();
 }
 
 /// Helper to load the next page of trip history.
 void loadMoreTrips(WidgetRef ref) {
-  final hasMore = ref.read(hasMoreTripsProvider);
-  if (hasMore) {
-    ref.read(tripsPageProvider.notifier).state++;
-  }
+  ref.read(tripsHistoryProvider.notifier).loadMore();
 }

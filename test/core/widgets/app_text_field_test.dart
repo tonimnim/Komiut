@@ -296,7 +296,6 @@ void main() {
 
     testWidgets('runs validator', (tester) async {
       final formKey = GlobalKey<FormState>();
-      String? validatorResult;
 
       await tester.pumpWidget(
         MaterialApp(

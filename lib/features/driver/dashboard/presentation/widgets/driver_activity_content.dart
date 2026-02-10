@@ -1,8 +1,7 @@
 /// State-based activity content for driver home.
 ///
 /// Shows different content based on driver's current state:
-/// - Idle: "Ready to start?" prompt with GO ONLINE button
-/// - In Queue: Big queue position hero with visual queue
+/// - Idle: Wallet card with transactions
 /// - On Trip: Trip progress with route visualization
 library;
 
@@ -12,8 +11,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
 import '../providers/driver_state_provider.dart';
 import 'idle_state_content.dart';
-import 'in_queue_content.dart';
-import 'on_trip_content.dart';
 
 /// State-based content that changes based on driver's current activity.
 class DriverActivityContent extends ConsumerWidget {
@@ -26,8 +23,10 @@ class DriverActivityContent extends ConsumerWidget {
     return switch (stateData.state) {
       DriverState.loading => const _LoadingState(),
       DriverState.idle => IdleStateContent(isOnline: stateData.isOnline),
-      DriverState.inQueue => InQueueContent(queue: stateData.queuePosition!),
-      DriverState.onTrip => OnTripContent(trip: stateData.activeTrip!),
+      DriverState.inQueue => IdleStateContent(isOnline: stateData.isOnline),
+      // User request: "REMOVE THE ONTRIP SHOWING IN HOME SCREEN" and show transactions instead.
+      // So we reuse IdleStateContent (which shows transactions) even when on trip.
+      DriverState.onTrip => IdleStateContent(isOnline: stateData.isOnline),
     };
   }
 }

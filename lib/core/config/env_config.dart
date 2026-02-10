@@ -22,7 +22,7 @@ class EnvConfig {
 
   /// Current active environment.
   /// Change this to switch between environments.
-  static const Environment current = Environment.dev;
+  static const Environment current = Environment.staging;
 
   /// Base URLs for each environment.
   static const Map<Environment, String> _baseUrls = {
@@ -31,8 +31,22 @@ class EnvConfig {
     Environment.prod: 'https://v2.komiut.com',
   };
 
+  /// Tenant IDs for each environment.
+  /// Used for multi-tenant API authentication.
+  static const Map<Environment, String> _tenantIds = {
+    Environment.dev: '@157943731372240',
+    Environment.staging: '@157943731372240',
+    Environment.prod: '',
+  };
+
   /// Get the base URL for the current environment.
   static String get baseUrl => _baseUrls[current]!;
+
+  /// Get the tenant ID for the current environment.
+  static String get tenantId => _tenantIds[current]!;
+
+  /// Get the tenant ID for a specific environment.
+  static String getTenantId(Environment env) => _tenantIds[env]!;
 
   /// Get the base URL for a specific environment.
   static String getBaseUrl(Environment env) => _baseUrls[env]!;

@@ -55,7 +55,7 @@ class TicketScreen extends ConsumerWidget {
         child: Column(
           children: [
             // Success message
-            Icon(
+            const Icon(
               Icons.check_circle,
               size: 64,
               color: AppColors.success,
@@ -92,9 +92,9 @@ class TicketScreen extends ConsumerWidget {
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: AppColors.primaryBlue,
-                      borderRadius: const BorderRadius.vertical(
+                      borderRadius: BorderRadius.vertical(
                         top: Radius.circular(16),
                       ),
                     ),
@@ -240,7 +240,7 @@ class TicketScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.info_outline,
                     size: 20,
                     color: AppColors.primaryBlue,

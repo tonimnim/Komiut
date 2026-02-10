@@ -65,20 +65,20 @@ class QueueLoading extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const ShimmerBox(width: 180, height: 20),
+              ShimmerBox(width: 180, height: 20),
               ShimmerBox(width: 40, height: 40, borderRadius: 20),
             ],
           ),
-          const SizedBox(height: 12),
-          const ShimmerBox(width: 140, height: 14),
-          const SizedBox(height: 8),
-          const ShimmerBox(width: 100, height: 14),
+          SizedBox(height: 12),
+          ShimmerBox(width: 140, height: 14),
+          SizedBox(height: 8),
+          ShimmerBox(width: 100, height: 14),
         ],
       ),
     );
@@ -112,7 +112,7 @@ class _QueuedVehicleCardShimmer extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: const Row(
         children: [
           // Position badge shimmer
           ShimmerBox(
@@ -120,16 +120,16 @@ class _QueuedVehicleCardShimmer extends StatelessWidget {
             height: 48,
             borderRadius: 24,
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
 
           // Vehicle info shimmer
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const ShimmerBox(width: 100, height: 16),
-                const SizedBox(height: 8),
-                const ShimmerBox(width: 80, height: 14),
+                ShimmerBox(width: 100, height: 16),
+                SizedBox(height: 8),
+                ShimmerBox(width: 80, height: 14),
               ],
             ),
           ),
@@ -139,8 +139,8 @@ class _QueuedVehicleCardShimmer extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ShimmerBox(width: 80, height: 24, borderRadius: 12),
-              const SizedBox(height: 8),
-              const ShimmerBox(width: 60, height: 12),
+              SizedBox(height: 8),
+              ShimmerBox(width: 60, height: 12),
             ],
           ),
         ],

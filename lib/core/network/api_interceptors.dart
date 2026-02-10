@@ -88,6 +88,7 @@ class AuthInterceptor extends QueuedInterceptor {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          '_domain': AppConfig.domainId,
         },
       ),
     );
@@ -98,6 +99,9 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    // Add domain header for white-label backend identification
+    options.headers['_domain'] = AppConfig.domainId;
+
     // Get access token from secure storage
     final token = await _storage.read(key: AppConfig.accessTokenKey);
 

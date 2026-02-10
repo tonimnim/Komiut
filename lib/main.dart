@@ -11,7 +11,6 @@ import 'package:komiut/core/theme/app_theme.dart';
 import 'package:komiut/di/injection_container.dart';
 import 'package:komiut/core/theme/theme_bloc.dart';
 import 'package:komiut/core/theme/theme_provider.dart';
-import 'package:komiut/core/constants/app_constants.dart';
 import 'package:komiut/features/shared/queue/presentation/providers/notification_providers.dart';
 
 void main() async {
@@ -51,10 +50,8 @@ class KomiutApp extends ConsumerWidget {
     final isDark = themeMode == ThemeMode.dark;
     final router = ref.watch(appRouterProvider);
 
-    // Initialize notification service with router for navigation
+    // Set router for notification navigation (idempotent assignment)
     setNotificationRouter(router);
-    // Initialize the notification service
-    ref.read(notificationServiceProvider).initialize();
 
     // Set status bar style based on theme
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

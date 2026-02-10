@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../../core/theme/app_colors.dart';
-import '../../../../../core/widgets/loading/shimmer_loading.dart';
 import '../../../home/domain/entities/trip_entity.dart';
 import '../../../home/presentation/providers/home_providers.dart';
 
@@ -25,18 +24,18 @@ class TripsHistoryScreen extends ConsumerWidget {
           if (trips.isEmpty) {
             return _buildEmptyState(context);
           }
-          // Use ListView.builder with addAutomaticKeepAlives: false for better memory
           return ListView.builder(
             physics: const BouncingScrollPhysics(
               parent: AlwaysScrollableScrollPhysics(),
             ),
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
+            padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
             itemCount: trips.length,
             addAutomaticKeepAlives: false,
             addRepaintBoundaries: true,
             itemBuilder: (context, index) => _TripCard(
               key: ValueKey(trips[index].id),
               trip: trips[index],
+              showDivider: index < trips.length - 1,
             ),
           );
         },
@@ -56,24 +55,15 @@ class TripsHistoryScreen extends ConsumerWidget {
         children: [
           Icon(
             Icons.directions_bus_outlined,
-            size: 64,
-            color: isDark
-                ? Colors.grey[600]
-                : AppColors.textSecondary.withValues(alpha: 0.5),
+            size: 48,
+            color: isDark ? Colors.grey[600] : Colors.grey[400],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'No trips yet',
             style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Your trip history will appear here',
-            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
               color: isDark ? Colors.grey[400] : AppColors.textSecondary,
             ),
           ),
@@ -83,20 +73,13 @@ class TripsHistoryScreen extends ConsumerWidget {
   }
 }
 
-/// Extracted loading state widget for better performance.
 class _TripsLoadingState extends StatelessWidget {
   const _TripsLoadingState();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-      itemCount: 5,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) => const Padding(
-        padding: EdgeInsets.only(bottom: 12),
-        child: ShimmerTripCard(margin: EdgeInsets.zero),
-      ),
+    return const Center(
+      child: CircularProgressIndicator(color: AppColors.primaryBlue),
     );
   }
 }
@@ -131,14 +114,16 @@ class _TripsErrorState extends StatelessWidget {
   }
 }
 
-/// Extracted trip card widget for better rebuild isolation.
+/// Flat trip tile - no card, just content with divider.
 class _TripCard extends StatelessWidget {
   const _TripCard({
     super.key,
     required this.trip,
+    required this.showDivider,
   });
 
   final TripEntity trip;
+  final bool showDivider;
 
   @override
   Widget build(BuildContext context) {
@@ -147,24 +132,13 @@ class _TripCard extends StatelessWidget {
     final dateFormat = DateFormat('MMM d, yyyy');
     final timeFormat = DateFormat('h:mm a');
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Row(
             children: [
-              Icon(
-                trip.isCompleted ? Icons.check_circle : Icons.cancel,
-                color: trip.isCompleted ? AppColors.success : AppColors.error,
-                size: 22,
-              ),
-              const SizedBox(width: 12),
+              // Route info
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,144 +146,65 @@ class _TripCard extends StatelessWidget {
                     Text(
                       trip.routeName,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 3),
                     Text(
-                      trip.isCompleted ? 'Completed' : 'Failed',
+                      '${trip.fromLocation} → ${trip.toLocation}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark
+                            ? Colors.grey[400]
+                            : AppColors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${dateFormat.format(trip.tripDate)} at ${timeFormat.format(trip.tripDate)}',
                       style: TextStyle(
                         fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: trip.isCompleted
-                            ? AppColors.success
-                            : AppColors.error,
+                        color: isDark ? Colors.grey[500] : AppColors.textHint,
                       ),
                     ),
                   ],
                 ),
               ),
-              Text(
-                trip.formattedFare,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Location details with RepaintBoundary for complex content
-          RepaintBoundary(
-            child: _TripLocationDetails(
-              fromLocation: trip.fromLocation,
-              toLocation: trip.toLocation,
-              isDark: isDark,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.access_time,
-                size: 14,
-                color: isDark ? Colors.grey[500] : AppColors.textHint,
-              ),
-              const SizedBox(width: 6),
-              Text(
-                '${dateFormat.format(trip.tripDate)} at ${timeFormat.format(trip.tripDate)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: isDark ? Colors.grey[500] : AppColors.textHint,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Extracted location details widget with RepaintBoundary for complex layout.
-class _TripLocationDetails extends StatelessWidget {
-  const _TripLocationDetails({
-    required this.fromLocation,
-    required this.toLocation,
-    required this.isDark,
-  });
-
-  final String fromLocation;
-  final String toLocation;
-  final bool isDark;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: isDark ? Colors.grey[850] : Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.trip_origin,
-                size: 16,
-                color: AppColors.primaryGreen,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  fromLocation,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface,
+              // Fare and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    trip.formattedFare,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
                   ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 7),
-            child: Row(
-              children: [
-                Container(
-                  width: 2,
-                  height: 16,
-                  color: isDark ? Colors.grey[700] : Colors.grey[300],
-                ),
-              ],
-            ),
-          ),
-          Row(
-            children: [
-              const Icon(
-                Icons.location_on,
-                size: 16,
-                color: AppColors.error,
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  toLocation,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: theme.colorScheme.onSurface,
+                  const SizedBox(height: 4),
+                  Text(
+                    trip.isCompleted ? 'Completed' : 'Failed',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color:
+                          trip.isCompleted ? AppColors.success : AppColors.error,
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        if (showDivider)
+          Divider(
+            height: 1,
+            color: isDark ? Colors.grey[800] : AppColors.divider,
+          ),
+      ],
     );
   }
 }

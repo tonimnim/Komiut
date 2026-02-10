@@ -83,7 +83,7 @@ final earningsSummaryProvider = FutureProvider<EarningsSummary>((ref) async {
   final profile = await ref.watch(driverProfileProvider.future);
 
   if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+    throw Exception('No vehicle assigned to captain');
   }
 
   final repository = ref.watch(earningsRepositoryProvider);
@@ -95,66 +95,105 @@ final earningsSummaryProvider = FutureProvider<EarningsSummary>((ref) async {
   );
 });
 
-/// Provider for earnings transaction history.
-///
-/// Fetches transaction history based on the selected period.
-/// Supports pagination via [earningsHistoryPageProvider].
-///
-/// Returns list of [EarningsTransaction] entities or throws on error.
-final earningsHistoryProvider =
-    FutureProvider<List<EarningsTransaction>>((ref) async {
-  final profile = await ref.watch(driverProfileProvider.future);
-
-  if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to driver');
+/// Notifier that accumulates earnings history pages.
+class EarningsHistoryNotifier
+    extends StateNotifier<AsyncValue<List<EarningsTransaction>>> {
+  EarningsHistoryNotifier(this._ref)
+      : super(const AsyncValue.loading()) {
+    _load();
   }
 
-  final period = ref.watch(selectedEarningsPeriodProvider);
-  final customStart = ref.watch(customStartDateProvider);
-  final customEnd = ref.watch(customEndDateProvider);
-  final page = ref.watch(earningsHistoryPageProvider);
+  final Ref _ref;
+  int _currentPage = 1;
+  bool _hasMore = true;
 
-  // Determine date range
-  final DateTime fromDate;
-  final DateTime toDate;
+  bool get hasMore => _hasMore;
 
-  if (period == EarningsPeriod.custom && customStart != null) {
-    fromDate = customStart;
-    toDate = customEnd ?? DateTime.now();
-  } else {
-    fromDate = period.startDate;
-    toDate = period.endDate;
+  Future<void> _load() async {
+    state = const AsyncValue.loading();
+    _currentPage = 1;
+    _hasMore = true;
+    await _fetchPage(1, replace: true);
   }
 
-  final repository = ref.watch(earningsRepositoryProvider);
-  final result = await repository.getEarningsHistory(
-    vehicleId: profile.vehicleId!,
-    fromDate: fromDate,
-    toDate: toDate,
-    pageNumber: page,
-    pageSize: 20,
-  );
+  Future<void> loadMore() async {
+    if (!_hasMore) return;
+    await _fetchPage(_currentPage + 1, replace: false);
+  }
 
-  return result.fold(
-    (failure) => throw Exception(failure.message),
-    (transactions) => transactions,
-  );
+  Future<void> refresh() async {
+    await _load();
+  }
+
+  Future<void> _fetchPage(int page, {required bool replace}) async {
+    try {
+      final profile = await _ref.read(driverProfileProvider.future);
+      if (!profile.hasVehicle) {
+        state = AsyncValue.error(
+            Exception('No vehicle assigned to captain'), StackTrace.current);
+        return;
+      }
+
+      final period = _ref.read(selectedEarningsPeriodProvider);
+      final customStart = _ref.read(customStartDateProvider);
+      final customEnd = _ref.read(customEndDateProvider);
+
+      final DateTime fromDate;
+      final DateTime toDate;
+      if (period == EarningsPeriod.custom && customStart != null) {
+        fromDate = customStart;
+        toDate = customEnd ?? DateTime.now();
+      } else {
+        fromDate = period.startDate;
+        toDate = period.endDate;
+      }
+
+      final repository = _ref.read(earningsRepositoryProvider);
+      final result = await repository.getEarningsHistory(
+        vehicleId: profile.vehicleId!,
+        fromDate: fromDate,
+        toDate: toDate,
+        pageNumber: page,
+        pageSize: 20,
+      );
+
+      result.fold(
+        (failure) {
+          if (replace) {
+            state = AsyncValue.error(
+                Exception(failure.message), StackTrace.current);
+          }
+        },
+        (newItems) {
+          _currentPage = page;
+          _hasMore = newItems.length >= 20;
+          final existing = replace ? <EarningsTransaction>[] : (state.value ?? []);
+          state = AsyncValue.data([...existing, ...newItems]);
+        },
+      );
+    } catch (e, st) {
+      if (replace) {
+        state = AsyncValue.error(e, st);
+      }
+    }
+  }
+}
+
+/// Provider for earnings transaction history with pagination accumulation.
+final earningsHistoryProvider = StateNotifierProvider<EarningsHistoryNotifier,
+    AsyncValue<List<EarningsTransaction>>>((ref) {
+  // Re-create when period changes
+  ref.watch(selectedEarningsPeriodProvider);
+  return EarningsHistoryNotifier(ref);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Pagination Providers
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Provider for current page number in earnings history.
-final earningsHistoryPageProvider = StateProvider<int>((ref) => 1);
-
 /// Provider for whether there are more pages to load.
 final hasMoreEarningsProvider = Provider<bool>((ref) {
-  final historyAsync = ref.watch(earningsHistoryProvider);
-  return historyAsync.whenOrNull(
-        data: (transactions) => transactions.length >= 20,
-      ) ??
-      false;
+  return ref.watch(earningsHistoryProvider.notifier).hasMore;
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -228,14 +267,10 @@ final transactionCountProvider = Provider<int>((ref) {
 /// Call this on pull-to-refresh or when returning to the earnings screen.
 void refreshEarnings(WidgetRef ref) {
   ref.invalidate(earningsSummaryProvider);
-  ref.invalidate(earningsHistoryProvider);
-  ref.read(earningsHistoryPageProvider.notifier).state = 1;
+  ref.read(earningsHistoryProvider.notifier).refresh();
 }
 
 /// Helper to load the next page of earnings history.
 void loadMoreEarnings(WidgetRef ref) {
-  final hasMore = ref.read(hasMoreEarningsProvider);
-  if (hasMore) {
-    ref.read(earningsHistoryPageProvider.notifier).state++;
-  }
+  ref.read(earningsHistoryProvider.notifier).loadMore();
 }

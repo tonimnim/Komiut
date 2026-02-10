@@ -238,7 +238,7 @@ class _ReviewSection extends StatelessWidget {
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
-                  child: Text(
+                  child: const Text(
                     'Edit',
                     style: TextStyle(
                       fontSize: 13,
@@ -452,7 +452,7 @@ class _VehicleDetails extends StatelessWidget {
               ),
               child: Text(
                 '#$position in queue',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                   color: AppColors.primaryBlue,
@@ -491,7 +491,7 @@ class _VehicleDetails extends StatelessWidget {
               const SizedBox(width: 16),
             ],
             if (departureTime != null) ...[
-              Icon(
+              const Icon(
                 Icons.schedule,
                 size: 14,
                 color: AppColors.info,
@@ -499,7 +499,7 @@ class _VehicleDetails extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 departureTime!,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: AppColors.info,
@@ -554,7 +554,7 @@ class _SeatsDetails extends StatelessWidget {
               ),
               child: Text(
                 'Seat $number',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: AppColors.primaryBlue,
@@ -586,7 +586,7 @@ class _PassengerDetails extends StatelessWidget {
             color: AppColors.primaryGreen.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.person,
             size: 20,
             color: AppColors.primaryGreen,
@@ -700,7 +700,7 @@ class _FareBreakdown extends StatelessWidget {
               ),
               Text(
                 '$currency ${totalFare.toStringAsFixed(0)}',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primaryBlue,
@@ -746,7 +746,7 @@ class _NotSelectedState extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(
+        const Icon(
           Icons.info_outline,
           size: 18,
           color: AppColors.warning,

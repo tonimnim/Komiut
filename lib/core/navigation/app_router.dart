@@ -36,17 +36,16 @@ import '../../features/shared/settings/presentation/screens/saved_saccos_screen.
 import '../../features/shared/settings/presentation/screens/payment_methods_screen.dart';
 import '../../features/shared/notifications/presentation/screens/notification_screen.dart';
 import '../../features/shared/scan/presentation/screens/scan_screen.dart';
-import '../../features/driver/driver.dart';
 import '../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
 import '../../features/driver/earnings/presentation/screens/earnings_screen.dart';
 import '../../features/driver/profile/presentation/screens/driver_profile_screen.dart';
-import '../../features/driver/queue/presentation/screens/queue_screen.dart' as driver_queue;
+import '../../features/driver/queue/presentation/screens/queue_screen.dart'
+    as driver_queue;
 import '../../features/driver/trips/presentation/screens/driver_trips_screen.dart';
 import '../../features/driver/notifications/presentation/screens/driver_notification_screen.dart';
 import '../../features/shared/shared.dart';
 import '../../features/passenger/discovery/presentation/screens/saccos_screen.dart';
 import '../../features/passenger/discovery/presentation/screens/sacco_detail_screen.dart';
-import '../../features/shared/queue/presentation/screens/queue_screen.dart';
 import '../../features/passenger/trips/presentation/screens/active_trip_screen.dart';
 import '../../features/shared/loyalty/presentation/screens/loyalty_screen.dart';
 import '../../features/passenger/tickets/tickets.dart';
@@ -137,8 +136,7 @@ GoRouter createAppRouter(Ref ref) {
         path: RouteConstants.twoFactor,
         name: 'twoFactor',
         builder: (context, state) {
-          final showHint = state.uri.queryParameters['showHint'] == 'true';
-          return TwoFactorScreen(showDemoHint: showHint);
+          return const TwoFactorScreen();
         },
       ),
 

@@ -36,7 +36,8 @@ class SavedRoutesScreen extends ConsumerWidget {
       ),
       body: routesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => _buildErrorState(context, ref, error.toString()),
+        error: (error, _) => _buildErrorState(
+            context, ref, error.toString().replaceAll('Exception: ', '')),
         data: (routes) => routes.isEmpty
             ? _buildEmptyState(context, isDark)
             : _buildRoutesList(context, ref, routes),
@@ -98,7 +99,7 @@ class SavedRoutesScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
+            const Icon(
               Icons.error_outline,
               size: 64,
               color: AppColors.error,
@@ -212,7 +213,7 @@ class SavedRoutesScreen extends ConsumerWidget {
                     const SizedBox(height: 4),
                     Text(
                       route.summary,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),

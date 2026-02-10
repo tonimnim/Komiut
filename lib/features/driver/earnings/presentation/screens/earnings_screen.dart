@@ -14,6 +14,8 @@ import '../../../../../core/widgets/cards/app_card.dart';
 import '../../../../../core/widgets/cards/stat_card.dart';
 import '../../../../../core/widgets/feedback/app_error.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
+import '../../domain/entities/earnings_summary.dart';
+import '../../domain/entities/earnings_transaction.dart';
 import '../providers/earnings_providers.dart';
 
 /// Earnings screen widget (standalone).
@@ -22,9 +24,7 @@ class EarningsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: EarningsContent(),
-    );
+    return const Scaffold(body: EarningsContent());
   }
 }
 
@@ -91,7 +91,7 @@ class _EarningsContentState extends ConsumerState<EarningsContent>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
             ),
             child: TabBar(
@@ -101,7 +101,8 @@ class _EarningsContentState extends ConsumerState<EarningsContent>
                 borderRadius: BorderRadius.circular(10),
               ),
               labelColor: Colors.white,
-              unselectedLabelColor: isDark ? Colors.grey[400] : AppColors.textSecondary,
+              unselectedLabelColor:
+                  isDark ? Colors.grey[400] : AppColors.textSecondary,
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               tabs: const [
@@ -114,10 +115,7 @@ class _EarningsContentState extends ConsumerState<EarningsContent>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
-                _OverviewTab(),
-                _HistoryTab(),
-              ],
+              children: [_OverviewTab(), _HistoryTab()],
             ),
           ),
         ],
@@ -160,7 +158,7 @@ class _OverviewTab extends ConsumerWidget {
             height: MediaQuery.of(context).size.height * 0.6,
             child: AppErrorWidget(
               title: 'Failed to load earnings',
-              message: error.toString(),
+              message: error.toString().replaceAll('Exception: ', ''),
               type: ErrorType.server,
               onRetry: () => ref.invalidate(earningsSummaryProvider),
             ),
@@ -211,8 +209,8 @@ class _OverviewLoading extends StatelessWidget {
           Row(
             children: List.generate(
               4,
-              (i) => Padding(
-                padding: const EdgeInsets.only(right: 8),
+              (i) => const Padding(
+                padding: EdgeInsets.only(right: 8),
                 child: ShimmerBox(width: 80, height: 32, borderRadius: 16),
               ),
             ),
@@ -222,19 +220,27 @@ class _OverviewLoading extends StatelessWidget {
           const ShimmerCard(height: 180, margin: EdgeInsets.zero),
           const SizedBox(height: 24),
           // Stats shimmer
-          Row(
+          const Row(
             children: [
-              Expanded(child: ShimmerCard(height: 100, margin: EdgeInsets.zero)),
-              const SizedBox(width: 12),
-              Expanded(child: ShimmerCard(height: 100, margin: EdgeInsets.zero)),
+              Expanded(
+                child: ShimmerCard(height: 100, margin: EdgeInsets.zero),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: ShimmerCard(height: 100, margin: EdgeInsets.zero),
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          Row(
+          const Row(
             children: [
-              Expanded(child: ShimmerCard(height: 100, margin: EdgeInsets.zero)),
-              const SizedBox(width: 12),
-              Expanded(child: ShimmerCard(height: 100, margin: EdgeInsets.zero)),
+              Expanded(
+                child: ShimmerCard(height: 100, margin: EdgeInsets.zero),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: ShimmerCard(height: 100, margin: EdgeInsets.zero),
+              ),
             ],
           ),
         ],
@@ -279,7 +285,7 @@ class _PeriodSelector extends ConsumerWidget {
 class _TotalEarningsCard extends ConsumerWidget {
   const _TotalEarningsCard({required this.summary});
 
-  final dynamic summary; // EarningsSummary
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -306,7 +312,7 @@ class _TotalEarningsCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.3),
+            color: AppColors.primaryBlue.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -317,7 +323,7 @@ class _TotalEarningsCard extends ConsumerWidget {
           Text(
             selectedPeriod.label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -335,7 +341,7 @@ class _TotalEarningsCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -357,7 +363,7 @@ class _TotalEarningsCard extends ConsumerWidget {
 class _PeriodStatsSection extends StatelessWidget {
   const _PeriodStatsSection({required this.summary});
 
-  final dynamic summary;
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -414,7 +420,7 @@ class _PeriodStatsSection extends StatelessWidget {
 class _QuickStatsCard extends StatelessWidget {
   const _QuickStatsCard({required this.summary});
 
-  final dynamic summary;
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -489,7 +495,7 @@ class _HistoryTab extends ConsumerWidget {
         error: (error, _) => Center(
           child: AppErrorWidget(
             title: 'Failed to load history',
-            message: error.toString(),
+            message: error.toString().replaceAll('Exception: ', ''),
             type: ErrorType.server,
             onRetry: () => ref.invalidate(earningsHistoryProvider),
           ),
@@ -500,14 +506,15 @@ class _HistoryTab extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.receipt_long, size: 64, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.receipt_long,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'No transactions yet',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -561,7 +568,7 @@ class _HistoryLoading extends StatelessWidget {
 class _TransactionItem extends StatelessWidget {
   const _TransactionItem({required this.transaction});
 
-  final dynamic transaction; // EarningsTransaction
+  final EarningsTransaction transaction;
 
   @override
   Widget build(BuildContext context) {
@@ -576,7 +583,7 @@ class _TransactionItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -591,7 +598,7 @@ class _TransactionItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.description ?? _getTypeLabel(transaction.type),
+                  transaction.description ?? transaction.typeName,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
@@ -606,25 +613,12 @@ class _TransactionItem extends StatelessWidget {
             ),
           ),
           Text(
-            '${isPositive ? '+' : ''}${transaction.currency ?? 'KES'} ${transaction.amount.toStringAsFixed(2)}',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: color,
-            ),
+            '${isPositive ? '+' : ''}${transaction.currency} ${transaction.amount.toStringAsFixed(2)}',
+            style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
         ],
       ),
     );
-  }
-
-  String _getTypeLabel(dynamic type) {
-    return switch (type.toString()) {
-      'EarningsType.trip' => 'Trip Earnings',
-      'EarningsType.bonus' => 'Bonus',
-      'EarningsType.deduction' => 'Deduction',
-      'EarningsType.payout' => 'Payout',
-      _ => 'Transaction',
-    };
   }
 
   String _formatDateTime(DateTime dt) {
@@ -658,9 +652,9 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       title,
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
     );
   }
 }

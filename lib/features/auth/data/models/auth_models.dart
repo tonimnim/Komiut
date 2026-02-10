@@ -45,18 +45,22 @@ class LoginResponseModel {
   });
 
   /// Creates from JSON.
+  /// Backend wraps responses in {"message": {...}}, so unwrap if needed.
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['message'] is Map<String, dynamic>
+        ? json['message'] as Map<String, dynamic>
+        : json;
     return LoginResponseModel(
-      accessToken: json['accessToken'] as String? ?? json['token'] as String,
-      refreshToken: json['refreshToken'] as String?,
-      expiresIn: json['expiresIn'] as int?,
-      userId: json['userId'] as String? ?? json['id'] as String?,
-      email: json['email'] as String?,
-      role: json['role'] != null
-          ? userRoleFromString(json['role'] as String)
+      accessToken: data['accessToken'] as String? ?? data['token'] as String,
+      refreshToken: data['refreshToken'] as String?,
+      expiresIn: data['expiresIn'] as int?,
+      userId: data['userId'] as String? ?? data['id'] as String?,
+      email: data['email'] as String?,
+      role: data['role'] != null
+          ? userRoleFromString(data['role'] as String)
           : null,
-      organizationId: json['organizationId'] as String?,
-      fullName: json['fullName'] as String? ?? json['userName'] as String?,
+      organizationId: data['organizationId'] as String?,
+      fullName: data['fullName'] as String? ?? data['userName'] as String?,
     );
   }
 
@@ -96,8 +100,9 @@ class RegisterRequestModel {
     required this.email,
     required this.phoneNumber,
     required this.password,
-    required this.confirmPassword,
-    required this.userName,
+    required this.confirmedPassword,
+    required this.firstName,
+    required this.lastName,
   });
 
   /// User's email.
@@ -109,19 +114,24 @@ class RegisterRequestModel {
   /// User's password.
   final String password;
 
-  /// Password confirmation (required by API).
-  final String confirmPassword;
+  /// Password confirmation (required by API as "confirmedPassword").
+  final String confirmedPassword;
 
-  /// User's full name.
-  final String userName;
+  /// User's first name.
+  final String firstName;
+
+  /// User's last name.
+  final String lastName;
 
   /// Converts to JSON matching MobileRegisrationCommand schema.
+  /// The backend expects email and phoneNumber as objects with a "value" field.
   Map<String, dynamic> toJson() => {
-        'email': email,
-        'phoneNumber': phoneNumber,
+        'email': {'value': email},
+        'phoneNumber': {'value': phoneNumber},
         'password': password,
-        'confirmPassword': confirmPassword,
-        'userName': userName,
+        'confirmedPassword': confirmedPassword,
+        'firstName': firstName,
+        'lastName': lastName,
       };
 }
 
@@ -135,11 +145,15 @@ class RegisterResponseModel {
   });
 
   /// Creates from JSON.
+  /// Backend wraps responses in {"message": {...}}, so unwrap if needed.
   factory RegisterResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['message'] is Map<String, dynamic>
+        ? json['message'] as Map<String, dynamic>
+        : json;
     return RegisterResponseModel(
-      success: json['success'] as bool? ?? true,
-      message: json['message'] as String?,
-      userId: json['userId'] as String? ?? json['id'] as String?,
+      success: data['success'] as bool? ?? true,
+      message: data['message'] as String?,
+      userId: data['userId'] as String? ?? data['id'] as String?,
     );
   }
 
@@ -182,10 +196,14 @@ class ResetPasswordResponseModel {
   });
 
   /// Creates from JSON.
+  /// Backend wraps responses in {"message": {...}}, so unwrap if needed.
   factory ResetPasswordResponseModel.fromJson(Map<String, dynamic> json) {
+    final data = json['message'] is Map<String, dynamic>
+        ? json['message'] as Map<String, dynamic>
+        : json;
     return ResetPasswordResponseModel(
-      success: json['success'] as bool? ?? true,
-      message: json['message'] as String?,
+      success: data['success'] as bool? ?? true,
+      message: data['message'] as String?,
     );
   }
 

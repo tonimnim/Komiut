@@ -41,16 +41,15 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
   Future<Either<Failure, DriverProfile>> getDriverProfile(
       String personnelId) async {
     return apiClient.get<DriverProfile>(
-      ApiEndpoints.personnel,
-      queryParameters: {'Id': personnelId},
+      ApiEndpoints.personnelById(personnelId),
       fromJson: (data) {
+        if (data is Map<String, dynamic>) {
+          return DriverProfileModel.fromJson(data).toEntity();
+        }
         if (data is List && data.isNotEmpty) {
           return DriverProfileModel.fromJson(
             data.first as Map<String, dynamic>,
           ).toEntity();
-        }
-        if (data is Map<String, dynamic>) {
-          return DriverProfileModel.fromJson(data).toEntity();
         }
         throw Exception('Invalid response format');
       },
@@ -82,7 +81,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
       ApiEndpoints.personnel,
       data: {
         'id': personnelId,
-        'role': {'isActive': isOnline},
+        'status': isOnline ? 'ACTIVE' : 'INACTIVE',
       },
     );
   }

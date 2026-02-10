@@ -47,9 +47,9 @@ class EarningsTransactionModel {
       id: json['id']?.toString() ?? '',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       type: _inferType(json),
-      timestamp: json['transactionTime'] != null
-          ? DateTime.parse(json['transactionTime'] as String)
-          : DateTime.now(),
+      timestamp:
+          DateTime.tryParse(json['transactionTime'] as String? ?? '') ??
+              DateTime.now(),
       tripId: json['tripId']?.toString(),
       bookingId: json['bookingId']?.toString(),
       description: json['description'] as String?,

@@ -78,10 +78,7 @@ class _WalletHistoryScreenState extends ConsumerState<WalletHistoryScreen> {
             elevation: 0,
             pinned: true,
             leading: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: theme.colorScheme.onSurface,
-              ),
+              icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
               onPressed: () => Navigator.of(context).pop(),
             ),
             title: Text(
@@ -104,10 +101,8 @@ class _WalletHistoryScreenState extends ConsumerState<WalletHistoryScreen> {
                   currency: wallet?.currency ?? 'KES',
                 ),
                 loading: () => const ShimmerCard(height: 100),
-                error: (_, __) => const BalanceDisplay(
-                  balance: 0,
-                  currency: 'KES',
-                ),
+                error: (_, __) =>
+                    const BalanceDisplay(balance: 0, currency: 'KES'),
               ),
             ),
           ),
@@ -157,7 +152,8 @@ class _WalletHistoryScreenState extends ConsumerState<WalletHistoryScreen> {
                           TransactionDetailSheet.show(context, transaction),
                     );
                   },
-                  childCount: transactions.length +
+                  childCount:
+                      transactions.length +
                       (ref.read(allTransactionsProvider.notifier).hasMore
                           ? 1
                           : 0),
@@ -181,7 +177,7 @@ class _WalletHistoryScreenState extends ConsumerState<WalletHistoryScreen> {
             error: (error, _) => SliverFillRemaining(
               child: AppErrorWidget(
                 title: 'Failed to load transactions',
-                message: error.toString(),
+                message: error.toString().replaceAll('Exception: ', ''),
                 type: ErrorType.server,
                 onRetry: () =>
                     ref.read(allTransactionsProvider.notifier).refresh(),
@@ -190,9 +186,7 @@ class _WalletHistoryScreenState extends ConsumerState<WalletHistoryScreen> {
           ),
 
           // Bottom padding
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 32),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
       ),
     );

@@ -424,8 +424,9 @@ extension ErrorHandlerX on Object {
   /// Convert any error to a Failure.
   Failure toFailure() {
     if (this is Failure) return this as Failure;
-    if (this is DioException)
+    if (this is DioException) {
       return ErrorHandler.fromDioError(this as DioException);
+    }
     return UnknownFailure(toString());
   }
 }

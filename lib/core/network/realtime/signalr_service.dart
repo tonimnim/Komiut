@@ -8,8 +8,10 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:dartz/dartz.dart';
+import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
+import '../../config/app_config.dart';
 import '../../config/env_config.dart';
 import '../../errors/failures.dart';
 import '../network_info.dart';
@@ -90,8 +92,13 @@ class SignalRService implements RealtimeService {
   // ─────────────────────────────────────────────────────────────────────────
 
   void _initializeHub() {
+    // Create headers with the domain ID for multi-tenant identification
+    final messageHeaders = MessageHeaders();
+    messageHeaders.setHeaderValue('_domain', AppConfig.domainId);
+
     final httpOptions = HttpConnectionOptions(
       accessTokenFactory: () async => _accessToken ?? '',
+      headers: messageHeaders,
       skipNegotiation: true,
       transport: HttpTransportType.WebSockets,
     );

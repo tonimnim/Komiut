@@ -78,6 +78,29 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   /// API client for making HTTP requests.
   final ApiClient apiClient;
 
+  /// Unwraps the backend's {"message": {...}} envelope.
+  Map<String, dynamic> _unwrapMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic>) return inner;
+      return data;
+    }
+    return {};
+  }
+
+  /// Extracts items list from paginated envelope.
+  List<dynamic> _extractItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        return inner['items'] as List;
+      }
+      if (data['items'] is List) return data['items'] as List;
+    }
+    return [];
+  }
+
   @override
   Future<Either<Failure, Booking>> createBooking(
     CreateBookingRequest request,
@@ -86,7 +109,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       ApiEndpoints.bookings,
       data: request.toJson(),
       fromJson: (data) =>
-          BookingModel.fromJson(data as Map<String, dynamic>).toEntity(),
+          BookingModel.fromJson(_unwrapMessage(data)).toEntity(),
     );
   }
 
@@ -95,55 +118,23 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     return apiClient.get<Booking>(
       ApiEndpoints.bookingById(bookingId),
       fromJson: (data) =>
-          BookingModel.fromJson(data as Map<String, dynamic>).toEntity(),
+          BookingModel.fromJson(_unwrapMessage(data)).toEntity(),
     );
   }
 
   @override
   Future<Either<Failure, List<Booking>>> getMyBookings() async {
-    final result = await apiClient.get<dynamic>(
-      ApiEndpoints.bookingsMy,
-      fromJson: (data) => data,
-    );
-
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        try {
-          List<Booking> bookings = [];
-
-          if (data is List) {
-            // Direct list response
-            bookings = data
-                .map((item) =>
-                    BookingModel.fromJson(item as Map<String, dynamic>)
-                        .toEntity())
-                .toList();
-          } else if (data is Map<String, dynamic>) {
-            // Paginated or wrapped response
-            if (data.containsKey('items')) {
-              final items = data['items'] as List;
-              bookings = items
-                  .map((item) =>
-                      BookingModel.fromJson(item as Map<String, dynamic>)
-                          .toEntity())
-                  .toList();
-            } else if (data.containsKey('data')) {
-              final items = data['data'] as List;
-              bookings = items
-                  .map((item) =>
-                      BookingModel.fromJson(item as Map<String, dynamic>)
-                          .toEntity())
-                  .toList();
-            }
-          }
-
-          // Sort by creation date, most recent first
-          bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return Right(bookings);
-        } catch (e) {
-          return Left(ServerFailure('Failed to parse bookings: $e'));
-        }
+    return apiClient.get<List<Booking>>(
+      ApiEndpoints.bookings,
+      queryParameters: {'PageNumber': 1, 'PageSize': 50},
+      fromJson: (data) {
+        final items = _extractItems(data);
+        final bookings = items
+            .map((item) =>
+                BookingModel.fromJson(item as Map<String, dynamic>).toEntity())
+            .toList();
+        bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return bookings;
       },
     );
   }
@@ -153,7 +144,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
     return apiClient.put<Booking>(
       ApiEndpoints.bookingCancel(bookingId),
       fromJson: (data) =>
-          BookingModel.fromJson(data as Map<String, dynamic>).toEntity(),
+          BookingModel.fromJson(_unwrapMessage(data)).toEntity(),
     );
   }
 
@@ -167,7 +158,7 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
       ApiEndpoints.bookingConfirm(bookingId),
       data: request.toJson(),
       fromJson: (data) =>
-          BookingModel.fromJson(data as Map<String, dynamic>).toEntity(),
+          BookingModel.fromJson(_unwrapMessage(data)).toEntity(),
     );
   }
 
@@ -175,47 +166,21 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<Either<Failure, List<Booking>>> getBookingsByStatus(
     BookingStatus status,
   ) async {
-    final result = await apiClient.get<dynamic>(
-      ApiEndpoints.bookingsMy,
-      queryParameters: {'status': status.name},
-      fromJson: (data) => data,
-    );
-
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        try {
-          List<Booking> bookings = [];
-
-          if (data is List) {
-            bookings = data
-                .map((item) =>
-                    BookingModel.fromJson(item as Map<String, dynamic>)
-                        .toEntity())
-                .toList();
-          } else if (data is Map<String, dynamic>) {
-            if (data.containsKey('items')) {
-              final items = data['items'] as List;
-              bookings = items
-                  .map((item) =>
-                      BookingModel.fromJson(item as Map<String, dynamic>)
-                          .toEntity())
-                  .toList();
-            } else if (data.containsKey('data')) {
-              final items = data['data'] as List;
-              bookings = items
-                  .map((item) =>
-                      BookingModel.fromJson(item as Map<String, dynamic>)
-                          .toEntity())
-                  .toList();
-            }
-          }
-
-          bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return Right(bookings);
-        } catch (e) {
-          return Left(ServerFailure('Failed to parse bookings: $e'));
-        }
+    return apiClient.get<List<Booking>>(
+      ApiEndpoints.bookings,
+      queryParameters: {
+        'Status': status.index,
+        'PageNumber': 1,
+        'PageSize': 50,
+      },
+      fromJson: (data) {
+        final items = _extractItems(data);
+        final bookings = items
+            .map((item) =>
+                BookingModel.fromJson(item as Map<String, dynamic>).toEntity())
+            .toList();
+        bookings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        return bookings;
       },
     );
   }

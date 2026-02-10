@@ -3,6 +3,8 @@ enum NotificationType {
   payment,
   promo,
   system,
+  queue,
+  assignment,
 }
 
 class NotificationEntity {
@@ -50,6 +52,10 @@ class NotificationEntity {
         return IconType.promo;
       case NotificationType.system:
         return IconType.system;
+      case NotificationType.queue:
+        return IconType.system;
+      case NotificationType.assignment:
+        return IconType.trip;
     }
   }
 }

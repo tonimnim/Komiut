@@ -7,7 +7,6 @@ library;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/database/database_providers.dart';
-import '../../../../../core/database/seed_data.dart';
 import '../../../../../core/domain/entities/route.dart';
 import '../../../../../core/domain/entities/route_fare.dart';
 import '../../../../../core/domain/entities/route_stop.dart';
@@ -19,48 +18,16 @@ import '../../domain/entities/route_entity.dart';
 // Route Providers
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Provider for fetching all routes.
-///
-/// Tries to fetch from API first, falls back to local database if API fails.
-/// The routes are also mapped to [RouteEntity] for UI compatibility.
+/// Provider for fetching all routes from the API.
 final routesProvider = FutureProvider<List<RouteEntity>>((ref) async {
-  final database = ref.watch(appDatabaseProvider);
-  final authState = ref.watch(authStateProvider);
-  final userId = authState.user?.id;
   final remoteDataSource = ref.watch(routesRemoteDataSourceProvider);
-
-  // Get favorites for current user
-  Set<int> favoriteIds = {};
-  if (userId != null) {
-    final favorites = await database.getFavoriteRoutes(userId);
-    favoriteIds = favorites.map((f) => f.id).toSet();
-  }
-
-  // Try fetching from API first
   final remoteResult = await remoteDataSource.getRoutes();
 
   return remoteResult.fold(
-    (failure) async {
-      // API failed, fall back to local database
-      // Seed routes if not exist
-      final seeder = DatabaseSeeder(database);
-      await seeder.seedRoutes();
-
-      final dbRoutes = await database.getAllRoutes();
-      return dbRoutes.map((dbRoute) {
-        return RouteEntity.fromDatabase(
-          dbRoute,
-          isFavorite: favoriteIds.contains(dbRoute.id),
-        );
-      }).toList();
-    },
+    (failure) => throw Exception(failure.message),
     (routes) {
-      // API succeeded, convert TransportRoute to RouteEntity
       return routes.map((route) {
-        return _transportRouteToEntity(
-          route,
-          isFavorite: favoriteIds.contains(int.tryParse(route.id) ?? 0),
-        );
+        return _transportRouteToEntity(route);
       }).toList();
     },
   );

@@ -115,6 +115,10 @@ class NotificationTile extends StatelessWidget {
         return Icons.local_offer;
       case NotificationType.system:
         return Icons.info_outline;
+      case NotificationType.queue:
+        return Icons.format_list_numbered;
+      case NotificationType.assignment:
+        return Icons.directions_bus;
     }
   }
 
@@ -128,6 +132,10 @@ class NotificationTile extends StatelessWidget {
         return Colors.orange;
       case NotificationType.system:
         return Colors.purple;
+      case NotificationType.queue:
+        return AppColors.primaryBlue;
+      case NotificationType.assignment:
+        return AppColors.success;
     }
   }
 }

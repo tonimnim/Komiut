@@ -319,7 +319,7 @@ class _FarePreviewCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
+          const Icon(
             Icons.receipt_long,
             color: AppColors.primaryBlue,
             size: 24,

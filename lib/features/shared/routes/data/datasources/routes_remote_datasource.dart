@@ -64,18 +64,35 @@ class RoutesRemoteDataSourceImpl implements RoutesRemoteDataSource {
   /// API client for making HTTP requests.
   final ApiClient apiClient;
 
+  /// Extracts the items list from the backend's paginated envelope.
+  /// Handles: raw List, {"message": {"items": [...]}}, {"items": [...]}, etc.
+  List<dynamic> _extractItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      // Unwrap {"message": {"items": [...]}} envelope
+      final inner = data['message'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        return inner['items'] as List;
+      }
+      // Direct {"items": [...]}
+      if (data['items'] is List) {
+        return data['items'] as List;
+      }
+    }
+    return [];
+  }
+
   @override
   Future<Either<Failure, List<TransportRoute>>> getRoutes() async {
     return apiClient.get<List<TransportRoute>>(
       ApiEndpoints.routes,
+      queryParameters: {'PageNumber': 1, 'PageSize': 100},
       fromJson: (data) {
-        if (data is List) {
-          return data
-              .map((json) =>
-                  RouteModel.fromJson(json as Map<String, dynamic>).toEntity())
-              .toList();
-        }
-        return <TransportRoute>[];
+        final items = _extractItems(data);
+        return items
+            .map((json) =>
+                RouteModel.fromJson(json as Map<String, dynamic>).toEntity())
+            .toList();
       },
     );
   }
@@ -84,26 +101,36 @@ class RoutesRemoteDataSourceImpl implements RoutesRemoteDataSource {
   Future<Either<Failure, TransportRoute>> getRouteById(String id) async {
     return apiClient.get<TransportRoute>(
       ApiEndpoints.routeById(id),
-      fromJson: (data) =>
-          RouteModel.fromJson(data as Map<String, dynamic>).toEntity(),
+      fromJson: (data) {
+        final json = _unwrapMessage(data);
+        return RouteModel.fromJson(json).toEntity();
+      },
     );
+  }
+
+  /// Unwraps the backend's {"message": {...}} envelope for single objects.
+  Map<String, dynamic> _unwrapMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic>) return inner;
+      return data;
+    }
+    return {};
   }
 
   @override
   Future<Either<Failure, List<RouteStop>>> getRouteStops(String routeId) async {
     return apiClient.get<List<RouteStop>>(
       ApiEndpoints.routeStops,
-      queryParameters: {'routeId': routeId},
+      queryParameters: {'RouteId': routeId, 'PageNumber': 1, 'PageSize': 100},
       fromJson: (data) {
-        if (data is List) {
-          return data
-              .map((json) =>
-                  RouteStopModel.fromJson(json as Map<String, dynamic>)
-                      .toEntity())
-              .toList()
-            ..sort((a, b) => a.sequence.compareTo(b.sequence));
-        }
-        return <RouteStop>[];
+        final items = _extractItems(data);
+        return items
+            .map((json) =>
+                RouteStopModel.fromJson(json as Map<String, dynamic>)
+                    .toEntity())
+            .toList()
+          ..sort((a, b) => a.sequence.compareTo(b.sequence));
       },
     );
   }
@@ -112,16 +139,14 @@ class RoutesRemoteDataSourceImpl implements RoutesRemoteDataSource {
   Future<Either<Failure, List<RouteFare>>> getRouteFares(String routeId) async {
     return apiClient.get<List<RouteFare>>(
       ApiEndpoints.routeFares,
-      queryParameters: {'routeId': routeId},
+      queryParameters: {'RouteId': routeId, 'PageNumber': 1, 'PageSize': 100},
       fromJson: (data) {
-        if (data is List) {
-          return data
-              .map((json) =>
-                  RouteFareModel.fromJson(json as Map<String, dynamic>)
-                      .toEntity())
-              .toList();
-        }
-        return <RouteFare>[];
+        final items = _extractItems(data);
+        return items
+            .map((json) =>
+                RouteFareModel.fromJson(json as Map<String, dynamic>)
+                    .toEntity())
+            .toList();
       },
     );
   }

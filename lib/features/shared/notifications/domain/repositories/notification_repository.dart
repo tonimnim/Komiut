@@ -5,8 +5,8 @@ import '../entities/notification_entity.dart';
 
 abstract class NotificationRepository {
   Future<Either<Failure, List<NotificationEntity>>> getNotifications({
-    int? page,
-    int? limit,
+    int pageNumber = 1,
+    int pageSize = 20,
   });
 
   Future<Either<Failure, NotificationEntity>> getNotification(String id);
@@ -14,8 +14,4 @@ abstract class NotificationRepository {
   Future<Either<Failure, void>> markAsRead(String id);
 
   Future<Either<Failure, void>> markAllAsRead();
-
-  Future<Either<Failure, void>> deleteNotification(String id);
-
-  Future<Either<Failure, int>> getUnreadCount();
 }

@@ -16,14 +16,8 @@ import '../models/loyalty_models.dart';
 class LoyaltyEndpoints {
   const LoyaltyEndpoints._();
 
-  /// Get current user's loyalty points.
-  static const String myPoints = '/api/Loyalty/my';
-
-  /// Get points history.
-  static const String history = '/api/Loyalty/history';
-
-  /// Redeem points.
-  static const String redeem = '/api/Loyalty/redeem';
+  /// Get loyalty points (single GET endpoint per Swagger).
+  static const String myPoints = '/api/LoyaltyPoints';
 }
 
 /// Provider for loyalty remote datasource.
@@ -78,6 +72,18 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
   /// API client for making requests.
   final ApiClient apiClient;
 
+  /// Unwraps the backend's {"message": {...}} envelope for single objects.
+  Map<String, dynamic> _unwrapMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic>) return inner;
+      return data;
+    }
+    return {};
+  }
+
+
+
   @override
   Future<Either<Failure, LoyaltyPoints>> getLoyaltyPoints() async {
     final result = await apiClient.get<dynamic>(
@@ -89,11 +95,12 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
       (failure) => Left(failure),
       (data) {
         try {
-          if (data is Map<String, dynamic>) {
-            final model = LoyaltyPointsApiModel.fromJson(data);
+          final json = _unwrapMessage(data);
+          if (json.isNotEmpty) {
+            final model = LoyaltyPointsApiModel.fromJson(json);
             return Right(model.toEntity());
           }
-          return Left(ServerFailure('Invalid response format'));
+          return const Left(ServerFailure('Invalid response format'));
         } catch (e) {
           return Left(ServerFailure('Failed to parse loyalty points: $e'));
         }
@@ -106,39 +113,8 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
     int limit = 20,
     int offset = 0,
   }) async {
-    final result = await apiClient.get<dynamic>(
-      LoyaltyEndpoints.history,
-      queryParameters: {
-        'limit': limit,
-        'offset': offset,
-      },
-      fromJson: (data) => data,
-    );
-
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        try {
-          List<PointsTransaction> transactions = [];
-
-          if (data is List) {
-            transactions = data
-                .map((item) => PointsTransactionApiModel.fromJson(
-                    item as Map<String, dynamic>))
-                .map((model) => model.toEntity())
-                .toList();
-          } else if (data is Map<String, dynamic>) {
-            final response = PointsHistoryResponse.fromJson(data);
-            transactions =
-                response.transactions.map((model) => model.toEntity()).toList();
-          }
-
-          return Right(transactions);
-        } catch (e) {
-          return Left(ServerFailure('Failed to parse points history: $e'));
-        }
-      },
-    );
+    // Not available in current API - return empty list
+    return const Right([]);
   }
 
   @override
@@ -146,49 +122,8 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
     required int points,
     required String bookingId,
   }) async {
-    // Validate redemption locally first
-    final validationError = LoyaltyRules.validateRedemption(
-      requestedPoints: points,
-      availablePoints:
-          points, // Will be validated on server with actual balance
-    );
-
-    if (validationError != null && points < LoyaltyRules.minimumRedemption) {
-      return Left(ValidationFailure(validationError));
-    }
-
-    final request = RedeemPointsRequest(
-      points: points,
-      bookingId: bookingId,
-    );
-
-    final result = await apiClient.post<dynamic>(
-      LoyaltyEndpoints.redeem,
-      data: request.toJson(),
-      fromJson: (data) => data,
-    );
-
-    return result.fold(
-      (failure) => Left(failure),
-      (data) {
-        try {
-          if (data is Map<String, dynamic>) {
-            final redemptionResult = RedemptionResult.fromJson(data);
-            return Right(redemptionResult);
-          }
-          // If server returns simple success, construct result
-          return Right(RedemptionResult(
-            success: true,
-            pointsRedeemed: points,
-            discountValue: calculateRedemptionValue(points),
-            remainingPoints: 0, // Unknown, will be refreshed
-            message: 'Points redeemed successfully',
-          ));
-        } catch (e) {
-          return Left(ServerFailure('Failed to parse redemption result: $e'));
-        }
-      },
-    );
+    // Not available in current API
+    return Left(ServerFailure('Redemption not yet supported'));
   }
 
   @override
