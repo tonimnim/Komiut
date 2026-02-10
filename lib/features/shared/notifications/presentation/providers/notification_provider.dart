@@ -58,7 +58,6 @@ class NotificationNotifier
     final result = await _repository.markAsRead(id);
     result.fold(
       (failure) {
-        // Revert on failure if needed, or just reload
         _loadNotifications();
       },
       (_) => null,

@@ -5,7 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../core/theme/app_colors.dart';
-
+import '../../domain/entities/booking.dart';
+import '../../../trips/domain/entities/driver_trip.dart';
 import '../../../trips/presentation/providers/trips_providers.dart';
 import '../providers/bookings_providers.dart';
 import '../widgets/passenger_booking_card.dart';
@@ -33,6 +34,12 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<void> _getCurrentLocation() async {
@@ -171,8 +178,8 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
   Widget _buildSheetContent(
     ScrollController scrollController,
-    AsyncValue activeTripAsync,
-    AsyncValue bookingsAsync,
+    AsyncValue<DriverTrip?> activeTripAsync,
+    AsyncValue<List<Booking>> bookingsAsync,
   ) {
     // Error from active trip
     if (activeTripAsync.hasError) {
@@ -259,8 +266,8 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
   Widget _buildTripWithBookings(
     ScrollController controller,
-    dynamic trip,
-    AsyncValue bookingsAsync,
+    DriverTrip trip,
+    AsyncValue<List<Booking>> bookingsAsync,
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -284,7 +291,6 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
 
   Widget _buildHandleBar() {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -301,9 +307,8 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     );
   }
 
-  Widget _buildTripHeader(dynamic trip) {
+  Widget _buildTripHeader(DriverTrip trip) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Column(
@@ -313,7 +318,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
             children: [
               Expanded(
                 child: Text(
-                  trip.routeName ?? 'Active Trip',
+                  trip.routeName,
                   style: theme.textTheme.titleLarge,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -328,7 +333,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  trip.statusName ?? 'Active',
+                  trip.statusName,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w600,
@@ -347,7 +352,7 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
               ),
               const SizedBox(width: 6),
               Text(
-                '${trip.passengerCount ?? 0}/${trip.maxCapacity ?? _defaultCapacity} passengers',
+                '${trip.passengerCount}/${trip.maxCapacity ?? _defaultCapacity} passengers',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -372,9 +377,8 @@ class _BookingsScreenState extends ConsumerState<BookingsScreen> {
     );
   }
 
-  Widget _buildBookingsContent(AsyncValue bookingsAsync) {
+  Widget _buildBookingsContent(AsyncValue<List<Booking>> bookingsAsync) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     if (bookingsAsync.hasError) {
       return Padding(

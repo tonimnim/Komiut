@@ -146,7 +146,6 @@ class _FilterChips extends ConsumerWidget {
             child: GestureDetector(
               onTap: () {
                 ref.read(selectedTripFilterProvider.notifier).state = filter;
-                ref.read(tripsPageProvider.notifier).state = 1;
               },
               child: Container(
                 padding:
@@ -154,7 +153,7 @@ class _FilterChips extends ConsumerWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? AppColors.primaryBlue
-                      : (isDark ? Colors.grey[900] : Colors.grey[100]),
+                      : (isDark ? Colors.white.withValues(alpha: 0.06) : Colors.grey[100]),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -342,7 +341,7 @@ class _EmptyStateView extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.grey[900]
+                    ? Colors.white.withValues(alpha: 0.06)
                     : AppColors.textSecondary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),

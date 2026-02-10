@@ -18,16 +18,16 @@ class NotificationRepositoryImpl implements NotificationRepository {
 
   @override
   Future<Either<Failure, List<NotificationEntity>>> getNotifications({
-    int? page,
-    int? limit,
+    int pageNumber = 1,
+    int pageSize = 20,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(NetworkFailure('No internet connection'));
     }
 
     final result = await _remoteDataSource.getNotifications(
-      page: page,
-      limit: limit,
+      pageNumber: pageNumber,
+      pageSize: pageSize,
     );
 
     return result.fold(
@@ -52,37 +52,13 @@ class NotificationRepositoryImpl implements NotificationRepository {
 
   @override
   Future<Either<Failure, void>> markAsRead(String id) async {
-    if (!await _networkInfo.isConnected) {
-      return const Left(NetworkFailure('No internet connection'));
-    }
-
-    return _remoteDataSource.markAsRead(id);
+    // API doesn't support this yet — handled locally in the notifier
+    return const Right(null);
   }
 
   @override
   Future<Either<Failure, void>> markAllAsRead() async {
-    if (!await _networkInfo.isConnected) {
-      return const Left(NetworkFailure('No internet connection'));
-    }
-
-    return _remoteDataSource.markAllAsRead();
-  }
-
-  @override
-  Future<Either<Failure, void>> deleteNotification(String id) async {
-    if (!await _networkInfo.isConnected) {
-      return const Left(NetworkFailure('No internet connection'));
-    }
-
-    return _remoteDataSource.deleteNotification(id);
-  }
-
-  @override
-  Future<Either<Failure, int>> getUnreadCount() async {
-    if (!await _networkInfo.isConnected) {
-      return const Left(NetworkFailure('No internet connection'));
-    }
-
-    return _remoteDataSource.getUnreadCount();
+    // API doesn't support this yet — handled locally in the notifier
+    return const Right(null);
   }
 }

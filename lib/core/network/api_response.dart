@@ -132,20 +132,26 @@ class PaginatedResponse<T> {
   });
 
   /// Creates from JSON with a mapper function for items.
+  /// Handles both direct response and backend's {"message": {...}} envelope.
   factory PaginatedResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) fromJson,
   ) {
-    final items = (json['items'] as List<dynamic>?)
+    // Unwrap {"message": {...}} envelope if present
+    final data = json['message'] is Map<String, dynamic>
+        ? json['message'] as Map<String, dynamic>
+        : json;
+
+    final items = (data['items'] as List<dynamic>?)
             ?.map((e) => fromJson(e as Map<String, dynamic>))
             .toList() ??
         [];
 
     return PaginatedResponse(
       items: items,
-      totalCount: json['totalCount'] as int? ?? 0,
-      page: json['page'] as int? ?? 1,
-      pageSize: json['pageSize'] as int? ?? 20,
+      totalCount: data['totalCount'] as int? ?? 0,
+      page: data['pageNumber'] as int? ?? data['page'] as int? ?? 1,
+      pageSize: data['pageSize'] as int? ?? 20,
     );
   }
 

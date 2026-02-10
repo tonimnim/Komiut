@@ -18,25 +18,21 @@ class BookingModel extends Booking {
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
+    final status = _parseStatus(json['status']);
     return BookingModel(
-      id: json['bookingId'] as String? ?? json['id'] as String,
-      tripId: json['tripId'] as String,
-      passengerId: json['passengerId'] as String,
-      // API currently does not return names, using placeholders or looking for extended properties
+      id: json['bookingId'] as String? ?? json['id'] as String? ?? '',
+      tripId: json['tripId'] as String? ?? '',
+      passengerId: json['passengerId'] as String? ?? '',
       passengerName: json['passengerName'] as String? ?? 'Passenger',
       passengerPhone: json['passengerPhone'] as String?,
-      status: _parseStatus(json['status'] as String?),
+      status: status,
       seatNumber: json['seatNumber'] as int? ?? 0,
-      pickupStopName:
-          json['pickupPointId'] as String? ?? 'Pickup', // TODO: Fetch stop name
-      dropoffStopName: json['dropoffPointId'] as String? ??
-          'Dropoff', // TODO: Fetch stop name
+      pickupStopName: json['pickupPointId'] as String? ?? 'Pickup',
+      dropoffStopName: json['dropoffPointId'] as String? ?? 'Dropoff',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      isPaid:
-          true, // Assuming paid if it exists in this list, or need status check
-      bookingTime: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
-          : DateTime.now(),
+      isPaid: status == BookingStatus.confirmed || status == BookingStatus.completed,
+      bookingTime: DateTime.tryParse(json['createdAt'] as String? ?? '') ??
+          DateTime.now(),
     );
   }
 
@@ -56,38 +52,41 @@ class BookingModel extends Booking {
     };
   }
 
-  static BookingStatus _parseStatus(String? status) {
+  static BookingStatus _parseStatus(dynamic status) {
     if (status == null) return BookingStatus.pending;
-    try {
-      // Handle numeric status if strictly following enum or string
-      // The API spec showed integers for enums in some places but strings in others?
-      // Spec says BookingStatus enum [0, 1, 2].
-      // But response content example often implies strings in these DTOs unless explicitly integer enum.
-      // Dto says: "status": { "type": "string", "nullable": true } in BookingDto properties!
-      // But Parameters says "schema": { "$ref": "#/components/schemas/BookingStatus" } which is int.
-      // C# often serializes enums as integers by default but can be configured to string.
-      // Given the DTO property type is "string", it's likely "Confirmed", "Pending" etc. or "0", "1".
 
-      // Attempt to parse integer first
-      final intStatus = int.tryParse(status);
-      if (intStatus != null) {
-        switch (intStatus) {
-          case 1:
-            return BookingStatus.confirmed;
-          case 2:
-            return BookingStatus.completed;
-          // 0 or others
-          default:
-            return BookingStatus.pending;
-        }
+    // Handle integer status (backend spec: 0=Pending, 1=Confirmed, 2=Cancelled)
+    if (status is int) {
+      switch (status) {
+        case 0:
+          return BookingStatus.pending;
+        case 1:
+          return BookingStatus.confirmed;
+        case 2:
+          return BookingStatus.cancelled;
+        default:
+          return BookingStatus.pending;
       }
-
-      return BookingStatus.values.firstWhere(
-        (e) => e.name.toLowerCase() == status.toLowerCase(),
-        orElse: () => BookingStatus.pending,
-      );
-    } catch (_) {
-      return BookingStatus.pending;
     }
+
+    final statusStr = status.toString();
+    final intStatus = int.tryParse(statusStr);
+    if (intStatus != null) {
+      switch (intStatus) {
+        case 0:
+          return BookingStatus.pending;
+        case 1:
+          return BookingStatus.confirmed;
+        case 2:
+          return BookingStatus.cancelled;
+        default:
+          return BookingStatus.pending;
+      }
+    }
+
+    return BookingStatus.values.firstWhere(
+      (e) => e.name.toLowerCase() == statusStr.toLowerCase(),
+      orElse: () => BookingStatus.pending,
+    );
   }
 }

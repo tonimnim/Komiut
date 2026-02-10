@@ -18,16 +18,13 @@ final earningsRemoteDataSourceProvider =
 
 /// Abstract interface for earnings data operations.
 abstract class EarningsRemoteDataSource {
-  /// Fetches earnings summary for a vehicle.
   Future<Either<Failure, EarningsSummary>> getEarningsSummary(String vehicleId);
-
-  /// Fetches earnings transaction history.
   Future<Either<Failure, List<EarningsTransaction>>> getEarningsHistory({
     required String vehicleId,
     DateTime? fromDate,
     DateTime? toDate,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   });
 }
 
@@ -37,19 +34,47 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
 
   final ApiClient apiClient;
 
+  List<dynamic> _extractItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        return inner['items'] as List;
+      }
+      if (data['items'] is List) {
+        return data['items'] as List;
+      }
+    }
+    return [];
+  }
+
+  Map<String, dynamic> _unwrapMessage(dynamic data) {
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic>) return inner;
+      return data;
+    }
+    return {};
+  }
+
   @override
   Future<Either<Failure, EarningsSummary>> getEarningsSummary(
       String vehicleId) async {
     return apiClient.get<EarningsSummary>(
       ApiEndpoints.dailyVehicleTotals,
-      queryParameters: {'VehicleId': vehicleId},
+      queryParameters: {
+        'VehicleId': vehicleId,
+        'PageNumber': 1,
+        'PageSize': 100,
+      },
       fromJson: (data) {
-        if (data is List) {
-          return EarningsSummaryModel.fromDailyTotals(data).toEntity();
+        final items = _extractItems(data);
+        if (items.isNotEmpty) {
+          return EarningsSummaryModel.fromDailyTotals(items).toEntity();
         }
-        return EarningsSummaryModel.fromJson(
-          data as Map<String, dynamic>,
-        ).toEntity();
+        // Fallback: try parsing as a single summary object
+        final json = _unwrapMessage(data);
+        return EarningsSummaryModel.fromJson(json).toEntity();
       },
     );
   }
@@ -59,25 +84,23 @@ class EarningsRemoteDataSourceImpl implements EarningsRemoteDataSource {
     required String vehicleId,
     DateTime? fromDate,
     DateTime? toDate,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   }) async {
     return apiClient.get<List<EarningsTransaction>>(
       ApiEndpoints.payments,
       queryParameters: {
         'VehicleId': vehicleId,
-        if (pageNumber != null) 'PageNumber': pageNumber.toString(),
-        if (pageSize != null) 'PageSize': pageSize.toString(),
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
       },
       fromJson: (data) {
-        if (data is List) {
-          return data
-              .map((json) => EarningsTransactionModel.fromJson(
-                    json as Map<String, dynamic>,
-                  ).toEntity())
-              .toList();
-        }
-        return <EarningsTransaction>[];
+        final items = _extractItems(data);
+        return items
+            .map((json) => EarningsTransactionModel.fromJson(
+                  json as Map<String, dynamic>,
+                ).toEntity())
+            .toList();
       },
     );
   }

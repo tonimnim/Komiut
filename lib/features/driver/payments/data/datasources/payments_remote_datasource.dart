@@ -16,8 +16,8 @@ final paymentsRemoteDataSourceProvider =
 abstract class PaymentsRemoteDataSource {
   Future<Either<Failure, List<Payment>>> getPayments({
     String? vehicleId,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   });
 }
 
@@ -26,22 +26,36 @@ class PaymentsRemoteDataSourceImpl implements PaymentsRemoteDataSource {
 
   final ApiClient apiClient;
 
+  List<dynamic> _extractItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        return inner['items'] as List;
+      }
+      if (data['items'] is List) {
+        return data['items'] as List;
+      }
+    }
+    return [];
+  }
+
   @override
   Future<Either<Failure, List<Payment>>> getPayments({
     String? vehicleId,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   }) async {
     return apiClient.get<List<Payment>>(
       ApiEndpoints.payments,
       queryParameters: {
         if (vehicleId != null) 'VehicleId': vehicleId,
-        if (pageNumber != null) 'PageNumber': pageNumber.toString(),
-        if (pageSize != null) 'PageSize': pageSize.toString(),
+        'PageNumber': pageNumber,
+        'PageSize': pageSize,
       },
       fromJson: (data) {
-        if (data is! List) return <Payment>[];
-        return data
+        final items = _extractItems(data);
+        return items
             .map((json) => PaymentModel.fromJson(json as Map<String, dynamic>))
             .toList();
       },

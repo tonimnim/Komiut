@@ -23,52 +23,7 @@ final loyaltyPointsProvider = FutureProvider<LoyaltyPoints?>((ref) async {
   final result = await dataSource.getLoyaltyPoints();
 
   return result.fold(
-    (failure) {
-      // Return mock data for development/demo
-      return LoyaltyPoints(
-        userId: authState.user!.id.toString(),
-        totalPoints: 1250,
-        availablePoints: 1100,
-        pendingPoints: 150,
-        tier: LoyaltyTier.silver,
-        pointsToNextTier: 750,
-        nextTier: LoyaltyTier.gold,
-        lifetimePoints: 1250,
-        recentActivity: [
-          PointsTransaction(
-            id: '1',
-            type: PointsTransactionType.earned,
-            points: 50,
-            description: 'Trip: CBD to Westlands',
-            bookingId: 'booking-001',
-            timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-          ),
-          PointsTransaction(
-            id: '2',
-            type: PointsTransactionType.earned,
-            points: 80,
-            description: 'Trip: Westlands to Karen',
-            bookingId: 'booking-002',
-            timestamp: DateTime.now().subtract(const Duration(days: 1)),
-          ),
-          PointsTransaction(
-            id: '3',
-            type: PointsTransactionType.redeemed,
-            points: 200,
-            description: 'Discount on booking',
-            bookingId: 'booking-003',
-            timestamp: DateTime.now().subtract(const Duration(days: 3)),
-          ),
-          PointsTransaction(
-            id: '4',
-            type: PointsTransactionType.bonus,
-            points: 100,
-            description: 'Welcome bonus',
-            timestamp: DateTime.now().subtract(const Duration(days: 7)),
-          ),
-        ],
-      );
-    },
+    (failure) => null,
     (points) => points,
   );
 });

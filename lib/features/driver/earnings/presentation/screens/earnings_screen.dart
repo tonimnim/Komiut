@@ -14,6 +14,8 @@ import '../../../../../core/widgets/cards/app_card.dart';
 import '../../../../../core/widgets/cards/stat_card.dart';
 import '../../../../../core/widgets/feedback/app_error.dart';
 import '../../../../../core/widgets/loading/shimmer_loading.dart';
+import '../../domain/entities/earnings_summary.dart';
+import '../../domain/entities/earnings_transaction.dart';
 import '../providers/earnings_providers.dart';
 
 /// Earnings screen widget (standalone).
@@ -89,7 +91,7 @@ class _EarningsContentState extends ConsumerState<EarningsContent>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: isDark ? Colors.grey[900] : Colors.grey[100],
+              color: isDark ? Colors.white.withValues(alpha: 0.06) : Colors.grey[100],
               borderRadius: BorderRadius.circular(12),
             ),
             child: TabBar(
@@ -283,7 +285,7 @@ class _PeriodSelector extends ConsumerWidget {
 class _TotalEarningsCard extends ConsumerWidget {
   const _TotalEarningsCard({required this.summary});
 
-  final dynamic summary; // EarningsSummary
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -310,7 +312,7 @@ class _TotalEarningsCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.3),
+            color: AppColors.primaryBlue.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -321,7 +323,7 @@ class _TotalEarningsCard extends ConsumerWidget {
           Text(
             selectedPeriod.label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -339,7 +341,7 @@ class _TotalEarningsCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
+                color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
@@ -361,7 +363,7 @@ class _TotalEarningsCard extends ConsumerWidget {
 class _PeriodStatsSection extends StatelessWidget {
   const _PeriodStatsSection({required this.summary});
 
-  final dynamic summary;
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -418,7 +420,7 @@ class _PeriodStatsSection extends StatelessWidget {
 class _QuickStatsCard extends StatelessWidget {
   const _QuickStatsCard({required this.summary});
 
-  final dynamic summary;
+  final EarningsSummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -566,7 +568,7 @@ class _HistoryLoading extends StatelessWidget {
 class _TransactionItem extends StatelessWidget {
   const _TransactionItem({required this.transaction});
 
-  final dynamic transaction; // EarningsTransaction
+  final EarningsTransaction transaction;
 
   @override
   Widget build(BuildContext context) {
@@ -581,7 +583,7 @@ class _TransactionItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -596,7 +598,7 @@ class _TransactionItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.description ?? _getTypeLabel(transaction.type),
+                  transaction.description ?? transaction.typeName,
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 4),
@@ -611,22 +613,12 @@ class _TransactionItem extends StatelessWidget {
             ),
           ),
           Text(
-            '${isPositive ? '+' : ''}${transaction.currency ?? 'KES'} ${transaction.amount.toStringAsFixed(2)}',
+            '${isPositive ? '+' : ''}${transaction.currency} ${transaction.amount.toStringAsFixed(2)}',
             style: TextStyle(fontWeight: FontWeight.bold, color: color),
           ),
         ],
       ),
     );
-  }
-
-  String _getTypeLabel(dynamic type) {
-    return switch (type.toString()) {
-      'EarningsType.trip' => 'Trip Earnings',
-      'EarningsType.bonus' => 'Bonus',
-      'EarningsType.deduction' => 'Deduction',
-      'EarningsType.payout' => 'Payout',
-      _ => 'Transaction',
-    };
   }
 
   String _formatDateTime(DateTime dt) {

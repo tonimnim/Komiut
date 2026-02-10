@@ -24,23 +24,24 @@ class RouteStopModel {
   });
 
   /// Creates from JSON map.
+  /// Handles both full schema and API's RoutePointDto (id, routeId, name, latitude, longitude, sequence, createdAt).
   factory RouteStopModel.fromJson(Map<String, dynamic> json) {
     return RouteStopModel(
-      id: json['id'] as String,
-      routeId: json['routeId'] as String,
-      name: json['name'] as String,
+      id: json['id'] as String? ?? '',
+      routeId: json['routeId'] as String? ?? '',
+      name: json['name'] as String? ?? 'Unknown Stop',
       latitude: (json['latitude'] as num?)?.toDouble(),
       longitude: (json['longitude'] as num?)?.toDouble(),
-      sequence: json['sequence'] as int,
+      sequence: json['sequence'] as int? ?? 0,
       address: json['address'] as String?,
       isActive: json['isActive'] as bool? ?? true,
       estimatedTimeFromStart: json['estimatedTimeFromStart'] as int?,
       distanceFromStart: (json['distanceFromStart'] as num?)?.toDouble(),
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+          ? DateTime.tryParse(json['updatedAt'] as String)
           : null,
     );
   }

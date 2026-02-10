@@ -25,15 +25,33 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
 
   final ApiClient apiClient;
 
+  List<dynamic> _extractItems(dynamic data) {
+    if (data is List) return data;
+    if (data is Map<String, dynamic>) {
+      final inner = data['message'];
+      if (inner is Map<String, dynamic> && inner['items'] is List) {
+        return inner['items'] as List;
+      }
+      if (data['items'] is List) {
+        return data['items'] as List;
+      }
+    }
+    return [];
+  }
+
   @override
   Future<Either<Failure, List<Booking>>> getBookingsForTrip(
       String tripId) async {
     return apiClient.get<List<Booking>>(
       ApiEndpoints.bookings,
-      queryParameters: {'tripId': tripId},
+      queryParameters: {
+        'tripId': tripId,
+        'PageNumber': 1,
+        'PageSize': 100,
+      },
       fromJson: (data) {
-        if (data is! List) return <Booking>[];
-        return data
+        final items = _extractItems(data);
+        return items
             .map((json) => BookingModel.fromJson(json as Map<String, dynamic>))
             .toList();
       },
@@ -60,7 +78,6 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
 
   @override
   Future<Either<Failure, void>> markAsNoShow(String bookingId) async {
-    // improved: using cancel with specific reason for no-show
     return cancelBooking(bookingId, 'No Show');
   }
 }

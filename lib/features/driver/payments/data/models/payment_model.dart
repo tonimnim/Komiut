@@ -15,18 +15,16 @@ class PaymentModel extends Payment {
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
     return PaymentModel(
-      id: json['id'] as String,
+      id: json['id'] as String? ?? json['paymentId'] as String? ?? '',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'KES',
-      transactionTime: json['transactionTime'] != null
-          ? DateTime.parse(json['transactionTime'] as String)
-          : DateTime.now(),
-      payerName: json['payerName']
-          as String?, // Note: API might not return name directly, might need to derive or it's missing
+      transactionTime:
+          DateTime.tryParse(json['transactionTime'] as String? ?? '') ??
+              DateTime.now(),
+      payerName: json['payerName'] as String?,
       payerPhone: json['payerPhone'] as String?,
       status: json['status'] as String?,
-      vehicleRegistration: json['vehicleRegistration']
-          as String?, // If API returns it directly or flattened
+      vehicleRegistration: json['vehicleRegistration'] as String?,
       referenceId: json['referenceId'] as String?,
     );
   }

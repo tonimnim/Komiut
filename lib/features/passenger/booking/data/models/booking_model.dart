@@ -30,50 +30,70 @@ class BookingModel {
   });
 
   /// Creates from JSON map.
+  /// Handles both full schema and API's BookingDto (bookingId, pickupPointId, dropoffPointId, numeric status).
   factory BookingModel.fromJson(Map<String, dynamic> json) {
     return BookingModel(
-      id: json['id'] as String,
-      passengerId: json['passengerId'] as String,
-      tripId: json['tripId'] as String,
-      vehicleId: json['vehicleId'] as String,
-      routeId: json['routeId'] as String,
+      id: json['bookingId'] as String? ?? json['id'] as String? ?? '',
+      passengerId: json['passengerId'] as String? ?? '',
+      tripId: json['tripId'] as String? ?? '',
+      vehicleId: json['vehicleId'] as String? ?? '',
+      routeId: json['routeId'] as String? ?? '',
       seatNumber: json['seatNumber'] as int?,
-      pickupStopId: json['pickupStopId'] as String,
-      dropoffStopId: json['dropoffStopId'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      pickupStopId: json['pickupPointId'] as String? ??
+          json['pickupStopId'] as String? ??
+          '',
+      dropoffStopId: json['dropoffPointId'] as String? ??
+          json['dropoffStopId'] as String? ??
+          '',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       currency: json['currency'] as String? ?? 'KES',
-      status: _parseStatus(json['status'] as String?),
+      status: _parseStatus(json['status']),
       paymentId: json['paymentId'] as String?,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String) ?? DateTime.now()
           : DateTime.now(),
       confirmedAt: json['confirmedAt'] != null
-          ? DateTime.parse(json['confirmedAt'] as String)
+          ? DateTime.tryParse(json['confirmedAt'] as String)
           : null,
       expiresAt: json['expiresAt'] != null
-          ? DateTime.parse(json['expiresAt'] as String)
+          ? DateTime.tryParse(json['expiresAt'] as String)
           : null,
     );
   }
 
-  /// Parse status string to enum.
-  static BookingStatus _parseStatus(String? status) {
+  /// Parse status from string or numeric enum (API uses 0=Pending, 1=Confirmed, 2=Cancelled).
+  static BookingStatus _parseStatus(dynamic status) {
     if (status == null) return BookingStatus.pending;
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return BookingStatus.pending;
-      case 'confirmed':
-        return BookingStatus.confirmed;
-      case 'cancelled':
-      case 'canceled':
-        return BookingStatus.cancelled;
-      case 'completed':
-        return BookingStatus.completed;
-      case 'expired':
-        return BookingStatus.expired;
-      default:
-        return BookingStatus.pending;
+    if (status is int) {
+      switch (status) {
+        case 0:
+          return BookingStatus.pending;
+        case 1:
+          return BookingStatus.confirmed;
+        case 2:
+          return BookingStatus.cancelled;
+        default:
+          return BookingStatus.pending;
+      }
     }
+    if (status is String) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return BookingStatus.pending;
+        case 'confirmed':
+          return BookingStatus.confirmed;
+        case 'cancelled':
+        case 'canceled':
+          return BookingStatus.cancelled;
+        case 'completed':
+          return BookingStatus.completed;
+        case 'expired':
+          return BookingStatus.expired;
+        default:
+          return BookingStatus.pending;
+      }
+    }
+    return BookingStatus.pending;
   }
 
   /// Unique identifier.

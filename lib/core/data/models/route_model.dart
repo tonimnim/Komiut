@@ -28,15 +28,20 @@ class RouteModel {
   });
 
   /// Creates from JSON map.
+  /// Handles both full schema and minimal API schema (id, name, code, status, organizationId, createdAt).
   factory RouteModel.fromJson(Map<String, dynamic> json) {
+    // Parse status flexibly - API may return string or null
+    final statusRaw = json['status'];
+    final status = (statusRaw == 'active' || statusRaw == 'Active' || statusRaw == null)
+        ? OrganizationStatus.active
+        : OrganizationStatus.inactive;
+
     return RouteModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? 'Unknown Route',
       code: json['code'] as String?,
-      status: json['status'] == 'active'
-          ? OrganizationStatus.active
-          : OrganizationStatus.inactive,
-      organizationId: json['organizationId'] as String,
+      status: status,
+      organizationId: json['organizationId'] as String? ?? '',
       description: json['description'] as String?,
       startPoint: json['startPoint'] as String?,
       endPoint: json['endPoint'] as String?,
@@ -48,10 +53,10 @@ class RouteModel {
           : null,
       isActive: json['isActive'] as bool? ?? true,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'] as String)
+          ? DateTime.tryParse(json['createdAt'] as String)
           : null,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'] as String)
+          ? DateTime.tryParse(json['updatedAt'] as String)
           : null,
     );
   }

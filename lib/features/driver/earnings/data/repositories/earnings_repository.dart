@@ -22,8 +22,8 @@ abstract class EarningsRepository {
     required String vehicleId,
     DateTime? fromDate,
     DateTime? toDate,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   });
 }
 
@@ -44,8 +44,8 @@ class EarningsRepositoryImpl implements EarningsRepository {
     required String vehicleId,
     DateTime? fromDate,
     DateTime? toDate,
-    int? pageNumber,
-    int? pageSize,
+    int pageNumber = 1,
+    int pageSize = 20,
   }) {
     return remoteDataSource.getEarningsHistory(
       vehicleId: vehicleId,

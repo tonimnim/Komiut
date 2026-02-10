@@ -53,7 +53,7 @@ class NotificationEntity {
       case NotificationType.system:
         return IconType.system;
       case NotificationType.queue:
-        return IconType.system; // Fallback or add new icon type
+        return IconType.system;
       case NotificationType.assignment:
         return IconType.trip;
     }

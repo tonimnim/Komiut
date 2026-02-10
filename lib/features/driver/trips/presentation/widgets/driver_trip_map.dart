@@ -41,9 +41,13 @@ class _DriverTripMapState extends ConsumerState<DriverTripMap> {
   static const _defaultPosition = LatLng(-1.2921, 36.8219);
 
   @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     // Get current driver position (mock for now, will use GPS later)
     final driverPosition = _getDriverPosition();
 
@@ -56,7 +60,7 @@ class _DriverTripMapState extends ConsumerState<DriverTripMap> {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -210,7 +214,7 @@ class _DriverMarker extends StatelessWidget {
         border: Border.all(color: Colors.white, width: 3),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryBlue.withOpacity(0.4),
+            color: AppColors.primaryBlue.withValues(alpha: 0.4),
             blurRadius: 12,
             spreadRadius: 4,
           ),
@@ -268,7 +272,7 @@ class _MapControlButton extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
           ],
         ),
         child: Icon(icon, size: 20, color: AppColors.textPrimary),
@@ -292,7 +296,7 @@ class _TripInfoChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primaryGreen.withOpacity(0.3),
+            color: AppColors.primaryGreen.withValues(alpha: 0.3),
             blurRadius: 8,
           ),
         ],
