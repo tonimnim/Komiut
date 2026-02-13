@@ -79,8 +79,7 @@ final activeTripProvider = FutureProvider<DriverTrip?>((ref) async {
 });
 
 /// Notifier that accumulates trip history pages.
-class TripsHistoryNotifier
-    extends StateNotifier<AsyncValue<List<DriverTrip>>> {
+class TripsHistoryNotifier extends StateNotifier<AsyncValue<List<DriverTrip>>> {
   TripsHistoryNotifier(this._ref) : super(const AsyncValue.loading()) {
     _load();
   }
@@ -134,8 +133,7 @@ class TripsHistoryNotifier
         (newItems) {
           _currentPage = page;
           _hasMore = newItems.length >= 20;
-          final existing =
-              replace ? <DriverTrip>[] : (state.value ?? []);
+          final existing = replace ? <DriverTrip>[] : (state.value ?? []);
           state = AsyncValue.data([...existing, ...newItems]);
         },
       );
@@ -148,8 +146,9 @@ class TripsHistoryNotifier
 }
 
 /// Provider for the driver's trip history with pagination accumulation.
-final tripsHistoryProvider = StateNotifierProvider<TripsHistoryNotifier,
-    AsyncValue<List<DriverTrip>>>((ref) {
+final tripsHistoryProvider =
+    StateNotifierProvider<TripsHistoryNotifier, AsyncValue<List<DriverTrip>>>(
+        (ref) {
   // Re-create when filter changes
   ref.watch(selectedTripFilterProvider);
   return TripsHistoryNotifier(ref);

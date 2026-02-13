@@ -26,6 +26,49 @@ final routesProvider = FutureProvider<List<RouteEntity>>((ref) async {
   return remoteResult.fold(
     (failure) => throw Exception(failure.message),
     (routes) {
+      if (routes.isEmpty) {
+        // Mock Data for Testing Queue Flow
+        return const [
+          RouteEntity(
+            id: 1,
+            name: 'Town - Westlands',
+            startPoint: 'CBD',
+            endPoint: 'Westlands',
+            stopsCount: 5,
+            durationMinutes: 20,
+            baseFare: 50.0,
+            farePerStop: 10.0,
+            currency: 'KES',
+            stops: ['Khoja', 'Museum', 'Westlands'],
+            isFavorite: true,
+            isPopular: true,
+          ),
+          RouteEntity(
+            id: 2,
+            name: 'Town - Upperhill',
+            startPoint: 'CBD',
+            endPoint: 'Upperhill',
+            stopsCount: 4,
+            durationMinutes: 15,
+            baseFare: 40.0,
+            farePerStop: 10.0,
+            currency: 'KES',
+            stops: ['Railways', 'Community', 'Upperhill'],
+          ),
+          RouteEntity(
+            id: 3,
+            name: 'Town - Kilimani',
+            startPoint: 'CBD',
+            endPoint: 'Kilimani',
+            stopsCount: 8,
+            durationMinutes: 30,
+            baseFare: 70.0,
+            farePerStop: 5.0,
+            currency: 'KES',
+            stops: ['GPO', 'Community', 'Hurlingham', 'Yaya'],
+          ),
+        ];
+      }
       return routes.map((route) {
         return _transportRouteToEntity(route);
       }).toList();

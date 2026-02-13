@@ -1,14 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../theme/app_colors.dart';
-import '../drawers/profile_drawer.dart';
-import '../../../features/driver/dashboard/presentation/screens/driver_home_screen.dart';
-import '../../../features/driver/earnings/presentation/screens/earnings_screen.dart';
-import '../../../features/driver/trips/presentation/screens/driver_trips_screen.dart';
-import '../../../features/driver/bookings/presentation/screens/bookings_screen.dart';
+import 'package:komiut/core/theme/app_colors.dart';
+import 'package:komiut/core/theme/app_icons.dart';
+import 'package:komiut/core/widgets/drawers/profile_drawer.dart';
+import 'package:komiut/features/driver/dashboard/presentation/screens/driver_home_screen.dart';
+import 'package:komiut/features/driver/earnings/presentation/screens/earnings_screen.dart';
+import 'package:komiut/features/driver/trips/presentation/screens/driver_trips_screen.dart';
+import 'package:komiut/features/driver/queue/presentation/screens/queue_screen.dart';
 
-import 'driver_navigation_keys.dart';
+import 'package:komiut/core/widgets/navigation/driver_navigation_keys.dart';
 
 final driverNavigationIndexProvider = StateProvider<int>((ref) => 0);
 
@@ -28,12 +29,11 @@ class DriverMainNavigation extends ConsumerWidget {
         index: currentIndex,
         children: const [
           DriverHomeContent(),
-          BookingsScreen(),
+          QueueContent(),
           DriverTripsContent(),
           EarningsContent(),
         ],
       ),
-      extendBody: true,
       bottomNavigationBar: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
@@ -58,8 +58,8 @@ class DriverMainNavigation extends ConsumerWidget {
                     _DriverNavItem(
                       index: 0,
                       currentIndex: currentIndex,
-                      icon: Icons.home_outlined,
-                      activeIcon: Icons.home,
+                      icon: AppIcons.homeOutlined,
+                      activeIcon: AppIcons.home,
                       label: 'Home',
                       onTap: () => ref
                           .read(driverNavigationIndexProvider.notifier)
@@ -68,9 +68,9 @@ class DriverMainNavigation extends ConsumerWidget {
                     _DriverNavItem(
                       index: 1,
                       currentIndex: currentIndex,
-                      icon: Icons.map_outlined,
-                      activeIcon: Icons.map,
-                      label: 'Bookings',
+                      icon: AppIcons.queueOutlined,
+                      activeIcon: AppIcons.queue,
+                      label: 'Queue',
                       onTap: () => ref
                           .read(driverNavigationIndexProvider.notifier)
                           .state = 1,
@@ -78,8 +78,8 @@ class DriverMainNavigation extends ConsumerWidget {
                     _DriverNavItem(
                       index: 2,
                       currentIndex: currentIndex,
-                      icon: Icons.directions_bus_outlined,
-                      activeIcon: Icons.directions_bus,
+                      icon: AppIcons.tripsOutlined,
+                      activeIcon: AppIcons.trips,
                       label: 'Trips',
                       onTap: () => ref
                           .read(driverNavigationIndexProvider.notifier)
@@ -88,8 +88,8 @@ class DriverMainNavigation extends ConsumerWidget {
                     _DriverNavItem(
                       index: 3,
                       currentIndex: currentIndex,
-                      icon: Icons.account_balance_wallet_outlined,
-                      activeIcon: Icons.account_balance_wallet,
+                      icon: AppIcons.earningsOutlined,
+                      activeIcon: AppIcons.earnings,
                       label: 'Earnings',
                       onTap: () => ref
                           .read(driverNavigationIndexProvider.notifier)

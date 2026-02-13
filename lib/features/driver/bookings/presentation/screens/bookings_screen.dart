@@ -4,16 +4,16 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../../core/theme/app_colors.dart';
-import '../../domain/entities/booking.dart';
-import '../../../trips/domain/entities/driver_trip.dart';
-import '../../../trips/presentation/providers/trips_providers.dart';
-import '../providers/bookings_providers.dart';
-import '../widgets/passenger_booking_card.dart';
-import '../../../../../shared/widgets/komiut_map.dart';
-import '../../../../../core/widgets/error_widget.dart';
-import '../../../../../core/widgets/empty_state_widget.dart';
-import '../../../../../core/widgets/loading/shimmer_loading.dart';
+import 'package:komiut/core/theme/app_colors.dart';
+import 'package:komiut/features/driver/bookings/domain/entities/booking.dart';
+import 'package:komiut/features/driver/trips/domain/entities/driver_trip.dart';
+import 'package:komiut/features/driver/trips/presentation/providers/trips_providers.dart';
+import 'package:komiut/features/driver/bookings/presentation/providers/bookings_providers.dart';
+import 'package:komiut/features/driver/bookings/presentation/widgets/passenger_booking_card.dart';
+import 'package:komiut/shared/widgets/komiut_map.dart';
+import 'package:komiut/core/widgets/error_widget.dart';
+import 'package:komiut/core/widgets/empty_state_widget.dart';
+import 'package:komiut/core/widgets/loading/shimmer_loading.dart';
 
 class BookingsScreen extends ConsumerStatefulWidget {
   const BookingsScreen({super.key});

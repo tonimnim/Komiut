@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../core/theme/app_colors.dart'; // Used in mock state
+import 'package:komiut/core/theme/app_colors.dart';
 
 class KomiutMap extends StatelessWidget {
   final LatLng initialPosition;

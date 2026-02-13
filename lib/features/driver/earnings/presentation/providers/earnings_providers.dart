@@ -42,7 +42,8 @@ enum EarningsPeriod {
         DateTime(now.year, now.month, now.day - now.weekday + 1),
       EarningsPeriod.thisMonth => DateTime(now.year, now.month, 1),
       EarningsPeriod.allTime => DateTime(2020, 1, 1), // Far past date
-      EarningsPeriod.custom => DateTime(now.year, now.month, now.day), // Default
+      EarningsPeriod.custom =>
+        DateTime(now.year, now.month, now.day), // Default
     };
   }
 
@@ -98,8 +99,7 @@ final earningsSummaryProvider = FutureProvider<EarningsSummary>((ref) async {
 /// Notifier that accumulates earnings history pages.
 class EarningsHistoryNotifier
     extends StateNotifier<AsyncValue<List<EarningsTransaction>>> {
-  EarningsHistoryNotifier(this._ref)
-      : super(const AsyncValue.loading()) {
+  EarningsHistoryNotifier(this._ref) : super(const AsyncValue.loading()) {
     _load();
   }
 
@@ -167,7 +167,8 @@ class EarningsHistoryNotifier
         (newItems) {
           _currentPage = page;
           _hasMore = newItems.length >= 20;
-          final existing = replace ? <EarningsTransaction>[] : (state.value ?? []);
+          final existing =
+              replace ? <EarningsTransaction>[] : (state.value ?? []);
           state = AsyncValue.data([...existing, ...newItems]);
         },
       );
@@ -205,7 +206,9 @@ final hasMoreEarningsProvider = Provider<bool>((ref) {
 /// Use this on the home screen instead of full summary provider
 /// to minimize rebuilds.
 final todayEarningsProvider = Provider<AsyncValue<double>>((ref) {
-  return ref.watch(earningsSummaryProvider).whenData((summary) => summary.today);
+  return ref
+      .watch(earningsSummaryProvider)
+      .whenData((summary) => summary.today);
 });
 
 /// Provider for today's earnings formatted for display.

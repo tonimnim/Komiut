@@ -22,17 +22,20 @@ import '../../domain/entities/queue_position.dart';
 ///
 /// Depends on [driverProfileProvider] to get the vehicleId.
 final driverQueuePositionProvider = FutureProvider<QueuePosition?>((ref) async {
+  // Check mock state first (for testing flow)
+  final mockPos = ref.watch(mockCurrentPositionProvider);
+  if (mockPos != null) return mockPos;
+
   final profile = await ref.watch(driverProfileProvider.future);
 
-  if (!profile.hasVehicle) {
-    return null;
-  }
+  final vehicleId = profile.vehicleId;
+  if (vehicleId == null) return null; // No vehicle assigned
 
   final repository = ref.watch(queueRepositoryProvider);
-  final result = await repository.getQueuePosition(profile.vehicleId!);
+  final result = await repository.getQueuePosition(vehicleId);
 
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => null, // Not in queue or error
     (position) => position,
   );
 });
@@ -59,7 +62,8 @@ final routeQueueProvider =
 /// Provider for whether the driver is currently in a queue.
 final isInQueueProvider = Provider<bool>((ref) {
   final positionAsync = ref.watch(driverQueuePositionProvider);
-  return positionAsync.whenOrNull(data: (position) => position != null) ?? false;
+  return positionAsync.whenOrNull(data: (position) => position != null) ??
+      false;
 });
 
 /// Provider for the driver's position number in queue.
@@ -125,9 +129,40 @@ final selectedRouteIdProvider = StateProvider<String?>((ref) => null);
 /// Provider for tracking queue operation loading state.
 final queueOperationLoadingProvider = StateProvider<bool>((ref) => false);
 
+/// Passenger count while loading passengers.
+final passengerCountProvider = StateProvider<int>((ref) => 0);
+
+/// Whether the driver is currently in the "loading passengers" phase.
+///
+/// This is a local UI state: after position=1, the driver taps
+/// "Start Loading" which flips this to true. The UI then shows the
+/// passenger counter and "Start Trip" button.
+final isLoadingPassengersProvider = StateProvider<bool>((ref) => false);
+
+/// Vehicle max capacity (mock value for now).
+final vehicleMaxCapacityProvider = StateProvider<int>((ref) => 14);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// External State Mocks (Simulating Home Screen)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Mock provider for passenger count set externally (e.g. from Home Screen).
+final mockExternalPassengerCountProvider = StateProvider<int>((ref) => 0);
+
+/// Computed provider to check if vehicle is full based on external state.
+final isVehicleFullProvider = Provider<bool>((ref) {
+  final current = ref.watch(mockExternalPassengerCountProvider);
+  final max = ref.watch(vehicleMaxCapacityProvider);
+  return current >= max;
+});
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Action Providers
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Mock state for debugging flow (so we can test without real backend)
+final mockCurrentPositionProvider =
+    StateProvider<QueuePosition?>((ref) => null);
 
 /// Provider for joining a queue.
 ///
@@ -140,35 +175,56 @@ final queueOperationLoadingProvider = StateProvider<bool>((ref) => false);
 /// ```
 final joinQueueProvider =
     FutureProvider.family<QueuePosition, String>((ref, routeId) async {
+  // Mock logic for testing with mock routes
+  if (['1', '2', '3'].contains(routeId)) {
+    await Future.delayed(const Duration(seconds: 1)); // Fake network delay
+
+    // Map mock route IDs to names
+    final routeNames = {
+      '1': 'Town - Westlands',
+      '2': 'Town - Upperhill',
+      '3': 'Town - Kilimani',
+    };
+
+    final newPosition = QueuePosition(
+      id: 'mock-pos-$routeId',
+      position: 4, // Start at position 4
+      routeId: routeId,
+      routeName: routeNames[routeId] ?? 'Route $routeId',
+      joinedAt: DateTime.now(),
+      status: QueueStatus.waiting,
+      estimatedWaitMinutes: 20,
+      vehiclesAhead: 3,
+      vehicleRegistration: 'KDA 001K', // Mock plate
+    );
+
+    // Update local mock state
+    ref.read(mockCurrentPositionProvider.notifier).state = newPosition;
+    ref.invalidate(driverQueuePositionProvider);
+    return newPosition;
+  }
+
   final profile = await ref.watch(driverProfileProvider.future);
 
-  if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to captain');
+  final vehicleId = profile.vehicleId;
+  if (vehicleId == null) {
+    throw Exception('No vehicle assigned. Please contact your organization.');
   }
 
-  // Set loading state
-  ref.read(queueOperationLoadingProvider.notifier).state = true;
+  final repository = ref.watch(queueRepositoryProvider);
+  final result = await repository.joinQueue(
+    vehicleId: vehicleId,
+    routeId: routeId,
+  );
 
-  try {
-    final repository = ref.watch(queueRepositoryProvider);
-    final result = await repository.joinQueue(
-      vehicleId: profile.vehicleId!,
-      routeId: routeId,
-    );
-
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (position) {
-        // Update selected route
-        ref.read(selectedRouteIdProvider.notifier).state = routeId;
-        // Refresh queue position
-        ref.invalidate(driverQueuePositionProvider);
-        return position;
-      },
-    );
-  } finally {
-    ref.read(queueOperationLoadingProvider.notifier).state = false;
-  }
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (position) {
+      // Refresh current position
+      ref.invalidate(driverQueuePositionProvider);
+      return position;
+    },
+  );
 });
 
 /// Provider for leaving the current queue.
@@ -180,31 +236,31 @@ final joinQueueProvider =
 /// await ref.read(leaveQueueProvider.future);
 /// ```
 final leaveQueueProvider = FutureProvider<void>((ref) async {
+  // Clear mock state if exists
+  if (ref.read(mockCurrentPositionProvider) != null) {
+    await Future.delayed(const Duration(milliseconds: 500));
+    ref.read(mockCurrentPositionProvider.notifier).state = null;
+    ref.invalidate(driverQueuePositionProvider);
+    return;
+  }
+
   final profile = await ref.watch(driverProfileProvider.future);
 
-  if (!profile.hasVehicle) {
-    throw Exception('No vehicle assigned to captain');
+  final vehicleId = profile.vehicleId;
+  if (vehicleId == null) {
+    throw Exception('No vehicle assigned. Please contact your organization.');
   }
 
-  // Set loading state
-  ref.read(queueOperationLoadingProvider.notifier).state = true;
+  final repository = ref.watch(queueRepositoryProvider);
+  final result = await repository.leaveQueue(vehicleId);
 
-  try {
-    final repository = ref.watch(queueRepositoryProvider);
-    final result = await repository.leaveQueue(profile.vehicleId!);
-
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) {
-        // Clear selected route
-        ref.read(selectedRouteIdProvider.notifier).state = null;
-        // Refresh queue position
-        ref.invalidate(driverQueuePositionProvider);
-      },
-    );
-  } finally {
-    ref.read(queueOperationLoadingProvider.notifier).state = false;
-  }
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (_) {
+      // Refresh current position
+      ref.invalidate(driverQueuePositionProvider);
+    },
+  );
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

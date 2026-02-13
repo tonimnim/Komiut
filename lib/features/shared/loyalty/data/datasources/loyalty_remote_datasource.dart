@@ -123,7 +123,7 @@ class LoyaltyRemoteDataSourceImpl implements LoyaltyRemoteDataSource {
     required String bookingId,
   }) async {
     // Not available in current API
-    return Left(ServerFailure('Redemption not yet supported'));
+    return const Left(ServerFailure('Redemption not yet supported'));
   }
 
   @override
